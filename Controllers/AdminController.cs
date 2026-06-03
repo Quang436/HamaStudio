@@ -484,7 +484,8 @@ namespace HamaStudio.Controllers
                     l.SoLichConLai,
                     l.GhiChu,
                     l.TrangThai,
-                    NgayTao = l.NgayTao.HasValue ? l.NgayTao.Value.ToString("dd/MM/yyyy HH:mm") : ""
+                    NgayTao = l.NgayTao.HasValue ? l.NgayTao.Value.ToString("dd/MM/yyyy HH:mm") : "",
+                    SoKhungGio = db.KhungGioLiches.Count(k => k.MaLichChup == l.MaLichChup)
                 });
 
             return Json(list, JsonRequestBehavior.AllowGet);
@@ -499,8 +500,8 @@ namespace HamaStudio.Controllers
                 return Json(new { success = false, message = "Invalid date format" });
 
             // Check if date already exists for this service
-            var existing = db.LichChups.FirstOrDefault(l => 
-                l.MaDichVu == maDichVu && 
+            var existing = db.LichChups.FirstOrDefault(l =>
+                l.MaDichVu == maDichVu &&
                 l.NgayChup == date.Date &&
                 l.TrangThai != "Đã hủy");
 
@@ -536,7 +537,7 @@ namespace HamaStudio.Controllers
                 return Json(new { success = false, message = "Invalid date format" });
 
             var lichChup = db.LichChups.Find(maLichChup);
-            if (lichChup == null) 
+            if (lichChup == null)
                 return Json(new { success = false, message = "Not found" });
 
             // Check for duplicate date for same service (excluding current record)
@@ -579,7 +580,7 @@ namespace HamaStudio.Controllers
             if (!IsAdmin()) return Json(new { success = false });
 
             var lichChup = db.LichChups.Find(maLichChup);
-            if (lichChup == null) 
+            if (lichChup == null)
                 return Json(new { success = false });
 
             // Check if there are confirmed bookings
@@ -665,6 +666,125 @@ namespace HamaStudio.Controllers
             if (!IsAdmin()) return Json(new { success = false }, JsonRequestBehavior.AllowGet);
             var list = db.DanhMucDichVus.Select(d => new { d.MaDanhMuc, d.TenDanhMuc }).ToList();
             return Json(list, JsonRequestBehavior.AllowGet);
+        }
+
+        // ─────────────────────────────────────────────
+        // QUẢN LÝ KHUNG GIỜ (KhungGioLich)
+        // ─────────────────────────────────────────────
+        [HttpGet]
+        public JsonResult GetKhungGioByLich(int maLichChup)
+        {
+            if (!IsAdmin()) return Json(new { success = false }, JsonRequestBehavior.AllowGet);
+
+            var list = db.KhungGioLiches
+                .Where(k => k.MaLichChup == maLichChup)
+                .OrderBy(k => k.GioBatDau)
+                .ToList()
+                .Select(k => new
+                {
+                    k.MaKhungGio,
+                    k.MaLichChup,
+                    k.GioBatDau,
+                    k.GioKetThuc,
+                    k.TrangThai,
+                    k.GhiChu,
+                    NgayTao = k.NgayTao.HasValue ? k.NgayTao.Value.ToString("dd/MM/yyyy HH:mm") : ""
+                });
+
+            return Json(list, JsonRequestBehavior.AllowGet);
+        }
+
+        [HttpPost]
+        public JsonResult ThemKhungGio(int maLichChup, string gioBatDau, string gioKetThuc, string ghiChu)
+        {
+            if (!IsAdmin()) return Json(new { success = false });
+
+            var existing = db.KhungGioLiches.FirstOrDefault(k => k.MaLichChup == maLichChup && k.GioBatDau == gioBatDau && k.GioKetThuc == gioKetThuc);
+            if (existing != null)
+                return Json(new { success = false, message = "Khung giờ này đã tồn tại trong lịch chụp!" });
+
+            var khungGio = new KhungGioLich
+            {
+                MaLichChup = maLichChup,
+                GioBatDau = gioBatDau,
+                GioKetThuc = gioKetThuc,
+                TrangThai = "Hoạt động",
+                GhiChu = ghiChu,
+                NgayTao = DateTime.Now
+            };
+            db.KhungGioLiches.Add(khungGio);
+            db.SaveChanges();
+            return Json(new { success = true, id = khungGio.MaKhungGio });
+        }
+
+        [HttpPost]
+        public JsonResult KhoaKhungGio(int maKhungGio, string lyDo)
+        {
+            if (!IsAdmin()) return Json(new { success = false });
+
+            var khungGio = db.KhungGioLiches.Find(maKhungGio);
+            if (khungGio == null) return Json(new { success = false, message = "Không tìm thấy khung giờ" });
+
+            khungGio.TrangThai = (khungGio.TrangThai == "Hoạt động") ? "Đã khóa" : "Hoạt động";
+            if (!string.IsNullOrEmpty(lyDo)) khungGio.GhiChu = lyDo;
+            db.SaveChanges();
+
+            return Json(new { success = true, trangThaiMoi = khungGio.TrangThai });
+        }
+
+        [HttpPost]
+        public JsonResult XoaKhungGio(int maKhungGio)
+        {
+            if (!IsAdmin()) return Json(new { success = false });
+
+            var khungGio = db.KhungGioLiches.Find(maKhungGio);
+            if (khungGio == null) return Json(new { success = false });
+
+            db.KhungGioLiches.Remove(khungGio);
+            db.SaveChanges();
+            return Json(new { success = true });
+        }
+
+        /// <summary>API cho user booking: lấy khung giờ theo ngày + dịch vụ</summary>
+        [HttpGet]
+        public JsonResult GetKhungGioAvailable(string date, int serviceId)
+        {
+            if (string.IsNullOrEmpty(date))
+                return Json(new { success = false }, JsonRequestBehavior.AllowGet);
+
+            if (!DateTime.TryParse(date, out DateTime parsedDate))
+                return Json(new { success = false }, JsonRequestBehavior.AllowGet);
+
+            var lichChup = db.LichChups
+                .Where(lc => lc.MaDichVu == serviceId
+                    && DbFunctions.TruncateTime(lc.NgayChup) == DbFunctions.TruncateTime(parsedDate)
+                    && lc.TrangThai != "Đã hủy")
+                .FirstOrDefault();
+
+            if (lichChup == null)
+                return Json(new { success = true, hasSchedule = false, slots = new object[0] }, JsonRequestBehavior.AllowGet);
+
+            var slots = db.KhungGioLiches
+                .Where(k => k.MaLichChup == lichChup.MaLichChup)
+                .OrderBy(k => k.GioBatDau)
+                .ToList()
+                .Select(k => new
+                {
+                    k.GioBatDau,
+                    k.GioKetThuc,
+                    isLocked = k.TrangThai == "Đã khóa",
+                    k.GhiChu
+                })
+                .ToList();
+
+            return Json(new
+            {
+                success = true,
+                hasSchedule = true,
+                maLichChup = lichChup.MaLichChup,
+                soLichConLai = lichChup.SoLichConLai,
+                slots
+            }, JsonRequestBehavior.AllowGet);
         }
 
         protected override void Dispose(bool disposing)

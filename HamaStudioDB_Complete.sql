@@ -127,10 +127,20 @@ CREATE TABLE LichChup (
     TrangThai NVARCHAR(20) DEFAULT N'Hoạt động'
 );
 
+-- ✨ NEW TABLE: KhungGioLich (Time Slots for each schedule)
+CREATE TABLE KhungGioLich (
+    MaKhungGio   INT PRIMARY KEY IDENTITY(1,1),
+    MaLichChup   INT NOT NULL FOREIGN KEY REFERENCES LichChup(MaLichChup),
+    GioBatDau    NVARCHAR(10) NOT NULL,
+    GioKetThuc   NVARCHAR(10) NOT NULL,
+    TrangThai    NVARCHAR(20) DEFAULT N'Hoạt động',
+    GhiChu       NVARCHAR(500),
+    NgayTao      DATETIME DEFAULT GETDATE()
+);
+
 -- Thêm cột MaLichChup vào bảng DatLich
 ALTER TABLE DatLich ADD MaLichChup INT;
 ALTER TABLE DatLich ADD FOREIGN KEY (MaLichChup) REFERENCES LichChup(MaLichChup);
-
 GO
 
 -----------------------------------------------------------
@@ -386,8 +396,17 @@ INSERT INTO LichChup (MaDichVu, NgayChup, SoLichToiDa, SoLichConLai, GhiChu, Nga
 (5, DATEADD(DAY, 12, CAST(GETDATE() AS DATE)), 5, 4, N'Studio 1 - Gia đình', DATEADD(DAY, -1, GETDATE()), N'Hoạt động'),
 (6, DATEADD(DAY, 20, CAST(GETDATE() AS DATE)), 3, 3, N'Nhà khách hàng - Natural light', DATEADD(DAY, -5, GETDATE()), N'Hoạt động'),
 (7, DATEADD(DAY, 21, CAST(GETDATE() AS DATE)), 2, 1, N'Studio 2 - Product lighting setup', DATEADD(DAY, -3, GETDATE()), N'Hoạt động'),
-(8, DATEADD(DAY, 16, CAST(GETDATE() AS DATE)), 4, 3, N'Bán đảo Sơn Trà - Golden hour', DATEADD(DAY, -2, GETDATE()), N'Hoạt động'),
+(9, DATEADD(DAY, 16, CAST(GETDATE() AS DATE)), 4, 3, N'Bán đảo Sơn Trà - Golden hour', DATEADD(DAY, -2, GETDATE()), N'Hoạt động'),
 (9, DATEADD(DAY, 25, CAST(GETDATE() AS DATE)), 3, 1, N'Studio 2 - Background xám đen', DATEADD(DAY, -6, GETDATE()), N'Hoạt động');
+
+-- Insert KhungGioLich (Time Slots)
+INSERT INTO KhungGioLich (MaLichChup, GioBatDau, GioKetThuc, GhiChu) VALUES
+(1, '08:00', '10:00', N'Ca sáng 1'),
+(1, '10:00', '12:00', N'Ca sáng 2'),
+(1, '14:00', '16:00', N'Ca chiều'),
+(2, '08:30', '11:00', N'Chụp ngoại cảnh'),
+(3, '07:00', '11:30', N'Ekip 1'),
+(3, '13:00', '17:30', N'Ekip 2');
 
 GO
 

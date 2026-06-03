@@ -4,9 +4,12 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,600;0,700;1,400&display=swap" rel="stylesheet">
+<link
+    href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,600;0,700;1,400&display=swap"
+    rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
 
 <style>
     :root {
@@ -176,7 +179,7 @@
     .booking-pkg-card:hover {
         border-color: var(--accent-gold);
         transform: translateY(-3px);
-        box-shadow: 0 10px 20px rgba(0,0,0,0.03);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.03);
     }
 
     .booking-pkg-card.selected {
@@ -204,12 +207,12 @@
     .booking-pkg-card {
         max-height: 200px;
         transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1),
-                    opacity 0.3s ease,
-                    border-width 0.2s ease,
-                    margin 0.3s ease,
-                    transform 0.35s cubic-bezier(0.4, 0, 0.2, 1),
-                    border-color 0.25s ease,
-                    box-shadow 0.25s ease;
+            opacity 0.3s ease,
+            border-width 0.2s ease,
+            margin 0.3s ease,
+            transform 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+            border-color 0.25s ease,
+            box-shadow 0.25s ease;
     }
 
     /* Badge on selected card */
@@ -248,7 +251,10 @@
         padding: 4px 0 2px;
         transition: color 0.2s;
     }
-    #pkgCollapseHint:hover { color: var(--accent-gold); }
+
+    #pkgCollapseHint:hover {
+        color: var(--accent-gold);
+    }
 
     /* ===== INPUTS & EXTRAS ===== */
     .input-luxury {
@@ -270,24 +276,39 @@
 
     /* ===== CUSTOM MODAL ===== */
     .custom-modal-overlay {
-        position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-        background: rgba(0,0,0,0.4);
-        display: flex; align-items: center; justify-content: center;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.4);
+        display: flex;
+        align-items: center;
+        justify-content: center;
         z-index: 9999;
-        opacity: 0; visibility: hidden;
+        opacity: 0;
+        visibility: hidden;
         transition: all 0.3s ease;
         backdrop-filter: blur(4px);
     }
+
     .custom-modal-overlay.active {
-        opacity: 1; visibility: visible;
+        opacity: 1;
+        visibility: visible;
     }
+
     .custom-modal-box {
-        background: #fff; padding: 40px 30px; border-radius: 16px;
-        text-align: center; max-width: 380px; width: 90%;
+        background: #fff;
+        padding: 40px 30px;
+        border-radius: 16px;
+        text-align: center;
+        max-width: 380px;
+        width: 90%;
         transform: translateY(-20px) scale(0.95);
         transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
     }
+
     .custom-modal-overlay.active .custom-modal-box {
         transform: translateY(0) scale(1);
     }
@@ -315,7 +336,7 @@
         background: white;
         border-radius: var(--card-radius);
         padding: 35px;
-        box-shadow: 0 15px 35px rgba(0,0,0,0.03);
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.03);
         border: 1px solid #f0f0f0;
     }
 
@@ -520,9 +541,9 @@
 
             @if (ViewBag.Error != null)
             {
-                    <div class="alert alert-danger shadow-sm border-0 mb-4 rounded-3 text-center">
-                        <i class="bi bi-exclamation-triangle-fill me-2"></i> @ViewBag.Error
-                    </div>
+                <div class="alert alert-danger shadow-sm border-0 mb-4 rounded-3 text-center">
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i> @ViewBag.Error
+                </div>
             }
 
             <div class="row g-5">
@@ -535,7 +556,8 @@
                         </div>
                         <div class="search-wrapper">
                             <i class="bi bi-search search-icon"></i>
-                            <input type="text" id="pkgSearch" class="search-input" placeholder="Tìm kiếm gói chụp nhanh..." oninput="filterPackages()">
+                            <input type="text" id="pkgSearch" class="search-input"
+                                placeholder="Tìm kiếm gói chụp nhanh..." oninput="filterPackages()">
                         </div>
 
                         <div id="packageList" class="d-flex flex-column gap-3">
@@ -551,22 +573,36 @@
 
                                 {
 
-                                    var addonsJson = Newtonsoft.Json.JsonConvert.SerializeObject((svc.DichVuBoSungs ?? new List<HamaStudio.Models.DichVuBoSung>()).Select(a => new { MaDVBS = a.MaDVBS, TenDVBS = a.TenDVBS, GiaTien = (double)a.GiaTien, MoTa = a.MoTa }));
-                                            <div class="booking-pkg-card @(selectedId == svc.MaDichVu ? "selected" : "")" data-id="@svc.MaDichVu" data-price="@svc.GiaTien" data-addons='@Html.Raw(addonsJson)' onclick="selectPackage(this)">
-                                                <img src="@(string.IsNullOrEmpty(svc.LinkAnhDaiDien) ? Url.Content("~/Content/Images/default.jpg") : (svc.LinkAnhDaiDien.StartsWith("http") ? svc.LinkAnhDaiDien : Url.Content("~/Content/Images/" + svc.LinkAnhDaiDien)))" onerror="this.src='https://images.unsplash.com/photo-1519225421980-715cb0215aed?w=300'" alt="@svc.TenDichVu" />
-                                                <div class="pkg-content position-relative">
-                                                    <span class="pkg-selected-badge"><i class="bi bi-check-lg"></i> Đã chọn</span>
-                                                    <h6 class="serif fw-bold mb-1 pkg-name">@svc.TenDichVu</h6>
-                                                    <p class="text-muted small mb-2 pkg-description">@svc.MoTa</p>
-                                                    <div class="fw-bold text-dark">@svc.GiaTien.ToString("N0") ₫</div>
-                                                </div>
-                                            </div>
+                                    var addonsJson = Newtonsoft.Json.JsonConvert.SerializeObject((svc.DichVuBoSungs ?? new
+                                    List<HamaStudio.Models.DichVuBoSung>()).Select(a => new
+                                    {
+                                        MaDVBS = a.MaDVBS,
+                                        TenDVBS =
+                                    a.TenDVBS,
+                                        GiaTien = (double)a.GiaTien,
+                                        MoTa = a.MoTa
+                                    }));
+                                    <div class="booking-pkg-card @(selectedId == svc.MaDichVu ? "selected" : "")"
+                                        data-id="@svc.MaDichVu" data-price="@svc.GiaTien" data-addons='@Html.Raw(addonsJson)'
+                                        onclick="selectPackage(this)">
+                                        <img src="@(string.IsNullOrEmpty(svc.LinkAnhDaiDien) ? Url.Content("~/Content/Images/default.jpg") : (svc.LinkAnhDaiDien.StartsWith("http") ? svc.LinkAnhDaiDien : Url.Content("~/Content/Images/" + svc.LinkAnhDaiDien)))"
+                                            onerror="this.src='https://images.unsplash.com/photo-1519225421980-715cb0215aed?w=300'"
+                                            alt="@svc.TenDichVu" />
+                                        <div class="pkg-content position-relative">
+                                            <span class="pkg-selected-badge"><i class="bi bi-check-lg"></i> Đã chọn</span>
+                                            <h6 class="serif fw-bold mb-1 pkg-name">@svc.TenDichVu</h6>
+                                            <p class="text-muted small mb-2 pkg-description">@svc.MoTa</p>
+                                            <div class="fw-bold text-dark">@svc.GiaTien.ToString("N0") ₫</div>
+                                        </div>
+                                    </div>
                                 }
 
                             }
                         </div>
-                        <p id="pkgCollapseHint" onclick="expandAllPackages()"><i class="bi bi-chevron-down me-1"></i> Xem tất cả gói chụp khác</p>
-                        <p id="noResults" class="text-muted mt-3 text-center" style="display:none;">Không tìm thấy gói phù hợp...</p>
+                        <p id="pkgCollapseHint" onclick="expandAllPackages()"><i class="bi bi-chevron-down me-1"></i>
+                            Xem tất cả gói chụp khác</p>
+                        <p id="noResults" class="text-muted mt-3 text-center" style="display:none;">Không tìm thấy gói
+                            phù hợp...</p>
                     </div>
 
                     <!-- 2. Dịch Vụ Bổ Sung -->
@@ -585,23 +621,31 @@
                             <div style="display: none;">
                                 <label class="small text-uppercase fw-bold text-muted">Khu vực chụp hình *</label>
                                 <select id="khuVucChup" class="input-luxury fw-bold text-dark mb-4">
-                                    <option value="0" data-name="Nội thành Đà Nẵng" selected>Nội thành Đà Nẵng (Miễn phí)</option>
+                                    <option value="0" data-name="Nội thành Đà Nẵng" selected>Nội thành Đà Nẵng (Miễn
+                                        phí)</option>
                                     <optgroup label="Ngoại thành / Tỉnh khác">
                                         <option value="500000" data-name="Quảng Nam">Quảng Nam (+ 500.000đ)</option>
-                                        <option value="700000" data-name="Thừa Thiên Huế">Thừa Thiên Huế (+ 700.000đ)</option>
-                                        <option value="1000000" data-name="Quảng Ngãi">Quảng Ngãi (+ 1.000.000đ)</option>
+                                        <option value="700000" data-name="Thừa Thiên Huế">Thừa Thiên Huế (+ 700.000đ)
+                                        </option>
+                                        <option value="1000000" data-name="Quảng Ngãi">Quảng Ngãi (+ 1.000.000đ)
+                                        </option>
                                         <option value="1500000" data-name="Bình Định">Bình Định (+ 1.500.000đ)</option>
                                         <option value="2000000" data-name="Phú Yên">Phú Yên (+ 2.000.000đ)</option>
-                                        <option value="2500000" data-name="Khánh Hòa">Khánh Hòa / Nha Trang (+ 2.500.000đ)</option>
-                                        <option value="3000000" data-name="Lâm Đồng">Lâm Đồng / Đà Lạt (+ 3.000.000đ)</option>
-                                        <option value="3500000" data-name="Bình Thuận">Ninh Thuận / Bình Thuận (+ 3.500.000đ)</option>
-                                        <option value="4000000" data-name="TP. Hồ Chí Minh">TP. Hồ Chí Minh (+ 4.000.000đ)</option>
+                                        <option value="2500000" data-name="Khánh Hòa">Khánh Hòa / Nha Trang (+
+                                            2.500.000đ)</option>
+                                        <option value="3000000" data-name="Lâm Đồng">Lâm Đồng / Đà Lạt (+ 3.000.000đ)
+                                        </option>
+                                        <option value="3500000" data-name="Bình Thuận">Ninh Thuận / Bình Thuận (+
+                                            3.500.000đ)</option>
+                                        <option value="4000000" data-name="TP. Hồ Chí Minh">TP. Hồ Chí Minh (+
+                                            4.000.000đ)</option>
                                         <option value="4000000" data-name="Hà Nội">Hà Nội (+ 4.000.000đ)</option>
                                     </optgroup>
                                 </select>
 
                                 <label class="small text-uppercase fw-bold text-muted">Địa chỉ chi tiết *</label>
-                                <input type="text" id="diaDiem" class="input-luxury" placeholder="Số nhà, tên đường, tên quán cafe/resort...">
+                                <input type="text" id="diaDiem" class="input-luxury"
+                                    placeholder="Số nhà, tên đường, tên quán cafe/resort...">
                             </div>
                             <input type="hidden" id="hDiaDiemGop" name="DiaDiem" value="" />
 
@@ -610,17 +654,20 @@
                             <label class="small text-uppercase fw-bold text-muted">Khu vực chụp hình *</label>
                             <div class="row g-2 mb-3">
                                 <div class="col-md-4">
-                                    <select id="tinhThanh" class="input-luxury fw-bold text-dark" style="font-size: 0.85rem;" onchange="loadDistricts()">
+                                    <select id="tinhThanh" class="input-luxury fw-bold text-dark"
+                                        style="font-size: 0.85rem;" onchange="loadDistricts()">
                                         <option value="">-- Tỉnh/Thành phố --</option>
                                     </select>
                                 </div>
                                 <div class="col-md-4">
-                                    <select id="quanHuyen" class="input-luxury fw-bold text-dark" style="font-size: 0.85rem;" onchange="loadWards()" disabled>
+                                    <select id="quanHuyen" class="input-luxury fw-bold text-dark"
+                                        style="font-size: 0.85rem;" onchange="loadWards()" disabled>
                                         <option value="">-- Quận/Huyện --</option>
                                     </select>
                                 </div>
                                 <div class="col-md-4">
-                                    <select id="phuongXa" class="input-luxury fw-bold text-dark" style="font-size: 0.85rem;" onchange="resetDistance()" disabled>
+                                    <select id="phuongXa" class="input-luxury fw-bold text-dark"
+                                        style="font-size: 0.85rem;" onchange="resetDistance()" disabled>
                                         <option value="">-- Phường/Xã --</option>
                                     </select>
                                 </div>
@@ -628,21 +675,31 @@
 
                             <label class="small text-uppercase fw-bold text-muted">Địa chỉ chi tiết *</label>
                             <div class="d-flex gap-2">
-                                <input type="text" id="soNha" class="input-luxury flex-grow-1" placeholder="Số nhà, tên đường, tên quán cafe/resort..." oninput="resetDistance()" required>
-                                <button type="button" class="btn btn-dark rounded-3 d-flex align-items-center justify-content-center" style="width: 48px; height: 45px; flex-shrink: 0;" id="btnConfirmAddress" onclick="calculateDistance()" title="Xác nhận và tính phí">
+                                <input type="text" id="soNha" class="input-luxury flex-grow-1"
+                                    placeholder="Số nhà, tên đường, tên quán cafe/resort..." oninput="resetDistance()"
+                                    required>
+                                <button type="button"
+                                    class="btn btn-dark rounded-3 d-flex align-items-center justify-content-center"
+                                    style="width: 48px; height: 45px; flex-shrink: 0;" id="btnConfirmAddress"
+                                    onclick="calculateDistance()" title="Xác nhận và tính phí">
                                     <i class="bi bi-check-lg fs-5"></i>
                                 </button>
                             </div>
-                            <div id="distanceResult" class="small mt-2 p-2 rounded-2 bg-light border" style="display: none;"></div>
-                            <div id="mapPicker" class="border" style="height: 300px; width: 100%; border-radius: 8px; margin-top: 10px; display: none; z-index: 1; position: relative;"></div>
+                            <div id="distanceResult" class="small mt-2 p-2 rounded-2 bg-light border"
+                                style="display: none;"></div>
+                            <div id="mapPicker" class="border"
+                                style="height: 300px; width: 100%; border-radius: 8px; margin-top: 10px; display: none; z-index: 1; position: relative;">
+                            </div>
                         </div>
                         <div class="mb-4">
                             <label class="small text-uppercase fw-bold text-muted">Số điện thoại liên hệ *</label>
-                            <input type="tel" id="soDienThoai" name="SoDienThoai" class="input-luxury" placeholder="Ví dụ: 0336 486 377" required>
+                            <input type="tel" id="soDienThoai" name="SoDienThoai" class="input-luxury"
+                                placeholder="Ví dụ: 0336 486 377" required>
                         </div>
                         <div class="mb-4">
                             <label class="small text-uppercase fw-bold text-muted">Ghi chú yêu cầu đặc biệt</label>
-                            <textarea id="ghiChu" name="GhiChu" class="input-luxury" rows="2" placeholder="Nhập ghi chú của bạn (Ví dụ: Concept cô dâu cổ điển, tone màu ấm, makeup nhẹ nhàng...)"></textarea>
+                            <textarea id="ghiChu" name="GhiChu" class="input-luxury" rows="2"
+                                placeholder="Nhập ghi chú của bạn (Ví dụ: Concept cô dâu cổ điển, tone màu ấm, makeup nhẹ nhàng...)"></textarea>
                         </div>
                     </div>
                 </div>
@@ -654,36 +711,56 @@
                         <!-- Lịch chụp -->
                         <div class="mb-4">
                             <div class="d-flex align-items-center justify-content-between mb-4">
-                                <button type="button" class="btn btn-sm btn-light rounded-circle" id="prevMonth"><i class="bi bi-chevron-left"></i></button>
+                                <button type="button" class="btn btn-sm btn-light rounded-circle" id="prevMonth"><i
+                                        class="bi bi-chevron-left"></i></button>
                                 <span class="fw-bold small text-uppercase ls-1" id="calTitle"></span>
-                                <button type="button" class="btn btn-sm btn-light rounded-circle" id="nextMonth"><i class="bi bi-chevron-right"></i></button>
+                                <button type="button" class="btn btn-sm btn-light rounded-circle" id="nextMonth"><i
+                                        class="bi bi-chevron-right"></i></button>
                             </div>
                             <table class="w-100 mb-3 text-center">
-                                <thead><tr class="small fw-bold text-muted"><th>T2</th><th>T3</th><th>T4</th><th>T5</th><th>T6</th><th>T7</th><th>CN</th></tr></thead>
+                                <thead>
+                                    <tr class="small fw-bold text-muted">
+                                        <th>T2</th>
+                                        <th>T3</th>
+                                        <th>T4</th>
+                                        <th>T5</th>
+                                        <th>T6</th>
+                                        <th>T7</th>
+                                        <th>CN</th>
+                                    </tr>
+                                </thead>
                                 <tbody id="calBody"></tbody>
                             </table>
                         </div>
 
                         <!-- Khung giờ -->
                         <label class="small text-uppercase fw-bold text-muted mb-3 d-block">Khung giờ buổi chụp</label>
-                        <div class="row g-2 mb-2">
-                            @foreach (var t in new[] { "08:00", "10:00", "14:00", "16:00", "19:00" })
-
-                            {
-                                    <div class="col-4"><button type="button" class="time-slot" data-time="@t">@t</button></div>
-                            }
+                        <div id="timeSlotContainer" class="row g-2 mb-2">
+                            <div class="col-12">
+                                <p class="text-muted small" id="slotHint" style="font-style:italic;">Vui lòng chọn gói
+                                    chụp và ngày chụp để xem các khung giờ có sẵn.</p>
+                            </div>
                         </div>
                         <div id="slotNotice" class="small text-success mb-4 d-none"></div>
 
                         <!-- Tóm tắt -->
                         <div class="p-3 bg-light rounded-3">
-                            <p class="small fw-bold text-uppercase ls-1 mb-3 border-bottom pb-2" style="color:var(--accent-gold);">Tóm tắt lịch đặt</p>
-                            <div class="d-flex justify-content-between small mb-2"><span>Gói chụp:</span><span id="sumService" class="fw-bold text-end">—</span></div>
-                            <div class="d-flex justify-content-between small mb-2"><span>Ngày chụp:</span><span id="sumDate" class="fw-bold">—</span></div>
-                            <div class="d-flex justify-content-between small mb-2"><span>Khung giờ:</span><span id="sumTime" class="fw-bold">—</span></div>
-                            <div class="d-flex justify-content-between small mb-2"><span>Địa điểm:</span><span id="sumLoc" class="fw-bold text-truncate ms-3" style="max-width:150px">—</span></div>
-                            <div class="d-flex justify-content-between small mb-2"><span>Dịch vụ thêm:</span><span id="sumExtra" class="fw-bold">0 ₫</span></div>
-                            <div class="d-flex justify-content-between small mb-2"><span>Phí di chuyển (<span id="sumDistance">0 km</span>):</span><span id="sumTravelFee" class="fw-bold text-success">Miễn phí</span></div>
+                            <p class="small fw-bold text-uppercase ls-1 mb-3 border-bottom pb-2"
+                                style="color:var(--accent-gold);">Tóm tắt lịch đặt</p>
+                            <div class="d-flex justify-content-between small mb-2"><span>Gói chụp:</span><span
+                                    id="sumService" class="fw-bold text-end">—</span></div>
+                            <div class="d-flex justify-content-between small mb-2"><span>Ngày chụp:</span><span
+                                    id="sumDate" class="fw-bold">—</span></div>
+                            <div class="d-flex justify-content-between small mb-2"><span>Khung giờ:</span><span
+                                    id="sumTime" class="fw-bold">—</span></div>
+                            <div class="d-flex justify-content-between small mb-2"><span>Địa điểm:</span><span
+                                    id="sumLoc" class="fw-bold text-truncate ms-3" style="max-width:150px">—</span>
+                            </div>
+                            <div class="d-flex justify-content-between small mb-2"><span>Dịch vụ thêm:</span><span
+                                    id="sumExtra" class="fw-bold">0 ₫</span></div>
+                            <div class="d-flex justify-content-between small mb-2"><span>Phí di chuyển (<span
+                                        id="sumDistance">0 km</span>):</span><span id="sumTravelFee"
+                                    class="fw-bold text-success">Miễn phí</span></div>
                             <div style="height:1px; background:#ddd; margin:15px 0"></div>
                             <div class="d-flex justify-content-between align-items-center">
                                 <span class="fw-bold">TỔNG CỘNG</span>
@@ -691,7 +768,8 @@
                             </div>
                         </div>
 
-                        <button type="button" class="btn-premium w-100 mt-4 shadow-sm" onclick="goToStep2()">TIẾN HÀNH THANH TOÁN <i class="bi bi-arrow-right ms-2"></i></button>
+                        <button type="button" class="btn-premium w-100 mt-4 shadow-sm" onclick="goToStep2()">TIẾN HÀNH
+                            THANH TOÁN <i class="bi bi-arrow-right ms-2"></i></button>
                     </div>
                 </div>
             </div>
@@ -713,21 +791,25 @@
                     <h5 class="serif fw-bold mb-4 border-bottom pb-2">1. Lựa chọn hình thức thanh toán</h5>
                     <div class="row g-3 mb-5">
                         <div class="col-md-6">
-                            <div class="pay-card-option active" id="payOptionCoc" onclick="selectHinhThucThanhToan('DatCoc')">
+                            <div class="pay-card-option active" id="payOptionCoc"
+                                onclick="selectHinhThucThanhToan('DatCoc')">
                                 <h6 class="fw-bold serif mb-2 text-uppercase ls-1">Đặt cọc trước 30%</h6>
-                                <p class="text-muted small mb-0">Thanh toán cọc để giữ chỗ lịch chụp nhanh chóng. Phần còn lại 70% sẽ thanh toán sau khi hoàn tất buổi chụp.</p>
+                                <p class="text-muted small mb-0">Thanh toán cọc để giữ chỗ lịch chụp nhanh chóng. Phần
+                                    còn lại 70% sẽ thanh toán sau khi hoàn tất buổi chụp.</p>
                                 <div class="mt-3 border-top pt-2">
-                                    <span class="text-muted small">Cọc cần thanh toán:</span><br/>
+                                    <span class="text-muted small">Cọc cần thanh toán:</span><br />
                                     <span class="fw-bold text-dark fs-5" id="valPayCoc">0 ₫</span>
                                 </div>
                             </div>
                         </div>
                         <div class="col-md-6">
-                            <div class="pay-card-option" id="payOptionHet" onclick="selectHinhThucThanhToan('ThanhToanHet')">
+                            <div class="pay-card-option" id="payOptionHet"
+                                onclick="selectHinhThucThanhToan('ThanhToanHet')">
                                 <h6 class="fw-bold serif mb-2 text-uppercase ls-1">Thanh toán 100%</h6>
-                                <p class="text-muted small mb-0">Thanh toán toàn bộ chi phí trong một giao dịch. Tiết kiệm thời gian, nhận trọn gói ưu đãi kèm quà tặng đặc biệt.</p>
+                                <p class="text-muted small mb-0">Thanh toán toàn bộ chi phí trong một giao dịch. Tiết
+                                    kiệm thời gian, nhận trọn gói ưu đãi kèm quà tặng đặc biệt.</p>
                                 <div class="mt-3 border-top pt-2">
-                                    <span class="text-muted small">Tổng thanh toán:</span><br/>
+                                    <span class="text-muted small">Tổng thanh toán:</span><br />
                                     <span class="fw-bold text-gold fs-5" id="valPayHet">0 ₫</span>
                                 </div>
                             </div>
@@ -737,25 +819,31 @@
                     <!-- Phương thức thanh toán -->
                     <h5 class="serif fw-bold mb-4 border-bottom pb-2">2. Chọn phương thức chuyển tiền</h5>
                     <div class="d-flex flex-column gap-3 mb-4">
-                        <button type="button" class="payment-method-btn active" id="payMethodQR" onclick="selectPhuongThuc('Chuyển khoản QR')">
+                        <button type="button" class="payment-method-btn active" id="payMethodQR"
+                            onclick="selectPhuongThuc('Chuyển khoản QR')">
                             <i class="bi bi-qr-code-scan fs-4 text-dark"></i>
                             <div>
                                 <span class="d-block fw-bold small">Chuyển khoản bằng mã VietQR (Khuyên dùng)</span>
-                                <span class="text-muted d-block" style="font-size:0.75rem;">Mã QR động tự động điền sẵn số tiền và nội dung chuyển khoản an toàn.</span>
+                                <span class="text-muted d-block" style="font-size:0.75rem;">Mã QR động tự động điền sẵn
+                                    số tiền và nội dung chuyển khoản an toàn.</span>
                             </div>
                         </button>
-                        <button type="button" class="payment-method-btn" id="payMethodATM" onclick="selectPhuongThuc('Thẻ ATM nội địa')">
+                        <button type="button" class="payment-method-btn" id="payMethodATM"
+                            onclick="selectPhuongThuc('Thẻ ATM nội địa')">
                             <i class="bi bi-credit-card-2-front fs-4 text-dark"></i>
                             <div>
                                 <span class="d-block fw-bold small">Thẻ ATM nội địa / Internet Banking</span>
-                                <span class="text-muted d-block" style="font-size:0.75rem;">Thanh toán an toàn qua cổng ngân hàng Việt Nam.</span>
+                                <span class="text-muted d-block" style="font-size:0.75rem;">Thanh toán an toàn qua cổng
+                                    ngân hàng Việt Nam.</span>
                             </div>
                         </button>
-                        <button type="button" class="payment-method-btn" id="payMethodVisa" onclick="selectPhuongThuc('Thẻ tín dụng')">
+                        <button type="button" class="payment-method-btn" id="payMethodVisa"
+                            onclick="selectPhuongThuc('Thẻ tín dụng')">
                             <i class="bi bi-credit-card fs-4 text-dark"></i>
                             <div>
                                 <span class="d-block fw-bold small">Thẻ Visa / Mastercard / JCB quốc tế</span>
-                                <span class="text-muted d-block" style="font-size:0.75rem;">Hỗ trợ tất cả các thẻ tín dụng quốc tế an toàn tuyệt đối.</span>
+                                <span class="text-muted d-block" style="font-size:0.75rem;">Hỗ trợ tất cả các thẻ tín
+                                    dụng quốc tế an toàn tuyệt đối.</span>
                             </div>
                         </button>
                     </div>
@@ -766,56 +854,77 @@
                         <h5 class="serif fw-bold mb-4">Thông tin chuyển tiền</h5>
 
                         <!-- QR Code panel -->
-                        <div id="panelQR" class="p-3 bg-light rounded-3 shadow-sm mb-4 border border-warning" style="background:#fffcf9 !important;">
-                            <span class="badge bg-warning text-dark mb-3 text-uppercase fw-bold ls-1" style="font-size: 0.65rem;">Quét Mã QR VietQR</span>
+                        <div id="panelQR" class="p-3 bg-light rounded-3 shadow-sm mb-4 border border-warning"
+                            style="background:#fffcf9 !important;">
+                            <span class="badge bg-warning text-dark mb-3 text-uppercase fw-bold ls-1"
+                                style="font-size: 0.65rem;">Quét Mã QR VietQR</span>
 
                             <!-- Dynamic QR Code (VietQR API) -->
-                            <div class="mx-auto bg-white p-3 rounded-3 shadow-sm border border-light" style="width:230px; height:230px;">
-                                <img id="imgQR" src="https://img.vietqr.io/image/MB-0336486377-compact2.png?amount=0&addInfo=HAMA%20LD&accountName=HAMA%20STUDIO" alt="Mã QR thanh toán Hama Studio" class="img-fluid w-100 h-100" />
+                            <div class="mx-auto bg-white p-3 rounded-3 shadow-sm border border-light"
+                                style="width:230px; height:230px;">
+                                <img id="imgQR"
+                                    src="https://img.vietqr.io/image/MB-0336486377-compact2.png?amount=0&addInfo=HAMA%20LD&accountName=HAMA%20STUDIO"
+                                    alt="Mã QR thanh toán Hama Studio" class="img-fluid w-100 h-100" />
                             </div>
 
                             <p class="text-muted small mt-3 mb-0" style="line-height:1.6;">
-                                Mở ứng dụng Ngân hàng di động (Mobile Banking) của bạn và thực hiện quét mã QR trên để tự động điền thông tin giao dịch.
+                                Mở ứng dụng Ngân hàng di động (Mobile Banking) của bạn và thực hiện quét mã QR trên để
+                                tự động điền thông tin giao dịch.
                             </p>
                         </div>
 
                         <!-- Card/ATM panel placeholder -->
-                        <div id="panelCreditCard" class="p-4 bg-light rounded-3 shadow-sm mb-4 text-start" style="display:none;">
-                            <span class="badge bg-dark text-white mb-3 text-uppercase fw-bold ls-1" style="font-size: 0.65rem;">Cổng thanh toán thẻ</span>
+                        <div id="panelCreditCard" class="p-4 bg-light rounded-3 shadow-sm mb-4 text-start"
+                            style="display:none;">
+                            <span class="badge bg-dark text-white mb-3 text-uppercase fw-bold ls-1"
+                                style="font-size: 0.65rem;">Cổng thanh toán thẻ</span>
                             <div class="mb-3">
                                 <label class="small fw-bold text-muted d-block mb-1">Số thẻ ngân hàng</label>
-                                <input type="text" class="form-control" placeholder="4111 2222 3333 4444" style="border-radius:6px; font-size:0.85rem;" />
+                                <input type="text" class="form-control" placeholder="4111 2222 3333 4444"
+                                    style="border-radius:6px; font-size:0.85rem;" />
                             </div>
                             <div class="row g-2 mb-3">
                                 <div class="col-6">
                                     <label class="small fw-bold text-muted d-block mb-1">Hạn sử dụng</label>
-                                    <input type="text" class="form-control" placeholder="MM/YY" style="border-radius:6px; font-size:0.85rem;" />
+                                    <input type="text" class="form-control" placeholder="MM/YY"
+                                        style="border-radius:6px; font-size:0.85rem;" />
                                 </div>
                                 <div class="col-6">
                                     <label class="small fw-bold text-muted d-block mb-1">Mã bảo mật CVV</label>
-                                    <input type="password" class="form-control" placeholder="123" style="border-radius:6px; font-size:0.85rem;" />
+                                    <input type="password" class="form-control" placeholder="123"
+                                        style="border-radius:6px; font-size:0.85rem;" />
                                 </div>
                             </div>
                             <div class="mb-1">
                                 <label class="small fw-bold text-muted d-block mb-1">Họ tên chủ thẻ</label>
-                                <input type="text" class="form-control text-uppercase" placeholder="NGUYEN VAN A" style="border-radius:6px; font-size:0.85rem;" />
+                                <input type="text" class="form-control text-uppercase" placeholder="NGUYEN VAN A"
+                                    style="border-radius:6px; font-size:0.85rem;" />
                             </div>
                         </div>
 
                         <!-- Summary block step 2 -->
                         <div class="p-3 bg-light rounded-3 text-start mb-4">
-                            <h6 class="serif fw-bold mb-3 border-bottom pb-2" style="font-size: 0.85rem;">Thông tin giao dịch</h6>
-                            <div class="d-flex justify-content-between small mb-2"><span>Số tiền thanh toán:</span><span id="sumStep2Amount" class="fw-bold text-dark fs-5">—</span></div>
-                            <div class="d-flex justify-content-between small mb-2"><span>Nội dung chuyển khoản:</span><span id="sumStep2Content" class="fw-bold text-muted text-uppercase text-end" style="font-size: 0.75rem;">—</span></div>
-                            <div class="d-flex justify-content-between small mb-1"><span>Hình thức:</span><span id="sumStep2HinhThuc" class="fw-bold text-gold small">—</span></div>
+                            <h6 class="serif fw-bold mb-3 border-bottom pb-2" style="font-size: 0.85rem;">Thông tin giao
+                                dịch</h6>
+                            <div class="d-flex justify-content-between small mb-2"><span>Số tiền thanh toán:</span><span
+                                    id="sumStep2Amount" class="fw-bold text-dark fs-5">—</span></div>
+                            <div class="d-flex justify-content-between small mb-2"><span>Nội dung chuyển
+                                    khoản:</span><span id="sumStep2Content"
+                                    class="fw-bold text-muted text-uppercase text-end"
+                                    style="font-size: 0.75rem;">—</span></div>
+                            <div class="d-flex justify-content-between small mb-1"><span>Hình thức:</span><span
+                                    id="sumStep2HinhThuc" class="fw-bold text-gold small">—</span></div>
                         </div>
 
                         <div class="row g-2">
                             <div class="col-4">
-                                <button type="button" class="btn-outline-premium w-100" onclick="goToStep1()"><i class="bi bi-arrow-left"></i> Quay lại</button>
+                                <button type="button" class="btn-outline-premium w-100" onclick="goToStep1()"><i
+                                        class="bi bi-arrow-left"></i> Quay lại</button>
                             </div>
                             <div class="col-8">
-                                <button type="button" class="btn-premium w-100 shadow-sm" onclick="confirmPaymentAndSubmit()"><i class="bi bi-check-circle-fill me-2"></i> Xác nhận đã thanh toán</button>
+                                <button type="button" class="btn-premium w-100 shadow-sm"
+                                    onclick="confirmPaymentAndSubmit()"><i class="bi bi-check-circle-fill me-2"></i> Xác
+                                    nhận đã thanh toán</button>
                             </div>
                         </div>
                     </div>
@@ -823,7 +932,7 @@
             </div>
         </div>
 
-</form>
+    </form>
 </div>
 
 <!-- Custom Error Modal -->
@@ -832,831 +941,813 @@
         <i class="bi bi-exclamation-triangle-fill text-warning mb-3 d-block" style="font-size: 3.5rem;"></i>
         <h5 class="serif fw-bold text-dark">Chưa đầy đủ thông tin</h5>
         <p id="customErrorMessage" class="text-muted small mt-2 mb-4" style="line-height:1.6;"></p>
-        <button type="button" class="btn btn-dark px-5 rounded-pill shadow-sm" onclick="closeErrorModal()">Đã hiểu</button>
+        <button type="button" class="btn btn-dark px-5 rounded-pill shadow-sm" onclick="closeErrorModal()">Đã
+            hiểu</button>
     </div>
 </div>
 
 <!-- Custom Payment Processing Overlay -->
 <div id="paymentLoadingOverlay" class="custom-modal-overlay" style="z-index: 1100;">
     <div class="custom-modal-box" style="max-width: 420px; padding: 40px 30px;">
-        <div id="paymentSpinner" class="spinner-border text-gold mb-4" role="status" style="width: 3.5rem; height: 3.5rem; border-width: 4px; color: var(--accent-gold) !important;"></div>
+        <div id="paymentSpinner" class="spinner-border text-gold mb-4" role="status"
+            style="width: 3.5rem; height: 3.5rem; border-width: 4px; color: var(--accent-gold) !important;"></div>
         <div id="paymentSuccessIcon" class="d-none mb-4">
             <i class="bi bi-check-circle-fill text-success" style="font-size: 4rem;"></i>
         </div>
         <h5 id="paymentStatusTitle" class="serif fw-bold text-dark">Đang đối soát giao dịch</h5>
         <p id="paymentStatusDesc" class="text-muted small mt-2 mb-0" style="line-height:1.6;">
-            Hama Studio đang kết nối cổng ngân hàng để đối soát giao dịch VietQR tự động. Vui lòng không đóng trình duyệt...
+            Hama Studio đang kết nối cổng ngân hàng để đối soát giao dịch VietQR tự động. Vui lòng không đóng trình
+            duyệt...
         </p>
     </div>
 </div>
 
 @section Scripts {
-        <!-- Google Maps đã được thay thế bằng giải pháp OpenStreetMap + OSRM hoàn toàn miễn phí và không cần API Key -->
-        <script>
-            (function () {
-                // ==================== CUSTOM MODAL LOGIC ====================
-                window.showErrorModal = function(msg) {
-                    document.getElementById('customErrorMessage').textContent = msg;
-                    document.getElementById('customErrorModal').classList.add('active');
-                };
-                window.closeErrorModal = function() {
-                    document.getElementById('customErrorModal').classList.remove('active');
-                };
+    <!-- Google Maps đã được thay thế bằng giải pháp OpenStreetMap + OSRM hoàn toàn miễn phí và không cần API Key -->
+    <script>
+        (function () {
+            // ==================== CUSTOM MODAL LOGIC ====================
+            window.showErrorModal = function (msg) {
+                document.getElementById('customErrorMessage').textContent = msg;
+                document.getElementById('customErrorModal').classList.add('active');
+            };
+            window.closeErrorModal = function () {
+                document.getElementById('customErrorModal').classList.remove('active');
+            };
 
-                // ==================== CALENDAR SYSTEM ====================
-                var cur = new Date(); cur.setDate(1);
-                function renderCal() {
-                    var y = cur.getFullYear(), m = cur.getMonth();
-                    var names = ['Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4', 'Tháng 5', 'Tháng 6', 'Tháng 7', 'Tháng 8', 'Tháng 9', 'Tháng 10', 'Tháng 11', 'Tháng 12'];
-                    document.getElementById('calTitle').textContent = names[m] + ', ' + y;
-                    var first = new Date(y, m, 1).getDay();
-                    var days = new Date(y, m + 1, 0).getDate();
-                    var startCol = (first === 0) ? 6 : first - 1;
-                    var html = '<tr>', col = 0;
+            // ==================== CALENDAR SYSTEM ====================
+            var cur = new Date(); cur.setDate(1);
+            function renderCal() {
+                var y = cur.getFullYear(), m = cur.getMonth();
+                var names = ['Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4', 'Tháng 5', 'Tháng 6', 'Tháng 7', 'Tháng 8', 'Tháng 9', 'Tháng 10', 'Tháng 11', 'Tháng 12'];
+                document.getElementById('calTitle').textContent = names[m] + ', ' + y;
+                var first = new Date(y, m, 1).getDay();
+                var days = new Date(y, m + 1, 0).getDate();
+                var startCol = (first === 0) ? 6 : first - 1;
+                var html = '<tr>', col = 0;
 
-                    // Tránh chọn ngày quá khứ
-                    var today = new Date();
-                    today.setHours(0,0,0,0);
+                // Tránh chọn ngày quá khứ
+                var today = new Date();
+                today.setHours(0, 0, 0, 0);
 
-                    for (var i = 0; i < startCol; i++) { html += '<td></td>'; col++; }
-                    for (var d = 1; d <= days; d++) {
-                        var cellDate = new Date(y, m, d);
-                        var isDisabled = cellDate < today ? 'disabled style="opacity:0.25; cursor:not-allowed;"' : '';
-                        var isTodayClass = cellDate.toDateString() === today.toDateString() ? 'today' : '';
+                for (var i = 0; i < startCol; i++) { html += '<td></td>'; col++; }
+                for (var d = 1; d <= days; d++) {
+                    var cellDate = new Date(y, m, d);
+                    var isDisabled = cellDate < today ? 'disabled style="opacity:0.25; cursor:not-allowed;"' : '';
+                    var isTodayClass = cellDate.toDateString() === today.toDateString() ? 'today' : '';
 
-                        html += `<td><button type="button" class="cal-day ${isTodayClass}" ${isDisabled} data-d="${d}" data-m="${m + 1}" data-y="${y}">${d}</button></td>`;
-                        col++; if (col === 7) { html += '</tr><tr>'; col = 0; }
-                    }
-                    document.getElementById('calBody').innerHTML = html + '</tr>';
-                    document.querySelectorAll('.cal-day').forEach(btn => {
-                        btn.onclick = function () {
-                            document.querySelectorAll('.cal-day').forEach(b => b.classList.remove('selected'));
-                            this.classList.add('selected');
-                            var mm = (this.dataset.m).padStart(2, '0');
-                            var dd = (this.dataset.d).padStart(2, '0');
-                            var selectedDate = this.dataset.y + '-' + mm + '-' + dd;
-                            document.getElementById('sumDate').textContent = dd + '/' + mm + '/' + this.dataset.y;
-                            document.getElementById('hNgayChup').value = selectedDate;
-
-                            // Gọi hàm kiểm tra trùng lịch (ekip bận)
-                            checkUnavailableSlots(selectedDate);
-                        }
-                    });
+                    html += `<td><button type="button" class="cal-day ${isTodayClass}" ${isDisabled} data-d="${d}" data-m="${m + 1}" data-y="${y}">${d}</button></td>`;
+                    col++; if (col === 7) { html += '</tr><tr>'; col = 0; }
                 }
-
-                document.getElementById('prevMonth').onclick = () => { cur.setMonth(cur.getMonth() - 1); renderCal(); };
-                document.getElementById('nextMonth').onclick = () => { cur.setMonth(cur.getMonth() + 1); renderCal(); };
-                renderCal();
-
-                // ==================== CHECK UNAVAILABLE SLOTS ====================
-                function checkUnavailableSlots(dateStr) {
-                    // Reset trạng thái tất cả các slot trước khi kiểm tra
-                    document.querySelectorAll('.time-slot').forEach(btn => {
-                        btn.removeAttribute('disabled');
-                        btn.style.opacity = '1';
-                        btn.style.pointerEvents = 'auto';
-                        btn.style.backgroundColor = '';
-                        btn.style.color = '';
-                        btn.style.borderColor = '';
-                        btn.title = '';
-
-                        const originalTime = btn.dataset.time;
-                        btn.innerHTML = originalTime;
-
-                        btn.removeAttribute('data-max');
-                        btn.removeAttribute('data-booked');
-                    });
-
-                    document.getElementById('slotNotice').classList.add('d-none');
-
-                    var isToday = false;
-                    var currentTimeVal = 0;
-                    var closestNextSlot = -1;
-
-                    var todayDate = new Date();
-                    var todayStr = todayDate.getFullYear() + '-' + String(todayDate.getMonth() + 1).padStart(2, '0') + '-' + String(todayDate.getDate()).padStart(2, '0');
-                    if (dateStr === todayStr) {
-                        isToday = true;
-                        currentTimeVal = todayDate.getHours() * 60 + todayDate.getMinutes();
-
-                        var slotsVals = [];
-                        document.querySelectorAll('.time-slot').forEach(btn => {
-                            var parts = btn.dataset.time.split(':');
-                            slotsVals.push(parseInt(parts[0]) * 60 + parseInt(parts[1]));
-                        });
-                        slotsVals.sort((a,b) => a - b);
-
-                        for (let i = 0; i < slotsVals.length; i++) {
-                            if (slotsVals[i] > currentTimeVal) {
-                                closestNextSlot = slotsVals[i];
-                                break;
-                            }
-                        }
-                    }
-
-                    var serviceId = document.getElementById('hMaDichVu').value;
-                    if (!serviceId) return;
-
-                    fetch(`/Booking/GetBookedSlots?date=${dateStr}&serviceId=${serviceId}`)
-                        .then(res => res.json())
-                        .then(data => {
-                            if (data.success) {
-                                const maxSlots = data.maxSlots || 1;
-                                const bookedMap = {};
-                                if (data.bookedSlots) {
-                                    data.bookedSlots.forEach(s => { bookedMap[s.KhungGio] = s.Count; });
-                                }
-
-                                document.querySelectorAll('.time-slot').forEach(btn => {
-                                    const slotTime = btn.dataset.time;
-                                    const booked = bookedMap[slotTime] || 0;
-                                    const remaining = maxSlots - booked;
-
-                                    btn.dataset.max = maxSlots;
-                                    btn.dataset.booked = booked;
-
-                                    var parts = slotTime.split(':');
-                                    var slotTimeVal = parseInt(parts[0]) * 60 + parseInt(parts[1]);
-
-                                    var isPassedOrTooClose = false;
-                                    if (isToday) {
-                                        if (slotTimeVal <= currentTimeVal || slotTimeVal === closestNextSlot) {
-                                            isPassedOrTooClose = true;
-                                        }
-                                    }
-
-                                    if (remaining <= 0 || isPassedOrTooClose) {
-                                        btn.setAttribute('disabled', 'disabled');
-                                        btn.style.opacity = '0.5';
-                                        btn.style.pointerEvents = 'none';
-                                        btn.style.backgroundColor = '#f8f9fa';
-                                        btn.style.color = '#adb5bd';
-                                        btn.style.borderColor = '#dee2e6';
-
-                                        if (isPassedOrTooClose && remaining > 0) {
-                                            btn.innerHTML = `${slotTime}<br><small style="font-size: 0.65rem; display:block; margin-top:-2px;">Không khả dụng</small>`;
-                                        } else {
-                                            btn.innerHTML = `${slotTime}<br><small style="font-size: 0.65rem; display:block; margin-top:-2px;">Hết chỗ</small>`;
-                                        }
-
-                                        if (btn.classList.contains('selected')) {
-                                            btn.classList.remove('selected');
-                                            document.getElementById('sumTime').textContent = '—';
-                                            document.getElementById('hKhungGio').value = '';
-                                        }
-                                    }
-                                });
-
-                                updateSlotNotice();
-                            }
-                        })
-                        .catch(err => console.error("Lỗi khi kiểm tra lịch bận:", err));
-                }
-
-                function updateSlotNotice() {
-                    var notice = document.getElementById('slotNotice');
-                    var selectedBtn = document.querySelector('.time-slot.selected');
-                    if (selectedBtn && selectedBtn.dataset.max) {
-                        var max = parseInt(selectedBtn.dataset.max);
-                        var booked = parseInt(selectedBtn.dataset.booked || 0);
-                        var remaining = max - booked;
-                        notice.innerHTML = `<i class="bi bi-info-circle-fill me-1"></i> Khung giờ này còn trống <strong>${remaining}</strong> suất.`;
-                        notice.classList.remove('d-none');
-                    } else {
-                        notice.classList.add('d-none');
-                    }
-                }
-
-                // ==================== TIME SLOTS ====================
-                document.querySelectorAll('.time-slot').forEach(btn => {
+                document.getElementById('calBody').innerHTML = html + '</tr>';
+                document.querySelectorAll('.cal-day').forEach(btn => {
                     btn.onclick = function () {
-                        document.querySelectorAll('.time-slot').forEach(b => b.classList.remove('selected'));
+                        document.querySelectorAll('.cal-day').forEach(b => b.classList.remove('selected'));
                         this.classList.add('selected');
-                        var t = this.dataset.time;
-                        document.getElementById('sumTime').textContent = t;
-                        document.getElementById('hKhungGio').value = t;
-                        updateSlotNotice();
+                        var mm = (this.dataset.m).padStart(2, '0');
+                        var dd = (this.dataset.d).padStart(2, '0');
+                        var selectedDate = this.dataset.y + '-' + mm + '-' + dd;
+                        document.getElementById('sumDate').textContent = dd + '/' + mm + '/' + this.dataset.y;
+                        document.getElementById('hNgayChup').value = selectedDate;
+
+                        // Rần lượt lấy khung giờ từ admin
+                        renderTimeSlots(selectedDate);
                     }
                 });
-
-                // ==================== SERVICE SEARCH & FILTER ====================
-                window.filterPackages = function () {
-                    var text = document.getElementById('pkgSearch').value.toLowerCase();
-                    var cards = document.querySelectorAll('.booking-pkg-card');
-                    var found = 0;
-                    cards.forEach(c => {
-                        var name = c.querySelector('.pkg-name').textContent.toLowerCase();
-                        if (name.includes(text)) { c.style.display = 'flex'; found++; }
-                        else { c.style.display = 'none'; }
-                    });
-                    document.getElementById('noResults').style.display = (found === 0) ? 'block' : 'none';
-                }
-            })();
-
-            // ==================== WIZARD & CALCULATION ====================
-            var basePrice = 0;
-            var totalPrice = 0;
-            var depositPrice = 0;
-            var currentStep = 1;
-            var bookingCodePlaceholder = "HAMA" + Math.floor(1000 + Math.random() * 9000);
-
-            // Biến lưu phí di chuyển
-            var travelFee = 0;
-            var travelDistance = 0;
-            var travelNote = "";
-
-            function selectPackage(card) {
-                var oldId = document.getElementById('hMaDichVu').value;
-                var newId = card.dataset.id;
-                var isAlreadySelected = (oldId === newId) && card.classList.contains('selected');
-
-                // === TOGGLE: Click same card → expand all back ===
-                if (isAlreadySelected) {
-                    expandAllPackages();
-                    return;
-                }
-
-                if (oldId && oldId !== newId) {
-                    // 1. Reset Dịch vụ đi kèm (Addons)
-                    document.querySelectorAll('.extra-cb').forEach(cb => {
-                        cb.checked = false;
-                    });
-
-                    // 2. Reset Ghi chú đặc biệt
-                    var gc = document.getElementById('ghiChu');
-                    if (gc) gc.value = '';
-
-                    // 3. Reset Lịch chụp
-                    document.getElementById('hNgayChup').value = '';
-                    document.getElementById('sumDate').textContent = '—';
-                    document.querySelectorAll('.cal-day').forEach(b => b.classList.remove('selected'));
-
-                    // 4. Reset Khung giờ
-                    document.getElementById('hKhungGio').value = '';
-                    document.getElementById('sumTime').textContent = '—';
-                    document.querySelectorAll('.time-slot').forEach(b => {
-                        b.classList.remove('selected');
-                        const originalTime = b.dataset.time;
-                        b.innerHTML = originalTime;
-                        b.removeAttribute('disabled');
-                        b.style.opacity = '1';
-                        b.style.pointerEvents = 'auto';
-                        b.style.backgroundColor = '';
-                        b.style.color = '';
-                        b.style.borderColor = '';
-                    });
-                    document.getElementById('slotNotice').classList.add('d-none');
-                }
-
-                // === COLLAPSE other cards ===
-                document.querySelectorAll('.booking-pkg-card').forEach(c => {
-                    c.classList.remove('selected');
-                    if (c !== card) {
-                        c.classList.add('pkg-hidden');
-                    } else {
-                        c.classList.remove('pkg-hidden');
-                    }
-                });
-                card.classList.add('selected');
-
-                // Show collapse hint
-                var hint = document.getElementById('pkgCollapseHint');
-                if (hint) hint.style.display = 'block';
-
-                // Hide search box when collapsed
-                var searchWrapper = document.querySelector('.search-wrapper');
-                if (searchWrapper) searchWrapper.style.display = 'none';
-
-                basePrice = parseInt(card.dataset.price);
-                document.getElementById('sumService').textContent = card.querySelector('.pkg-name').textContent;
-                document.getElementById('hMaDichVu').value = card.dataset.id;
-
-                // Tải động dịch vụ đi kèm
-                var addons = [];
-                try {
-                    addons = JSON.parse(card.dataset.addons || '[]');
-                } catch (e) {
-                    console.error("Lỗi khi parse addons JSON:", e);
-                }
-                renderAddons(addons);
-
-                // Cập nhật lại slot trống nếu đã chọn ngày
-                var dateStr = document.getElementById('hNgayChup').value;
-                if (dateStr) {
-                    checkUnavailableSlots(dateStr);
-                }
-
-                calcTotal();
             }
 
-            // Expand all packages back (called on second click or hint click)
-            function expandAllPackages() {
-                document.querySelectorAll('.booking-pkg-card').forEach(c => {
-                    c.classList.remove('pkg-hidden');
-                });
-                var hint = document.getElementById('pkgCollapseHint');
-                if (hint) hint.style.display = 'none';
-                var searchWrapper = document.querySelector('.search-wrapper');
-                if (searchWrapper) searchWrapper.style.display = 'block';
-            }
+            document.getElementById('prevMonth').onclick = () => { cur.setMonth(cur.getMonth() - 1); renderCal(); };
+            document.getElementById('nextMonth').onclick = () => { cur.setMonth(cur.getMonth() + 1); renderCal(); };
+            renderCal();
 
-            // Initialize if package is selected via URL query parameter
-            var sel = document.querySelector('.booking-pkg-card.selected');
-            if (sel) selectPackage(sel);
+            // ==================== DYNAMIC TIME SLOTS FROM ADMIN ====================
 
-            function renderAddons(addons) {
-                var container = document.getElementById('addonsContainer');
+
+            function renderTimeSlots(dateStr) {
+                var container = document.getElementById('timeSlotContainer');
+                var hintEl = document.getElementById('slotHint');
+                var notice = document.getElementById('slotNotice');
                 if (!container) return;
 
-                if (!addons || addons.length === 0) {
-                    container.innerHTML = '<p class="text-muted small">Gói chụp này không có dịch vụ đi kèm thêm.</p>';
+                // Bố cục cử
+                if (hintEl) hintEl.style.display = 'none';
+                if (notice) notice.classList.add('d-none');
+                container.innerHTML = '<div class="col-12"><p class="text-muted small" style="font-style:italic">Đang tải khung giờ...</p></div>';
+
+                // Xóa lựa chọn giờ cũ
+                document.getElementById('sumTime').textContent = '—';
+                document.getElementById('hKhungGio').value = '';
+
+                var serviceId = document.getElementById('hMaDichVu').value;
+                if (!serviceId || !dateStr) {
+                    container.innerHTML = '<div class="col-12"><p class="text-muted small" id="slotHint" style="font-style:italic">Vui lòng chọn gói chụp và ngày chụp để xem các khung giờ có sẵn.</p></div>';
                     return;
                 }
 
-                var html = '';
-                addons.forEach(addon => {
-                    var addonId = `ex_${addon.MaDVBS}`;
-                    var formattedPrice = '';
-                    if (addon.GiaTien >= 1000000) {
-                        formattedPrice = `+${(addon.GiaTien / 1000000).toFixed(1).replace('.0', '')}M`;
+                // Is today?
+                var today = new Date();
+                var todayStr = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0') + '-' + String(today.getDate()).padStart(2, '0');
+                var isToday = (dateStr === todayStr);
+                var nowMinutes = today.getHours() * 60 + today.getMinutes();
+
+                console.log('Fetching slots for:', { date: dateStr, serviceId: serviceId });
+
+                fetch('/Admin/GetKhungGioAvailable?date=' + dateStr + '&serviceId=' + serviceId)
+                    .then(function (r) { return r.json(); })
+                    .then(function (data) {
+                        console.log('API Response:', data);
+                        var slots = [];
+
+                        if (data.success && data.hasSchedule && data.slots && data.slots.length > 0) {
+                            slots = data.slots;
+                        } else if (data.success && data.hasSchedule && (!data.slots || data.slots.length === 0)) {
+                            container.innerHTML = '<div class="col-12"><p class="text-warning small"><i class="bi bi-exclamation-circle"></i> Ngày này đã mở lịch nhưng chưa cài đặt khung giờ cụ thể.</p></div>';
+                            return;
+                        } else {
+                            // Không có lịch admin: Không hiện giờ mặc định nữa
+                            container.innerHTML = '<div class="col-12"><p class="text-muted small"><i class="bi bi-calendar-x"></i> Ngày này hiện chưa có khung giờ khả dụng. Vui lòng chọn ngày khác.</p></div>';
+                            return;
+                        }
+
+                        var html = '';
+                        var hasAnyAvailable = false;
+
+                        (slots || []).forEach(function (slot) {
+                            var gioHienThi = slot.GioBatDau + (slot.GioKetThuc ? ' - ' + slot.GioKetThuc : '');
+                            var isLocked = slot.isLocked;
+                            // Tính toán giờ quá khứ (past check)
+                            var parts = slot.GioBatDau.split(':');
+                            var slotMin = parseInt(parts[0]) * 60 + parseInt(parts[1]);
+                            var isPast = isToday && (slotMin <= nowMinutes + 60);
+
+                            var isDisabled = isLocked || isPast;
+                            if (!isDisabled) hasAnyAvailable = true;
+
+                            var btnStyle, subText;
+                            if (isLocked) {
+                                btnStyle = 'background:#f0f0f0;color:#bbb;border-color:#ddd;cursor:not-allowed;opacity:0.7;';
+                                subText = '<br><small style="font-size:0.65rem;display:block;margin-top:-2px;">Đã khóa</small>';
+                            } else if (isPast) {
+                                btnStyle = 'background:#f8f9fa;color:#adb5bd;border-color:#dee2e6;cursor:not-allowed;opacity:0.6;';
+                                subText = '<br><small style="font-size:0.65rem;display:block;margin-top:-2px;">Hết hạn</small>';
+                            } else {
+                                btnStyle = '';
+                                subText = '';
+                            }
+
+                            html += '<div class="col-6 col-md-4">';
+                            if (isDisabled) {
+                                html += '<button type="button" class="time-slot" disabled style="' + btnStyle + '" title="' + (slot.GhiChu || '') + '">' + gioHienThi + subText + '</button>';
+                            } else {
+                                html += '<button type="button" class="time-slot" data-time="' + gioHienThi + '" onclick="selectTimeSlot(this)">' + gioHienThi + '</button>';
+                            }
+                            html += '</div>';
+                        });
+
+                        if (!hasAnyAvailable && slots.length > 0) {
+                            html += '<div class="col-12"><p class="text-danger small mt-2"><i class="bi bi-x-circle"></i> Tất cả khung giờ đã hết chỗ hoặc bị khóa. Vui lòng chọn ngày khác.</p></div>';
+                        }
+
+                        container.innerHTML = html;
+                    })
+                    .catch(function (err) {
+                        console.error('renderTimeSlots error:', err);
+                        container.innerHTML = '<div class="col-12"><p class="text-danger small">Lỗi khi tải khung giờ. Vui lòng thử lại.</p></div>';
+                    });
+            }
+
+            // Gọi khi chọn gói chụp — reset slots
+            window._onServiceSelected = function () {
+                var dateStr = document.getElementById('hNgayChup').value;
+                if (dateStr) renderTimeSlots(dateStr);
+                else {
+                    var container = document.getElementById('timeSlotContainer');
+                    if (container) container.innerHTML = '<div class="col-12"><p class="text-muted small" id="slotHint" style="font-style:italic">Vui lòng chọn ngày chụp để xem các khung giờ có sẵn.</p></div>';
+                    document.getElementById('sumTime').textContent = '—';
+                    document.getElementById('hKhungGio').value = '';
+                }
+            };
+
+            window.selectTimeSlot = function (btn) {
+                document.querySelectorAll('.time-slot').forEach(function (b) { b.classList.remove('selected'); });
+                btn.classList.add('selected');
+                var t = btn.dataset.time;
+                document.getElementById('sumTime').textContent = t;
+                document.getElementById('hKhungGio').value = t;
+                var notice = document.getElementById('slotNotice');
+                if (notice) notice.classList.add('d-none');
+            };
+
+            // ==================== SERVICE SEARCH & FILTER ====================
+            window.filterPackages = function () {
+                var text = document.getElementById('pkgSearch').value.toLowerCase();
+                var cards = document.querySelectorAll('.booking-pkg-card');
+                var found = 0;
+                cards.forEach(c => {
+                    var name = c.querySelector('.pkg-name').textContent.toLowerCase();
+                    if (name.includes(text)) { c.style.display = 'flex'; found++; }
+                    else { c.style.display = 'none'; }
+                });
+                document.getElementById('noResults').style.display = (found === 0) ? 'block' : 'none';
+            }
+        })();
+
+        // ==================== WIZARD & CALCULATION ====================
+        var basePrice = 0;
+        var totalPrice = 0;
+        var depositPrice = 0;
+        var currentStep = 1;
+        var bookingCodePlaceholder = "HAMA" + Math.floor(1000 + Math.random() * 9000);
+
+        // Biến lưu phí di chuyển
+        var travelFee = 0;
+        var travelDistance = 0;
+        var travelNote = "";
+
+        function selectPackage(card) {
+            var oldId = document.getElementById('hMaDichVu').value;
+            var newId = card.dataset.id;
+            var isAlreadySelected = (oldId === newId) && card.classList.contains('selected');
+
+            // === TOGGLE: Click same card → expand all back ===
+            if (isAlreadySelected) {
+                expandAllPackages();
+                return;
+            }
+
+            if (oldId && oldId !== newId) {
+                // 1. Reset Dịch vụ đi kèm (Addons)
+                document.querySelectorAll('.extra-cb').forEach(cb => {
+                    cb.checked = false;
+                });
+
+                // 2. Reset Ghi chú đặc biệt
+                var gc = document.getElementById('ghiChu');
+                if (gc) gc.value = '';
+
+                // 3. Reset Lịch chụp
+                document.getElementById('hNgayChup').value = '';
+                document.getElementById('sumDate').textContent = '—';
+                document.querySelectorAll('.cal-day').forEach(b => b.classList.remove('selected'));
+
+                // 4. Reset Khung giờ
+                document.getElementById('hKhungGio').value = '';
+                document.getElementById('sumTime').textContent = '—';
+                // Reset lựa chọn khóa giờ cũ
+                var container = document.getElementById('timeSlotContainer');
+                if (container) container.innerHTML = '<div class="col-12"><p class="text-muted small" style="font-style:italic">Đang cập nhật khung giờ...</p></div>';
+                document.getElementById('sumTime').textContent = '—';
+                document.getElementById('hKhungGio').value = '';
+                document.getElementById('slotNotice').classList.add('d-none');
+            }
+
+            // === COLLAPSE other cards ===
+            document.querySelectorAll('.booking-pkg-card').forEach(c => {
+                c.classList.remove('selected');
+                if (c !== card) {
+                    c.classList.add('pkg-hidden');
+                } else {
+                    c.classList.remove('pkg-hidden');
+                }
+            });
+            card.classList.add('selected');
+
+            // Show collapse hint
+            var hint = document.getElementById('pkgCollapseHint');
+            if (hint) hint.style.display = 'block';
+
+            // Hide search box when collapsed
+            var searchWrapper = document.querySelector('.search-wrapper');
+            if (searchWrapper) searchWrapper.style.display = 'none';
+
+            basePrice = parseInt(card.dataset.price);
+            document.getElementById('sumService').textContent = card.querySelector('.pkg-name').textContent;
+            document.getElementById('hMaDichVu').value = card.dataset.id;
+
+            // Tải động dịch vụ đi kèm
+            var addons = [];
+            try {
+                addons = JSON.parse(card.dataset.addons || '[]');
+            } catch (e) {
+                console.error("Lỗi khi parse addons JSON:", e);
+            }
+            renderAddons(addons);
+
+            // Cập nhật slot khóa giờ khi dịch vụ thay đổi
+            if (window._onServiceSelected) window._onServiceSelected();
+
+            calcTotal();
+        }
+
+        // Expand all packages back (called on second click or hint click)
+        function expandAllPackages() {
+            document.querySelectorAll('.booking-pkg-card').forEach(c => {
+                c.classList.remove('pkg-hidden');
+            });
+            var hint = document.getElementById('pkgCollapseHint');
+            if (hint) hint.style.display = 'none';
+            var searchWrapper = document.querySelector('.search-wrapper');
+            if (searchWrapper) searchWrapper.style.display = 'block';
+        }
+
+        // Initialize if package is selected via URL query parameter
+        var sel = document.querySelector('.booking-pkg-card.selected');
+        if (sel) selectPackage(sel);
+
+        function renderAddons(addons) {
+            var container = document.getElementById('addonsContainer');
+            if (!container) return;
+
+            if (!addons || addons.length === 0) {
+                container.innerHTML = '<p class="text-muted small">Gói chụp này không có dịch vụ đi kèm thêm.</p>';
+                return;
+            }
+
+            var html = '';
+            addons.forEach(addon => {
+                var addonId = `ex_${addon.MaDVBS}`;
+                var formattedPrice = '';
+                if (addon.GiaTien >= 1000000) {
+                    formattedPrice = `+${(addon.GiaTien / 1000000).toFixed(1).replace('.0', '')}M`;
+                } else {
+                    formattedPrice = `+${(addon.GiaTien / 1000).toLocaleString()}K`;
+                }
+
+                html += `
+                                    <div class="col-md-6">
+                                        <div class="extra-item d-flex justify-content-between align-items-center" onclick="toggleCheckbox('${addonId}', event)">
+                                            <div class="form-check m-0">
+                                                <input class="form-check-input extra-cb" type="checkbox" value="${addon.GiaTien}" id="${addonId}" data-name="${addon.TenDVBS}" onchange="calcTotal()" onclick="event.stopPropagation()">
+                                                <label class="form-check-label small fw-bold" for="${addonId}" onclick="event.stopPropagation()">${addon.TenDVBS}</label>
+                                            </div>
+                                            <span class="small text-muted">${formattedPrice}</span>
+                                        </div>
+                                    </div>
+                                `;
+            });
+            container.innerHTML = html;
+        }
+
+        function toggleCheckbox(id, event) {
+            if (event && (event.target.tagName === 'INPUT' || event.target.tagName === 'LABEL')) {
+                return;
+            }
+            var cb = document.getElementById(id);
+            if (cb) {
+                cb.checked = !cb.checked;
+                calcTotal();
+            }
+        }
+
+        function calcTotal() {
+            var extra = 0;
+            document.querySelectorAll('.extra-cb:checked').forEach(cb => { extra += parseInt(cb.value); });
+            totalPrice = basePrice + extra + travelFee;
+            depositPrice = Math.round(totalPrice * 0.3);
+
+            // Ghi giá trị Tổng Tiền Thực Tế để lưu vào Database
+            document.getElementById('hTongTienThucTe').value = totalPrice;
+
+            document.getElementById('sumExtra').textContent = extra.toLocaleString() + ' ₫';
+
+            var feeDisplay = travelFee > 0 ? travelFee.toLocaleString() + ' ₫' : 'Miễn phí';
+            document.getElementById('sumTravelFee').textContent = feeDisplay;
+            if (travelFee > 0) {
+                document.getElementById('sumTravelFee').className = "fw-bold text-danger";
+            } else {
+                document.getElementById('sumTravelFee').className = "fw-bold text-success";
+            }
+
+            document.getElementById('sumTotal').textContent = totalPrice.toLocaleString() + ' ₫';
+
+            // Cập nhật giá trị hiển thị ở Step 2
+            document.getElementById('valPayCoc').textContent = depositPrice.toLocaleString() + ' ₫';
+            document.getElementById('valPayHet').textContent = totalPrice.toLocaleString() + ' ₫';
+
+            // Cập nhật giá trị ở phần QR/Giao dịch
+            updatePaymentDetails();
+        }
+
+        function upSummary() {
+            var tinh = document.getElementById('tinhThanh');
+            var quan = document.getElementById('quanHuyen');
+            var phuong = document.getElementById('phuongXa');
+            var soNha = document.getElementById('soNha').value.trim();
+
+            var fullLoc = "Chưa nhập địa chỉ";
+
+            if (tinh.value && quan.value && phuong.value && soNha) {
+                var tinhName = tinh.options[tinh.selectedIndex].dataset.name;
+                var quanName = quan.options[quan.selectedIndex].dataset.name;
+                var phuongName = phuong.options[phuong.selectedIndex].dataset.name;
+                fullLoc = `${soNha}, ${phuongName}, ${quanName}, ${tinhName}`;
+            }
+
+            document.getElementById('sumLoc').textContent = fullLoc;
+            document.getElementById('hDiaDiemGop').value = fullLoc; // Lưu toàn bộ vào DB
+
+            if (fullLoc !== "Chưa nhập địa chỉ") {
+                document.getElementById('diaDiem').value = fullLoc; // Lưu ẩn vào ô cũ tránh null required
+            } else {
+                document.getElementById('diaDiem').value = "";
+            }
+
+            calcTotal();
+        }
+
+        // ==================== STEP TRANSITIONS ====================
+        function goToStep2() {
+            var fMaDichVu = document.getElementById('hMaDichVu').value;
+            var fNgayChup = document.getElementById('hNgayChup').value;
+            var fKhungGio = document.getElementById('hKhungGio').value;
+            var tinh = document.getElementById('tinhThanh').value;
+            var quan = document.getElementById('quanHuyen').value;
+            var phuong = document.getElementById('phuongXa').value;
+            var soNha = document.getElementById('soNha').value.trim();
+            var fSoDienThoai = document.getElementById('soDienThoai').value;
+
+            // Kiểm tra các trường dữ liệu ở Step 1
+            if (!fMaDichVu) { window.showErrorModal("Vui lòng chọn một Gói chụp dịch vụ ở khung bên trái!"); return; }
+            if (!fNgayChup) { window.showErrorModal("Vui lòng chọn Ngày chụp trên lịch (Ngày phải sau hôm nay ít nhất 1 ngày)!"); return; }
+            if (!fKhungGio) { window.showErrorModal("Vui lòng chọn Khung giờ cho buổi chụp!"); return; }
+            if (!tinh || !quan || !phuong || !soNha) { window.showErrorModal("Vui lòng nhập đầy đủ địa chỉ chi tiết cho buổi chụp!"); return; }
+            if (!isDistanceCalculated) { window.showErrorModal("Vui lòng nhấn nút Xác nhận (dấu tích) ở ô nhập địa chỉ để tính phí di chuyển trước khi tiếp tục!"); return; }
+            if (!fSoDienThoai.trim()) { window.showErrorModal("Vui lòng nhập Số điện thoại liên hệ!"); return; }
+
+            // Chuyển UI
+            document.getElementById('step1Container').style.display = 'none';
+            document.getElementById('step2Container').style.display = 'block';
+
+            // Cập nhật Progress Bar
+            document.getElementById('stepIndicator1').className = 'step-item completed';
+            document.getElementById('stepIndicator2').className = 'step-item active';
+            document.getElementById('progressLine').style.width = '50%';
+
+            currentStep = 2;
+            updatePaymentDetails();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function goToStep1() {
+            document.getElementById('step1Container').style.display = 'block';
+            document.getElementById('step2Container').style.display = 'none';
+
+            // Cập nhật Progress Bar
+            document.getElementById('stepIndicator1').className = 'step-item active';
+            document.getElementById('stepIndicator2').className = 'step-item';
+            document.getElementById('progressLine').style.width = '0%';
+
+            currentStep = 1;
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // ==================== PAYMENT METHODS SELECTION ====================
+        function selectHinhThucThanhToan(type) {
+            document.getElementById('payOptionCoc').classList.remove('active');
+            document.getElementById('payOptionHet').classList.remove('active');
+
+            document.getElementById('hHinhThucThanhToan').value = type;
+
+            if (type === 'DatCoc') {
+                document.getElementById('payOptionCoc').classList.add('active');
+            } else {
+                document.getElementById('payOptionHet').classList.add('active');
+            }
+            updatePaymentDetails();
+        }
+
+        function selectPhuongThuc(method) {
+            document.getElementById('payMethodQR').classList.remove('active');
+            document.getElementById('payMethodATM').classList.remove('active');
+            document.getElementById('payMethodVisa').classList.remove('active');
+
+            document.getElementById('hPhuongThucThanhToan').value = method;
+
+            if (method === 'Chuyển khoản QR') {
+                document.getElementById('payMethodQR').classList.add('active');
+                document.getElementById('panelQR').style.display = 'block';
+                document.getElementById('panelCreditCard').style.display = 'none';
+            } else if (method === 'Thẻ ATM nội địa') {
+                document.getElementById('payMethodATM').classList.add('active');
+                document.getElementById('panelQR').style.display = 'none';
+                document.getElementById('panelCreditCard').style.display = 'block';
+            } else {
+                document.getElementById('payMethodVisa').classList.add('active');
+                document.getElementById('panelQR').style.display = 'none';
+                document.getElementById('panelCreditCard').style.display = 'block';
+            }
+        }
+
+        function updatePaymentDetails() {
+            var hinhThuc = document.getElementById('hHinhThucThanhToan').value;
+            var amountToPay = (hinhThuc === 'DatCoc') ? depositPrice : totalPrice;
+
+            // Ghi giá trị vào hidden input gửi đi
+            document.getElementById('hSoTienThanhToan').value = amountToPay;
+
+            // Cập nhật thông tin text hiển thị
+            document.getElementById('sumStep2Amount').textContent = amountToPay.toLocaleString() + ' ₫';
+
+            var infoText = bookingCodePlaceholder + " " + (hinhThuc === 'DatCoc' ? "COC 30%" : "FULL 100%");
+            document.getElementById('sumStep2Content').textContent = infoText;
+            document.getElementById('sumStep2HinhThuc').textContent = (hinhThuc === 'DatCoc') ? "Đặt cọc trước (30%)" : "Thanh toán toàn bộ (100%)";
+
+            // Cập nhật URL QR động theo chuẩn VietQR API thực tế
+            var addInfoEncoded = encodeURIComponent(infoText);
+            var qrUrl = `https://img.vietqr.io/image/MB-0336486377-compact2.png?amount=${amountToPay}&addInfo=${addInfoEncoded}&accountName=HAMA%20STUDIO`;
+            document.getElementById('imgQR').src = qrUrl;
+        }
+
+        // ==================== SUBMISSION & SIMULATION ====================
+        function confirmPaymentAndSubmit() {
+            // Hiển thị Overlay mô phỏng thanh toán tự động
+            const overlay = document.getElementById('paymentLoadingOverlay');
+            const spinner = document.getElementById('paymentSpinner');
+            const successIcon = document.getElementById('paymentSuccessIcon');
+            const title = document.getElementById('paymentStatusTitle');
+            const desc = document.getElementById('paymentStatusDesc');
+
+            overlay.classList.add('active');
+            spinner.classList.remove('d-none');
+            successIcon.classList.add('d-none');
+            title.textContent = "Đang đối soát giao dịch";
+            desc.textContent = "Hama Studio đang kết nối cổng ngân hàng để đối soát giao dịch VietQR tự động. Vui lòng không đóng trình duyệt...";
+
+            // Nối Ghi Chú tự động
+            var currentGhiChu = document.getElementById('ghiChu').value;
+            var extraNames = [];
+            document.querySelectorAll('.extra-cb:checked').forEach(cb => { extraNames.push(cb.dataset.name); });
+            var extraStr = extraNames.length > 0 ? "Dịch vụ đi kèm: " + extraNames.join(", ") : "";
+            var generatedNote = [extraStr, travelNote].filter(Boolean).join(" | ");
+            if (generatedNote) {
+                document.getElementById('ghiChu').value = (currentGhiChu ? currentGhiChu + "\n\n" : "") + "[" + generatedNote + "]";
+            }
+
+            // Giả lập tín hiệu chuyển khoản ngân hàng sau 1.5 giây
+            setTimeout(() => {
+                title.textContent = "Đã nhận tín hiệu chuyển khoản";
+                desc.textContent = "Cổng VietQR đã khớp lệnh mã đơn đặt lịch của bạn. Đang tiến hành xác minh số tiền giao dịch...";
+
+                // Giả lập xác thực thành công sau 3 giây tổng cộng
+                setTimeout(() => {
+                    spinner.classList.add('d-none');
+                    successIcon.classList.remove('d-none');
+                    title.textContent = "Thanh toán thành công!";
+
+                    var moneyVal = parseInt(document.getElementById('hSoTienThanhToan').value) || 0;
+                    desc.innerHTML = `<span class="text-success fw-semibold">Hệ thống đã tự động ghi nhận số tiền ${moneyVal.toLocaleString()} ₫</span>.<br>Lịch chụp của bạn đã được xác nhận cọc 30% tự động. Đang chuẩn bị tạo đơn...`;
+
+                    // Cập nhật Progress Bar
+                    document.getElementById('stepIndicator2').className = 'step-item completed';
+                    document.getElementById('stepIndicator3').className = 'step-item active';
+                    document.getElementById('progressLine').style.width = '100%';
+
+                    // Submit form sau 1.8 giây hiển thị tích xanh thành công
+                    setTimeout(() => {
+                        document.getElementById('bookingWizardForm').submit();
+                    }, 1800);
+
+                }, 1500);
+
+            }, 1500);
+        }
+
+        // ==================== DISTANCE CALCULATION ====================
+        var STUDIO_ADDRESS = "Đà Nẵng, Việt Nam"; // Mốc xuất phát
+
+        // Fetch danh sách tỉnh thành
+        fetch('https://provinces.open-api.vn/api/?depth=1')
+            .then(res => res.json())
+            .then(data => {
+                let html = '<option value="">-- Tỉnh/Thành phố --</option>';
+                data.forEach(t => { html += `<option value="${t.code}" data-name="${t.name}">${t.name}</option>`; });
+                document.getElementById('tinhThanh').innerHTML = html;
+            });
+
+        function loadDistricts() {
+            var provinceCode = document.getElementById('tinhThanh').value;
+            var quanHuyen = document.getElementById('quanHuyen');
+            var phuongXa = document.getElementById('phuongXa');
+
+            resetDistance();
+            phuongXa.innerHTML = '<option value="">-- Phường/Xã --</option>';
+            phuongXa.disabled = true;
+
+            if (!provinceCode) {
+                quanHuyen.innerHTML = '<option value="">-- Quận/Huyện --</option>';
+                quanHuyen.disabled = true;
+                return;
+            }
+
+            fetch(`https://provinces.open-api.vn/api/p/${provinceCode}?depth=2`)
+                .then(res => res.json())
+                .then(data => {
+                    let html = '<option value="">-- Quận/Huyện --</option>';
+                    data.districts.forEach(d => { html += `<option value="${d.code}" data-name="${d.name}">${d.name}</option>`; });
+                    quanHuyen.innerHTML = html;
+                    quanHuyen.disabled = false;
+                });
+        }
+
+        function loadWards() {
+            var districtCode = document.getElementById('quanHuyen').value;
+            var phuongXa = document.getElementById('phuongXa');
+
+            resetDistance();
+
+            if (!districtCode) {
+                phuongXa.innerHTML = '<option value="">-- Phường/Xã --</option>';
+                phuongXa.disabled = true;
+                return;
+            }
+
+            fetch(`https://provinces.open-api.vn/api/d/${districtCode}?depth=2`)
+                .then(res => res.json())
+                .then(data => {
+                    let html = '<option value="">-- Phường/Xã --</option>';
+                    data.wards.forEach(w => { html += `<option value="${w.code}" data-name="${w.name}">${w.name}</option>`; });
+                    phuongXa.innerHTML = html;
+                    phuongXa.disabled = false;
+                });
+        }
+
+        var isDistanceCalculated = false;
+
+        function resetDistance() {
+            travelFee = 0;
+            travelDistance = 0;
+            travelNote = "";
+            isDistanceCalculated = false;
+            document.getElementById('distanceResult').style.display = 'none';
+            document.getElementById('sumDistance').textContent = "0 km";
+            upSummary();
+        }
+
+        // Tọa độ mốc xuất phát: Hama Studio Đà Nẵng (123 Ngô Quyền, Đà Nẵng)
+        const STUDIO_COORDS = { lat: 16.09498, lon: 108.24488 };
+
+        // Hàm định vị địa chỉ chuẩn xác (Sử dụng ArcGIS cho độ chính xác số nhà tại VN)
+        async function geocodeExactAddress(soNha, phuongName, quanName, tinhName) {
+            const queries = [
+                `${soNha}, ${phuongName}, ${quanName}, ${tinhName}`,
+                `${phuongName}, ${quanName}, ${tinhName}`
+            ];
+
+            for (let query of queries) {
+                try {
+                    const url = `https://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer/findAddressCandidates?f=json&singleLine=${encodeURIComponent(query)}&maxLocations=1`;
+                    const res = await fetch(url);
+                    const data = await res.json();
+
+                    if (data && data.candidates && data.candidates.length > 0) {
+                        const loc = data.candidates[0].location; // {x: lon, y: lat}
+                        return {
+                            lat: loc.y,
+                            lon: loc.x,
+                            matchedText: query
+                        };
+                    }
+                } catch (e) {
+                    console.error("Lỗi định vị ArcGIS với truy vấn: " + query, e);
+                }
+            }
+
+            throw new Error("Không thể định vị được địa chỉ này trên bản đồ. Vui lòng kiểm tra lại kết nối mạng!");
+        }
+
+        var map = null;
+        var marker = null;
+
+        function initOrUpdateMap(lat, lon) {
+            var mapContainer = document.getElementById('mapPicker');
+            mapContainer.style.display = 'block';
+
+            if (!map) {
+                map = L.map('mapPicker').setView([lat, lon], 16);
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    maxZoom: 19,
+                    attribution: '© OpenStreetMap'
+                }).addTo(map);
+
+                marker = L.marker([lat, lon], { draggable: true }).addTo(map);
+                marker.bindPopup("<b>Vị trí chụp</b><br>Kéo thả ghim để định vị chính xác!").openPopup();
+
+                marker.on('dragend', async function (e) {
+                    var newPos = marker.getLatLng();
+                    await calculateOsrmRoute(newPos.lat, newPos.lng);
+                });
+            } else {
+                map.setView([lat, lon], 16);
+                marker.setLatLng([lat, lon]);
+                marker.bindPopup("<b>Vị trí chụp</b><br>Kéo thả ghim để định vị chính xác!").openPopup();
+            }
+
+            // Fix map display issue when container was hidden
+            setTimeout(() => { map.invalidateSize(); }, 300);
+        }
+
+        async function calculateOsrmRoute(destLat, destLon) {
+            var btn = document.getElementById('btnConfirmAddress');
+            var resDiv = document.getElementById('distanceResult');
+
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>';
+            btn.disabled = true;
+
+            try {
+                var osrmUrl = `https://router.project-osrm.org/route/v1/driving/${STUDIO_COORDS.lon},${STUDIO_COORDS.lat};${destLon},${destLat}?overview=false`;
+
+                var routeRes = await fetch(osrmUrl);
+                var routeData = await routeRes.json();
+
+                btn.innerHTML = '<i class="bi bi-check-lg fs-5"></i>';
+                btn.disabled = false;
+                resDiv.style.display = 'block';
+
+                if (routeData && routeData.routes && routeData.routes.length > 0) {
+                    var distanceMeters = routeData.routes[0].distance;
+                    var distanceKm = Math.round(distanceMeters / 1000);
+
+                    travelDistance = distanceKm;
+
+                    if (distanceKm <= 10) {
+                        travelFee = 0;
+                        travelNote = `Phí di chuyển: Miễn phí (${distanceKm} km)`;
+                        resDiv.innerHTML = `<span class="text-success fw-bold"><i class="bi bi-check-circle-fill"></i> Khoảng cách (Ô tô): ${distanceKm} km - Miễn phí di chuyển</span>`;
                     } else {
-                        formattedPrice = `+${(addon.GiaTien / 1000).toLocaleString()}K`;
+                        var extraKm = distanceKm - 10;
+                        travelFee = extraKm * 10000;
+                        travelNote = `Phí di chuyển: ${travelFee.toLocaleString()}đ (${distanceKm} km)`;
+                        resDiv.innerHTML = `<span class="text-warning text-dark fw-bold"><i class="bi bi-info-circle-fill"></i> Khoảng cách (Ô tô): ${distanceKm} km - Phí di chuyển: ${travelFee.toLocaleString()} ₫</span>`;
                     }
 
-                    html += `
-                        <div class="col-md-6">
-                            <div class="extra-item d-flex justify-content-between align-items-center" onclick="toggleCheckbox('${addonId}', event)">
-                                <div class="form-check m-0">
-                                    <input class="form-check-input extra-cb" type="checkbox" value="${addon.GiaTien}" id="${addonId}" data-name="${addon.TenDVBS}" onchange="calcTotal()" onclick="event.stopPropagation()">
-                                    <label class="form-check-label small fw-bold" for="${addonId}" onclick="event.stopPropagation()">${addon.TenDVBS}</label>
-                                </div>
-                                <span class="small text-muted">${formattedPrice}</span>
-                            </div>
-                        </div>
-                    `;
-                });
-                container.innerHTML = html;
-            }
-
-            function toggleCheckbox(id, event) {
-                if (event && (event.target.tagName === 'INPUT' || event.target.tagName === 'LABEL')) {
-                    return;
-                }
-                var cb = document.getElementById(id);
-                if (cb) {
-                    cb.checked = !cb.checked;
-                    calcTotal();
-                }
-            }
-
-            function calcTotal() {
-                var extra = 0;
-                document.querySelectorAll('.extra-cb:checked').forEach(cb => { extra += parseInt(cb.value); });
-                totalPrice = basePrice + extra + travelFee;
-                depositPrice = Math.round(totalPrice * 0.3);
-
-                // Ghi giá trị Tổng Tiền Thực Tế để lưu vào Database
-                document.getElementById('hTongTienThucTe').value = totalPrice;
-
-                document.getElementById('sumExtra').textContent = extra.toLocaleString() + ' ₫';
-
-                var feeDisplay = travelFee > 0 ? travelFee.toLocaleString() + ' ₫' : 'Miễn phí';
-                document.getElementById('sumTravelFee').textContent = feeDisplay;
-                if (travelFee > 0) {
-                    document.getElementById('sumTravelFee').className = "fw-bold text-danger";
+                    isDistanceCalculated = true;
+                    document.getElementById('sumDistance').textContent = distanceKm + " km";
+                    upSummary();
                 } else {
-                    document.getElementById('sumTravelFee').className = "fw-bold text-success";
+                    throw new Error("Không thể tìm kiếm tuyến đường dành cho Ô tô từ bản đồ OSRM.");
                 }
+            } catch (err) {
+                console.error("Lỗi khi tính khoảng cách: ", err);
+                btn.innerHTML = '<i class="bi bi-check-lg fs-5"></i>';
+                btn.disabled = false;
+                resDiv.style.display = 'block';
 
-                document.getElementById('sumTotal').textContent = totalPrice.toLocaleString() + ' ₫';
-
-                // Cập nhật giá trị hiển thị ở Step 2
-                document.getElementById('valPayCoc').textContent = depositPrice.toLocaleString() + ' ₫';
-                document.getElementById('valPayHet').textContent = totalPrice.toLocaleString() + ' ₫';
-
-                // Cập nhật giá trị ở phần QR/Giao dịch
-                updatePaymentDetails();
+                travelFee = 0;
+                isDistanceCalculated = false;
+                resDiv.innerHTML = `<span class="text-danger"><i class="bi bi-exclamation-triangle-fill"></i> Không thể đo khoảng cách. Hãy thử kiểm tra lại kết nối mạng!</span>`;
+                upSummary();
             }
+        }
 
-            function upSummary() {
+        async function calculateDistance() {
+            var btn = document.getElementById('btnConfirmAddress');
+            var resDiv = document.getElementById('distanceResult');
+
+            try {
                 var tinh = document.getElementById('tinhThanh');
                 var quan = document.getElementById('quanHuyen');
                 var phuong = document.getElementById('phuongXa');
                 var soNha = document.getElementById('soNha').value.trim();
 
-                var fullLoc = "Chưa nhập địa chỉ";
-
-                if (tinh.value && quan.value && phuong.value && soNha) {
-                    var tinhName = tinh.options[tinh.selectedIndex].dataset.name;
-                    var quanName = quan.options[quan.selectedIndex].dataset.name;
-                    var phuongName = phuong.options[phuong.selectedIndex].dataset.name;
-                    fullLoc = `${soNha}, ${phuongName}, ${quanName}, ${tinhName}`;
-                }
-
-                document.getElementById('sumLoc').textContent = fullLoc;
-                document.getElementById('hDiaDiemGop').value = fullLoc; // Lưu toàn bộ vào DB
-
-                if (fullLoc !== "Chưa nhập địa chỉ") {
-                    document.getElementById('diaDiem').value = fullLoc; // Lưu ẩn vào ô cũ tránh null required
-                } else {
-                    document.getElementById('diaDiem').value = "";
-                }
-
-                calcTotal();
-            }
-
-            // ==================== STEP TRANSITIONS ====================
-            function goToStep2() {
-                var fMaDichVu = document.getElementById('hMaDichVu').value;
-                var fNgayChup = document.getElementById('hNgayChup').value;
-                var fKhungGio = document.getElementById('hKhungGio').value;
-                var tinh = document.getElementById('tinhThanh').value;
-                var quan = document.getElementById('quanHuyen').value;
-                var phuong = document.getElementById('phuongXa').value;
-                var soNha = document.getElementById('soNha').value.trim();
-                var fSoDienThoai = document.getElementById('soDienThoai').value;
-
-                // Kiểm tra các trường dữ liệu ở Step 1
-                if (!fMaDichVu) { window.showErrorModal("Vui lòng chọn một Gói chụp dịch vụ ở khung bên trái!"); return; }
-                if (!fNgayChup) { window.showErrorModal("Vui lòng chọn Ngày chụp trên lịch (Ngày phải sau hôm nay ít nhất 1 ngày)!"); return; }
-                if (!fKhungGio) { window.showErrorModal("Vui lòng chọn Khung giờ cho buổi chụp!"); return; }
-                if (!tinh || !quan || !phuong || !soNha) { window.showErrorModal("Vui lòng nhập đầy đủ địa chỉ chi tiết cho buổi chụp!"); return; }
-                if (!isDistanceCalculated) { window.showErrorModal("Vui lòng nhấn nút Xác nhận (dấu tích) ở ô nhập địa chỉ để tính phí di chuyển trước khi tiếp tục!"); return; }
-                if (!fSoDienThoai.trim()) { window.showErrorModal("Vui lòng nhập Số điện thoại liên hệ!"); return; }
-
-                // Chuyển UI
-                document.getElementById('step1Container').style.display = 'none';
-                document.getElementById('step2Container').style.display = 'block';
-
-                // Cập nhật Progress Bar
-                document.getElementById('stepIndicator1').className = 'step-item completed';
-                document.getElementById('stepIndicator2').className = 'step-item active';
-                document.getElementById('progressLine').style.width = '50%';
-
-                currentStep = 2;
-                updatePaymentDetails();
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-            }
-
-            function goToStep1() {
-                document.getElementById('step1Container').style.display = 'block';
-                document.getElementById('step2Container').style.display = 'none';
-
-                // Cập nhật Progress Bar
-                document.getElementById('stepIndicator1').className = 'step-item active';
-                document.getElementById('stepIndicator2').className = 'step-item';
-                document.getElementById('progressLine').style.width = '0%';
-
-                currentStep = 1;
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-            }
-
-            // ==================== PAYMENT METHODS SELECTION ====================
-            function selectHinhThucThanhToan(type) {
-                document.getElementById('payOptionCoc').classList.remove('active');
-                document.getElementById('payOptionHet').classList.remove('active');
-
-                document.getElementById('hHinhThucThanhToan').value = type;
-
-                if (type === 'DatCoc') {
-                    document.getElementById('payOptionCoc').classList.add('active');
-                } else {
-                    document.getElementById('payOptionHet').classList.add('active');
-                }
-                updatePaymentDetails();
-            }
-
-            function selectPhuongThuc(method) {
-                document.getElementById('payMethodQR').classList.remove('active');
-                document.getElementById('payMethodATM').classList.remove('active');
-                document.getElementById('payMethodVisa').classList.remove('active');
-
-                document.getElementById('hPhuongThucThanhToan').value = method;
-
-                if (method === 'Chuyển khoản QR') {
-                    document.getElementById('payMethodQR').classList.add('active');
-                    document.getElementById('panelQR').style.display = 'block';
-                    document.getElementById('panelCreditCard').style.display = 'none';
-                } else if (method === 'Thẻ ATM nội địa') {
-                    document.getElementById('payMethodATM').classList.add('active');
-                    document.getElementById('panelQR').style.display = 'none';
-                    document.getElementById('panelCreditCard').style.display = 'block';
-                } else {
-                    document.getElementById('payMethodVisa').classList.add('active');
-                    document.getElementById('panelQR').style.display = 'none';
-                    document.getElementById('panelCreditCard').style.display = 'block';
-                }
-            }
-
-            function updatePaymentDetails() {
-                var hinhThuc = document.getElementById('hHinhThucThanhToan').value;
-                var amountToPay = (hinhThuc === 'DatCoc') ? depositPrice : totalPrice;
-
-                // Ghi giá trị vào hidden input gửi đi
-                document.getElementById('hSoTienThanhToan').value = amountToPay;
-
-                // Cập nhật thông tin text hiển thị
-                document.getElementById('sumStep2Amount').textContent = amountToPay.toLocaleString() + ' ₫';
-
-                var infoText = bookingCodePlaceholder + " " + (hinhThuc === 'DatCoc' ? "COC 30%" : "FULL 100%");
-                document.getElementById('sumStep2Content').textContent = infoText;
-                document.getElementById('sumStep2HinhThuc').textContent = (hinhThuc === 'DatCoc') ? "Đặt cọc trước (30%)" : "Thanh toán toàn bộ (100%)";
-
-                // Cập nhật URL QR động theo chuẩn VietQR API thực tế
-                var addInfoEncoded = encodeURIComponent(infoText);
-                var qrUrl = `https://img.vietqr.io/image/MB-0336486377-compact2.png?amount=${amountToPay}&addInfo=${addInfoEncoded}&accountName=HAMA%20STUDIO`;
-                document.getElementById('imgQR').src = qrUrl;
-            }
-
-            // ==================== SUBMISSION & SIMULATION ====================
-            function confirmPaymentAndSubmit() {
-                // Hiển thị Overlay mô phỏng thanh toán tự động
-                const overlay = document.getElementById('paymentLoadingOverlay');
-                const spinner = document.getElementById('paymentSpinner');
-                const successIcon = document.getElementById('paymentSuccessIcon');
-                const title = document.getElementById('paymentStatusTitle');
-                const desc = document.getElementById('paymentStatusDesc');
-
-                overlay.classList.add('active');
-                spinner.classList.remove('d-none');
-                successIcon.classList.add('d-none');
-                title.textContent = "Đang đối soát giao dịch";
-                desc.textContent = "Hama Studio đang kết nối cổng ngân hàng để đối soát giao dịch VietQR tự động. Vui lòng không đóng trình duyệt...";
-
-                // Nối Ghi Chú tự động
-                var currentGhiChu = document.getElementById('ghiChu').value;
-                var extraNames = [];
-                document.querySelectorAll('.extra-cb:checked').forEach(cb => { extraNames.push(cb.dataset.name); });
-                var extraStr = extraNames.length > 0 ? "Dịch vụ đi kèm: " + extraNames.join(", ") : "";
-                var generatedNote = [extraStr, travelNote].filter(Boolean).join(" | ");
-                if (generatedNote) {
-                    document.getElementById('ghiChu').value = (currentGhiChu ? currentGhiChu + "\n\n" : "") + "[" + generatedNote + "]";
-                }
-
-                // Giả lập tín hiệu chuyển khoản ngân hàng sau 1.5 giây
-                setTimeout(() => {
-                    title.textContent = "Đã nhận tín hiệu chuyển khoản";
-                    desc.textContent = "Cổng VietQR đã khớp lệnh mã đơn đặt lịch của bạn. Đang tiến hành xác minh số tiền giao dịch...";
-
-                    // Giả lập xác thực thành công sau 3 giây tổng cộng
-                    setTimeout(() => {
-                        spinner.classList.add('d-none');
-                        successIcon.classList.remove('d-none');
-                        title.textContent = "Thanh toán thành công!";
-
-                        var moneyVal = parseInt(document.getElementById('hSoTienThanhToan').value) || 0;
-                        desc.innerHTML = `<span class="text-success fw-semibold">Hệ thống đã tự động ghi nhận số tiền ${moneyVal.toLocaleString()} ₫</span>.<br>Lịch chụp của bạn đã được xác nhận cọc 30% tự động. Đang chuẩn bị tạo đơn...`;
-
-                        // Cập nhật Progress Bar
-                        document.getElementById('stepIndicator2').className = 'step-item completed';
-                        document.getElementById('stepIndicator3').className = 'step-item active';
-                        document.getElementById('progressLine').style.width = '100%';
-
-                        // Submit form sau 1.8 giây hiển thị tích xanh thành công
-                        setTimeout(() => {
-                            document.getElementById('bookingWizardForm').submit();
-                        }, 1800);
-
-                    }, 1500);
-
-                }, 1500);
-            }
-
-            // ==================== DISTANCE CALCULATION ====================
-            var STUDIO_ADDRESS = "Đà Nẵng, Việt Nam"; // Mốc xuất phát
-
-            // Fetch danh sách tỉnh thành
-            fetch('https://provinces.open-api.vn/api/?depth=1')
-                .then(res => res.json())
-                .then(data => {
-                    let html = '<option value="">-- Tỉnh/Thành phố --</option>';
-                    data.forEach(t => { html += `<option value="${t.code}" data-name="${t.name}">${t.name}</option>`; });
-                    document.getElementById('tinhThanh').innerHTML = html;
-                });
-
-            function loadDistricts() {
-                var provinceCode = document.getElementById('tinhThanh').value;
-                var quanHuyen = document.getElementById('quanHuyen');
-                var phuongXa = document.getElementById('phuongXa');
-
-                resetDistance();
-                phuongXa.innerHTML = '<option value="">-- Phường/Xã --</option>';
-                phuongXa.disabled = true;
-
-                if (!provinceCode) {
-                    quanHuyen.innerHTML = '<option value="">-- Quận/Huyện --</option>';
-                    quanHuyen.disabled = true;
+                if (!tinh.value || !quan.value || !phuong.value || !soNha) {
+                    window.showErrorModal("Vui lòng chọn đầy đủ Tỉnh/Thành, Quận/Huyện, Phường/Xã và nhập địa chỉ cụ thể trước khi xác nhận!");
                     return;
                 }
 
-                fetch(`https://provinces.open-api.vn/api/p/${provinceCode}?depth=2`)
-                    .then(res => res.json())
-                    .then(data => {
-                        let html = '<option value="">-- Quận/Huyện --</option>';
-                        data.districts.forEach(d => { html += `<option value="${d.code}" data-name="${d.name}">${d.name}</option>`; });
-                        quanHuyen.innerHTML = html;
-                        quanHuyen.disabled = false;
-                    });
-            }
-
-            function loadWards() {
-                var districtCode = document.getElementById('quanHuyen').value;
-                var phuongXa = document.getElementById('phuongXa');
-
-                resetDistance();
-
-                if (!districtCode) {
-                    phuongXa.innerHTML = '<option value="">-- Phường/Xã --</option>';
-                    phuongXa.disabled = true;
-                    return;
-                }
-
-                fetch(`https://provinces.open-api.vn/api/d/${districtCode}?depth=2`)
-                    .then(res => res.json())
-                    .then(data => {
-                        let html = '<option value="">-- Phường/Xã --</option>';
-                        data.wards.forEach(w => { html += `<option value="${w.code}" data-name="${w.name}">${w.name}</option>`; });
-                        phuongXa.innerHTML = html;
-                        phuongXa.disabled = false;
-                    });
-            }
-
-            var isDistanceCalculated = false;
-
-            function resetDistance() {
-                travelFee = 0;
-                travelDistance = 0;
-                travelNote = "";
-                isDistanceCalculated = false;
-                document.getElementById('distanceResult').style.display = 'none';
-                document.getElementById('sumDistance').textContent = "0 km";
-                upSummary();
-            }
-
-            // Tọa độ mốc xuất phát: Hama Studio Đà Nẵng (123 Ngô Quyền, Đà Nẵng)
-            const STUDIO_COORDS = { lat: 16.09498, lon: 108.24488 };
-
-            // Hàm định vị địa chỉ chuẩn xác (Sử dụng ArcGIS cho độ chính xác số nhà tại VN)
-            async function geocodeExactAddress(soNha, phuongName, quanName, tinhName) {
-                const queries = [
-                    `${soNha}, ${phuongName}, ${quanName}, ${tinhName}`,
-                    `${phuongName}, ${quanName}, ${tinhName}`
-                ];
-
-                for (let query of queries) {
-                    try {
-                        const url = `https://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer/findAddressCandidates?f=json&singleLine=${encodeURIComponent(query)}&maxLocations=1`;
-                        const res = await fetch(url);
-                        const data = await res.json();
-
-                        if (data && data.candidates && data.candidates.length > 0) {
-                            const loc = data.candidates[0].location; // {x: lon, y: lat}
-                            return {
-                                lat: loc.y,
-                                lon: loc.x,
-                                matchedText: query
-                            };
-                        }
-                    } catch (e) {
-                        console.error("Lỗi định vị ArcGIS với truy vấn: " + query, e);
-                    }
-                }
-
-                throw new Error("Không thể định vị được địa chỉ này trên bản đồ. Vui lòng kiểm tra lại kết nối mạng!");
-            }
-
-            var map = null;
-            var marker = null;
-
-            function initOrUpdateMap(lat, lon) {
-                var mapContainer = document.getElementById('mapPicker');
-                mapContainer.style.display = 'block';
-
-                if (!map) {
-                    map = L.map('mapPicker').setView([lat, lon], 16);
-                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                        maxZoom: 19,
-                        attribution: '© OpenStreetMap'
-                    }).addTo(map);
-
-                    marker = L.marker([lat, lon], { draggable: true }).addTo(map);
-                    marker.bindPopup("<b>Vị trí chụp</b><br>Kéo thả ghim để định vị chính xác!").openPopup();
-
-                    marker.on('dragend', async function(e) {
-                        var newPos = marker.getLatLng();
-                        await calculateOsrmRoute(newPos.lat, newPos.lng);
-                    });
-                } else {
-                    map.setView([lat, lon], 16);
-                    marker.setLatLng([lat, lon]);
-                    marker.bindPopup("<b>Vị trí chụp</b><br>Kéo thả ghim để định vị chính xác!").openPopup();
-                }
-
-                // Fix map display issue when container was hidden
-                setTimeout(() => { map.invalidateSize(); }, 300);
-            }
-
-            async function calculateOsrmRoute(destLat, destLon) {
-                var btn = document.getElementById('btnConfirmAddress');
-                var resDiv = document.getElementById('distanceResult');
+                var tinhName = tinh.options[tinh.selectedIndex].dataset.name;
+                var quanName = quan.options[quan.selectedIndex].dataset.name;
+                var phuongName = phuong.options[phuong.selectedIndex].dataset.name;
 
                 btn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>';
                 btn.disabled = true;
 
-                try {
-                    var osrmUrl = `https://router.project-osrm.org/route/v1/driving/${STUDIO_COORDS.lon},${STUDIO_COORDS.lat};${destLon},${destLat}?overview=false`;
+                // 1. Định vị tọa độ đích (Geocoding) qua ArcGIS tới tận Số nhà
+                var dest = await geocodeExactAddress(soNha, phuongName, quanName, tinhName);
 
-                    var routeRes = await fetch(osrmUrl);
-                    var routeData = await routeRes.json();
+                // 2. Hiển thị bản đồ để kéo thả ghim
+                initOrUpdateMap(dest.lat, dest.lon);
 
-                    btn.innerHTML = '<i class="bi bi-check-lg fs-5"></i>';
-                    btn.disabled = false;
-                    resDiv.style.display = 'block';
+                // 3. Tính khoảng cách thực tế (Driving Distance) dựa trên tọa độ của Ghim
+                await calculateOsrmRoute(dest.lat, dest.lon);
 
-                    if (routeData && routeData.routes && routeData.routes.length > 0) {
-                        var distanceMeters = routeData.routes[0].distance;
-                        var distanceKm = Math.round(distanceMeters / 1000);
+            } catch (err) {
+                console.error("Lỗi khi định vị: ", err);
+                btn.innerHTML = '<i class="bi bi-check-lg fs-5"></i>';
+                btn.disabled = false;
+                resDiv.style.display = 'block';
 
-                        travelDistance = distanceKm;
-
-                        if (distanceKm <= 10) {
-                            travelFee = 0;
-                            travelNote = `Phí di chuyển: Miễn phí (${distanceKm} km)`;
-                            resDiv.innerHTML = `<span class="text-success fw-bold"><i class="bi bi-check-circle-fill"></i> Khoảng cách (Ô tô): ${distanceKm} km - Miễn phí di chuyển</span>`;
-                        } else {
-                            var extraKm = distanceKm - 10;
-                            travelFee = extraKm * 10000;
-                            travelNote = `Phí di chuyển: ${travelFee.toLocaleString()}đ (${distanceKm} km)`;
-                            resDiv.innerHTML = `<span class="text-warning text-dark fw-bold"><i class="bi bi-info-circle-fill"></i> Khoảng cách (Ô tô): ${distanceKm} km - Phí di chuyển: ${travelFee.toLocaleString()} ₫</span>`;
-                        }
-
-                        isDistanceCalculated = true;
-                        document.getElementById('sumDistance').textContent = distanceKm + " km";
-                        upSummary();
-                    } else {
-                        throw new Error("Không thể tìm kiếm tuyến đường dành cho Ô tô từ bản đồ OSRM.");
-                    }
-                } catch (err) {
-                    console.error("Lỗi khi tính khoảng cách: ", err);
-                    btn.innerHTML = '<i class="bi bi-check-lg fs-5"></i>';
-                    btn.disabled = false;
-                    resDiv.style.display = 'block';
-
-                    travelFee = 0;
-                    isDistanceCalculated = false;
-                    resDiv.innerHTML = `<span class="text-danger"><i class="bi bi-exclamation-triangle-fill"></i> Không thể đo khoảng cách. Hãy thử kiểm tra lại kết nối mạng!</span>`;
-                    upSummary();
-                }
+                travelFee = 0;
+                isDistanceCalculated = false;
+                resDiv.innerHTML = `<span class="text-danger"><i class="bi bi-exclamation-triangle-fill"></i> Không thể đo khoảng cách. Hãy thử kiểm tra lại kết nối mạng!</span>`;
+                window.showErrorModal(err.message || "Đã xảy ra sự cố khi tự động đo khoảng cách. Vui lòng thử lại sau!");
+                upSummary();
             }
+        }
 
-            async function calculateDistance() {
-                var btn = document.getElementById('btnConfirmAddress');
-                var resDiv = document.getElementById('distanceResult');
-
-                try {
-                    var tinh = document.getElementById('tinhThanh');
-                    var quan = document.getElementById('quanHuyen');
-                    var phuong = document.getElementById('phuongXa');
-                    var soNha = document.getElementById('soNha').value.trim();
-
-                    if (!tinh.value || !quan.value || !phuong.value || !soNha) {
-                        window.showErrorModal("Vui lòng chọn đầy đủ Tỉnh/Thành, Quận/Huyện, Phường/Xã và nhập địa chỉ cụ thể trước khi xác nhận!");
-                        return;
-                    }
-
-                    var tinhName = tinh.options[tinh.selectedIndex].dataset.name;
-                    var quanName = quan.options[quan.selectedIndex].dataset.name;
-                    var phuongName = phuong.options[phuong.selectedIndex].dataset.name;
-
-                    btn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>';
-                    btn.disabled = true;
-
-                    // 1. Định vị tọa độ đích (Geocoding) qua ArcGIS tới tận Số nhà
-                    var dest = await geocodeExactAddress(soNha, phuongName, quanName, tinhName);
-
-                    // 2. Hiển thị bản đồ để kéo thả ghim
-                    initOrUpdateMap(dest.lat, dest.lon);
-
-                    // 3. Tính khoảng cách thực tế (Driving Distance) dựa trên tọa độ của Ghim
-                    await calculateOsrmRoute(dest.lat, dest.lon);
-
-                } catch (err) {
-                    console.error("Lỗi khi định vị: ", err);
-                    btn.innerHTML = '<i class="bi bi-check-lg fs-5"></i>';
-                    btn.disabled = false;
-                    resDiv.style.display = 'block';
-
-                    travelFee = 0;
-                    isDistanceCalculated = false;
-                    resDiv.innerHTML = `<span class="text-danger"><i class="bi bi-exclamation-triangle-fill"></i> Không thể đo khoảng cách. Hãy thử kiểm tra lại kết nối mạng!</span>`;
-                    window.showErrorModal(err.message || "Đã xảy ra sự cố khi tự động đo khoảng cách. Vui lòng thử lại sau!");
-                    upSummary();
-                }
-            }
-
-            window.addEventListener('load', function() {
-                resetDistance();
-            });
-        </script>
-        <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+        window.addEventListener('load', function () {
+            resetDistance();
+        });
+    </script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 }

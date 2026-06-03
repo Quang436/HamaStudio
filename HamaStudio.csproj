@@ -142,6 +142,7 @@
     <Compile Include="Models\DichVuBoSung.cs" />
     <Compile Include="Models\HamaStudioDbContext.cs" />
     <Compile Include="Models\KhachHang.cs" />
+    <Compile Include="Models\KhungGioLich.cs" />
     <Compile Include="Models\LichChup.cs" />
     <Compile Include="Models\Portfolio.cs" />
     <Compile Include="Models\QuanTriVien.cs" />
