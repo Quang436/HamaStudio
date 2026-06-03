@@ -147,6 +147,8 @@
     <Compile Include="Models\Portfolio.cs" />
     <Compile Include="Models\QuanTriVien.cs" />
     <Compile Include="Models\ThanhToan.cs" />
+    <Compile Include="Services\EmailService.cs" />
+    <Compile Include="Services\ReminderService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

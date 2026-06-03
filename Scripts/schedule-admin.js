@@ -357,3 +357,30 @@ function deleteSchedule(id) {
 
 // ─── Helper ─────────────────────────────────
 function escSch(s) { return (s || '').replace(/'/g, "\\'").replace(/"/g, '&quot;'); }
+// Gửi nhắc lịch thủ công
+function sendRemindersManual() {
+    if (!confirm('Bạn có muốn quét và gửi email nhắc lịch cho tất cả khách hàng có lịch chụp vào NGÀY MAI không?')) return;
+
+    var btn = event.currentTarget;
+    var originalHtml = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Đang gửi...';
+
+    fetch('/Admin/GuiNhacLichManual', { method: 'POST' })
+        .then(function (r) { return r.json(); })
+        .then(function (res) {
+            if (res.success) {
+                alert(res.message || 'Đã gửi nhắc lịch thành công!');
+            } else {
+                alert('Lỗi: ' + (res.message || 'Không thể gửi mail. Vui lòng kiểm tra cấu hình Gmail.'));
+            }
+        })
+        .catch(function (err) {
+            console.error('sendRemindersManual:', err);
+            alert('Lỗi kết nối server!');
+        })
+        .finally(function () {
+            btn.disabled = false;
+            btn.innerHTML = originalHtml;
+        });
+}
