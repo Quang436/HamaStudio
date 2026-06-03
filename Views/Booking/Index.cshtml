@@ -1,5 +1,6 @@
 @{
     ViewBag.Title = "Đặt lịch & Thanh toán | Hama Studio Experience";
+
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
@@ -186,6 +187,68 @@
     .booking-pkg-card.selected img {
         filter: brightness(0.95);
     }
+
+    /* ===== PACKAGE COLLAPSE ANIMATION ===== */
+    .booking-pkg-card.pkg-hidden {
+        max-height: 0;
+        opacity: 0;
+        overflow: hidden;
+        border-width: 0;
+        margin: 0 !important;
+        padding: 0 !important;
+        pointer-events: none;
+        transform: scaleY(0.8);
+        transform-origin: top;
+    }
+
+    .booking-pkg-card {
+        max-height: 200px;
+        transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+                    opacity 0.3s ease,
+                    border-width 0.2s ease,
+                    margin 0.3s ease,
+                    transform 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+                    border-color 0.25s ease,
+                    box-shadow 0.25s ease;
+    }
+
+    /* Badge on selected card */
+    .pkg-selected-badge {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background: var(--accent-gold);
+        color: white;
+        font-size: 0.6rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        padding: 3px 8px;
+        border-radius: 20px;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        opacity: 0;
+        transform: scale(0.7);
+        transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .booking-pkg-card.selected .pkg-selected-badge {
+        opacity: 1;
+        transform: scale(1);
+    }
+
+    /* Show-all hint when collapsed */
+    #pkgCollapseHint {
+        display: none;
+        text-align: center;
+        font-size: 0.78rem;
+        color: var(--text-muted);
+        cursor: pointer;
+        padding: 4px 0 2px;
+        transition: color 0.2s;
+    }
+    #pkgCollapseHint:hover { color: var(--accent-gold); }
 
     /* ===== INPUTS & EXTRAS ===== */
     .input-luxury {
@@ -434,12 +497,12 @@
     <!-- MAIN FORM FOR MULTI-STEP SUBMISSION -->
     <form id="bookingWizardForm" method="POST" action="/Booking/Index">
         @Html.AntiForgeryToken()
-        
+
         <!-- Hidden Inputs for Booking details -->
         <input type="hidden" id="hMaDichVu" name="MaDichVu" value="@ViewBag.SelectedServiceId" />
         <input type="hidden" id="hNgayChup" name="NgayChup" value="" />
         <input type="hidden" id="hKhungGio" name="KhungGio" value="" />
-        
+
         <!-- Hidden Inputs for Payment details -->
         <input type="hidden" id="hHinhThucThanhToan" name="HinhThucThanhToan" value="DatCoc" />
         <input type="hidden" id="hPhuongThucThanhToan" name="PhuongThucThanhToan" value="Chuyển khoản QR" />
@@ -457,9 +520,9 @@
 
             @if (ViewBag.Error != null)
             {
-                <div class="alert alert-danger shadow-sm border-0 mb-4 rounded-3 text-center">
-                    <i class="bi bi-exclamation-triangle-fill me-2"></i> @ViewBag.Error
-                </div>
+                    <div class="alert alert-danger shadow-sm border-0 mb-4 rounded-3 text-center">
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i> @ViewBag.Error
+                    </div>
             }
 
             <div class="row g-5">
@@ -477,23 +540,32 @@
 
                         <div id="packageList" class="d-flex flex-column gap-3">
                             @if (ViewBag.Services != null)
+
                             {
+
                                 var services = ViewBag.Services as IEnumerable<HamaStudio.Models.DichVu>;
+
                                 int? selectedId = ViewBag.SelectedServiceId as int?;
+
                                 foreach (var svc in services)
+
                                 {
+
                                     var addonsJson = Newtonsoft.Json.JsonConvert.SerializeObject((svc.DichVuBoSungs ?? new List<HamaStudio.Models.DichVuBoSung>()).Select(a => new { MaDVBS = a.MaDVBS, TenDVBS = a.TenDVBS, GiaTien = (double)a.GiaTien, MoTa = a.MoTa }));
-                                    <div class="booking-pkg-card @(selectedId == svc.MaDichVu ? "selected" : "")" data-id="@svc.MaDichVu" data-price="@svc.GiaTien" data-addons='@Html.Raw(addonsJson)' onclick="selectPackage(this)">
-                                        <img src="@(string.IsNullOrEmpty(svc.LinkAnhDaiDien) ? Url.Content("~/Content/Images/default.jpg") : (svc.LinkAnhDaiDien.StartsWith("http") ? svc.LinkAnhDaiDien : Url.Content("~/Content/Images/" + svc.LinkAnhDaiDien)))" onerror="this.src='https://images.unsplash.com/photo-1519225421980-715cb0215aed?w=300'" alt="@svc.TenDichVu" />
-                                        <div class="pkg-content position-relative">
-                                            <h6 class="serif fw-bold mb-1 pkg-name">@svc.TenDichVu</h6>
-                                            <p class="text-muted small mb-2 pkg-description">@svc.MoTa</p>
-                                            <div class="fw-bold text-dark">@svc.GiaTien.ToString("N0") ₫</div>
-                                        </div>
-                                    </div>
+                                            <div class="booking-pkg-card @(selectedId == svc.MaDichVu ? "selected" : "")" data-id="@svc.MaDichVu" data-price="@svc.GiaTien" data-addons='@Html.Raw(addonsJson)' onclick="selectPackage(this)">
+                                                <img src="@(string.IsNullOrEmpty(svc.LinkAnhDaiDien) ? Url.Content("~/Content/Images/default.jpg") : (svc.LinkAnhDaiDien.StartsWith("http") ? svc.LinkAnhDaiDien : Url.Content("~/Content/Images/" + svc.LinkAnhDaiDien)))" onerror="this.src='https://images.unsplash.com/photo-1519225421980-715cb0215aed?w=300'" alt="@svc.TenDichVu" />
+                                                <div class="pkg-content position-relative">
+                                                    <span class="pkg-selected-badge"><i class="bi bi-check-lg"></i> Đã chọn</span>
+                                                    <h6 class="serif fw-bold mb-1 pkg-name">@svc.TenDichVu</h6>
+                                                    <p class="text-muted small mb-2 pkg-description">@svc.MoTa</p>
+                                                    <div class="fw-bold text-dark">@svc.GiaTien.ToString("N0") ₫</div>
+                                                </div>
+                                            </div>
                                 }
+
                             }
                         </div>
+                        <p id="pkgCollapseHint" onclick="expandAllPackages()"><i class="bi bi-chevron-down me-1"></i> Xem tất cả gói chụp khác</p>
                         <p id="noResults" class="text-muted mt-3 text-center" style="display:none;">Không tìm thấy gói phù hợp...</p>
                     </div>
 
@@ -527,7 +599,7 @@
                                         <option value="4000000" data-name="Hà Nội">Hà Nội (+ 4.000.000đ)</option>
                                     </optgroup>
                                 </select>
-                                
+
                                 <label class="small text-uppercase fw-bold text-muted">Địa chỉ chi tiết *</label>
                                 <input type="text" id="diaDiem" class="input-luxury" placeholder="Số nhà, tên đường, tên quán cafe/resort...">
                             </div>
@@ -553,7 +625,7 @@
                                     </select>
                                 </div>
                             </div>
-                            
+
                             <label class="small text-uppercase fw-bold text-muted">Địa chỉ chi tiết *</label>
                             <div class="d-flex gap-2">
                                 <input type="text" id="soNha" class="input-luxury flex-grow-1" placeholder="Số nhà, tên đường, tên quán cafe/resort..." oninput="resetDistance()" required>
@@ -578,7 +650,7 @@
                 <div class="col-lg-5">
                     <div class="sidebar-box sticky-top" style="top:100px;">
                         <h5 class="serif fw-bold mb-4">4. Thời gian mong muốn</h5>
-                        
+
                         <!-- Lịch chụp -->
                         <div class="mb-4">
                             <div class="d-flex align-items-center justify-content-between mb-4">
@@ -596,8 +668,9 @@
                         <label class="small text-uppercase fw-bold text-muted mb-3 d-block">Khung giờ buổi chụp</label>
                         <div class="row g-2 mb-2">
                             @foreach (var t in new[] { "08:00", "10:00", "14:00", "16:00", "19:00" })
+
                             {
-                                <div class="col-4"><button type="button" class="time-slot" data-time="@t">@t</button></div>
+                                    <div class="col-4"><button type="button" class="time-slot" data-time="@t">@t</button></div>
                             }
                         </div>
                         <div id="slotNotice" class="small text-success mb-4 d-none"></div>
@@ -695,7 +768,7 @@
                         <!-- QR Code panel -->
                         <div id="panelQR" class="p-3 bg-light rounded-3 shadow-sm mb-4 border border-warning" style="background:#fffcf9 !important;">
                             <span class="badge bg-warning text-dark mb-3 text-uppercase fw-bold ls-1" style="font-size: 0.65rem;">Quét Mã QR VietQR</span>
-                            
+
                             <!-- Dynamic QR Code (VietQR API) -->
                             <div class="mx-auto bg-white p-3 rounded-3 shadow-sm border border-light" style="width:230px; height:230px;">
                                 <img id="imgQR" src="https://img.vietqr.io/image/MB-0336486377-compact2.png?amount=0&addInfo=HAMA%20LD&accountName=HAMA%20STUDIO" alt="Mã QR thanh toán Hama Studio" class="img-fluid w-100 h-100" />
@@ -778,777 +851,812 @@
 </div>
 
 @section Scripts {
-    <!-- Google Maps đã được thay thế bằng giải pháp OpenStreetMap + OSRM hoàn toàn miễn phí và không cần API Key -->
-    <script>
-        (function () {
-            // ==================== CUSTOM MODAL LOGIC ====================
-            window.showErrorModal = function(msg) {
-                document.getElementById('customErrorMessage').textContent = msg;
-                document.getElementById('customErrorModal').classList.add('active');
-            };
-            window.closeErrorModal = function() {
-                document.getElementById('customErrorModal').classList.remove('active');
-            };
+        <!-- Google Maps đã được thay thế bằng giải pháp OpenStreetMap + OSRM hoàn toàn miễn phí và không cần API Key -->
+        <script>
+            (function () {
+                // ==================== CUSTOM MODAL LOGIC ====================
+                window.showErrorModal = function(msg) {
+                    document.getElementById('customErrorMessage').textContent = msg;
+                    document.getElementById('customErrorModal').classList.add('active');
+                };
+                window.closeErrorModal = function() {
+                    document.getElementById('customErrorModal').classList.remove('active');
+                };
 
-            // ==================== CALENDAR SYSTEM ====================
-            var cur = new Date(); cur.setDate(1);
-            function renderCal() {
-                var y = cur.getFullYear(), m = cur.getMonth();
-                var names = ['Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4', 'Tháng 5', 'Tháng 6', 'Tháng 7', 'Tháng 8', 'Tháng 9', 'Tháng 10', 'Tháng 11', 'Tháng 12'];
-                document.getElementById('calTitle').textContent = names[m] + ', ' + y;
-                var first = new Date(y, m, 1).getDay();
-                var days = new Date(y, m + 1, 0).getDate();
-                var startCol = (first === 0) ? 6 : first - 1;
-                var html = '<tr>', col = 0;
-                
-                // Tránh chọn ngày quá khứ
-                var today = new Date();
-                today.setHours(0,0,0,0);
+                // ==================== CALENDAR SYSTEM ====================
+                var cur = new Date(); cur.setDate(1);
+                function renderCal() {
+                    var y = cur.getFullYear(), m = cur.getMonth();
+                    var names = ['Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4', 'Tháng 5', 'Tháng 6', 'Tháng 7', 'Tháng 8', 'Tháng 9', 'Tháng 10', 'Tháng 11', 'Tháng 12'];
+                    document.getElementById('calTitle').textContent = names[m] + ', ' + y;
+                    var first = new Date(y, m, 1).getDay();
+                    var days = new Date(y, m + 1, 0).getDate();
+                    var startCol = (first === 0) ? 6 : first - 1;
+                    var html = '<tr>', col = 0;
 
-                for (var i = 0; i < startCol; i++) { html += '<td></td>'; col++; }
-                for (var d = 1; d <= days; d++) {
-                    var cellDate = new Date(y, m, d);
-                    var isDisabled = cellDate < today ? 'disabled style="opacity:0.25; cursor:not-allowed;"' : '';
-                    var isTodayClass = cellDate.toDateString() === today.toDateString() ? 'today' : '';
-                    
-                    html += `<td><button type="button" class="cal-day ${isTodayClass}" ${isDisabled} data-d="${d}" data-m="${m + 1}" data-y="${y}">${d}</button></td>`;
-                    col++; if (col === 7) { html += '</tr><tr>'; col = 0; }
-                }
-                document.getElementById('calBody').innerHTML = html + '</tr>';
-                document.querySelectorAll('.cal-day').forEach(btn => {
-                    btn.onclick = function () {
-                        document.querySelectorAll('.cal-day').forEach(b => b.classList.remove('selected'));
-                        this.classList.add('selected');
-                        var mm = (this.dataset.m).padStart(2, '0');
-                        var dd = (this.dataset.d).padStart(2, '0');
-                        var selectedDate = this.dataset.y + '-' + mm + '-' + dd;
-                        document.getElementById('sumDate').textContent = dd + '/' + mm + '/' + this.dataset.y;
-                        document.getElementById('hNgayChup').value = selectedDate;
-                        
-                        // Gọi hàm kiểm tra trùng lịch (ekip bận)
-                        checkUnavailableSlots(selectedDate);
+                    // Tránh chọn ngày quá khứ
+                    var today = new Date();
+                    today.setHours(0,0,0,0);
+
+                    for (var i = 0; i < startCol; i++) { html += '<td></td>'; col++; }
+                    for (var d = 1; d <= days; d++) {
+                        var cellDate = new Date(y, m, d);
+                        var isDisabled = cellDate < today ? 'disabled style="opacity:0.25; cursor:not-allowed;"' : '';
+                        var isTodayClass = cellDate.toDateString() === today.toDateString() ? 'today' : '';
+
+                        html += `<td><button type="button" class="cal-day ${isTodayClass}" ${isDisabled} data-d="${d}" data-m="${m + 1}" data-y="${y}">${d}</button></td>`;
+                        col++; if (col === 7) { html += '</tr><tr>'; col = 0; }
                     }
-                });
-            }
-            
-            document.getElementById('prevMonth').onclick = () => { cur.setMonth(cur.getMonth() - 1); renderCal(); };
-            document.getElementById('nextMonth').onclick = () => { cur.setMonth(cur.getMonth() + 1); renderCal(); };
-            renderCal();
+                    document.getElementById('calBody').innerHTML = html + '</tr>';
+                    document.querySelectorAll('.cal-day').forEach(btn => {
+                        btn.onclick = function () {
+                            document.querySelectorAll('.cal-day').forEach(b => b.classList.remove('selected'));
+                            this.classList.add('selected');
+                            var mm = (this.dataset.m).padStart(2, '0');
+                            var dd = (this.dataset.d).padStart(2, '0');
+                            var selectedDate = this.dataset.y + '-' + mm + '-' + dd;
+                            document.getElementById('sumDate').textContent = dd + '/' + mm + '/' + this.dataset.y;
+                            document.getElementById('hNgayChup').value = selectedDate;
 
-            // ==================== CHECK UNAVAILABLE SLOTS ====================
-            function checkUnavailableSlots(dateStr) {
-                // Reset trạng thái tất cả các slot trước khi kiểm tra
-                document.querySelectorAll('.time-slot').forEach(btn => {
-                    btn.removeAttribute('disabled');
-                    btn.style.opacity = '1';
-                    btn.style.pointerEvents = 'auto';
-                    btn.style.backgroundColor = '';
-                    btn.style.color = '';
-                    btn.style.borderColor = '';
-                    btn.title = '';
-                    
-                    const originalTime = btn.dataset.time;
-                    btn.innerHTML = originalTime;
-                    
-                    btn.removeAttribute('data-max');
-                    btn.removeAttribute('data-booked');
-                });
-                
-                document.getElementById('slotNotice').classList.add('d-none');
-
-                var isToday = false;
-                var currentTimeVal = 0;
-                var closestNextSlot = -1;
-
-                var todayDate = new Date();
-                var todayStr = todayDate.getFullYear() + '-' + String(todayDate.getMonth() + 1).padStart(2, '0') + '-' + String(todayDate.getDate()).padStart(2, '0');
-                if (dateStr === todayStr) {
-                    isToday = true;
-                    currentTimeVal = todayDate.getHours() * 60 + todayDate.getMinutes();
-                    
-                    var slotsVals = [];
-                    document.querySelectorAll('.time-slot').forEach(btn => {
-                        var parts = btn.dataset.time.split(':');
-                        slotsVals.push(parseInt(parts[0]) * 60 + parseInt(parts[1]));
+                            // Gọi hàm kiểm tra trùng lịch (ekip bận)
+                            checkUnavailableSlots(selectedDate);
+                        }
                     });
-                    slotsVals.sort((a,b) => a - b);
-                    
-                    for (let i = 0; i < slotsVals.length; i++) {
-                        if (slotsVals[i] > currentTimeVal) {
-                            closestNextSlot = slotsVals[i];
-                            break;
+                }
+
+                document.getElementById('prevMonth').onclick = () => { cur.setMonth(cur.getMonth() - 1); renderCal(); };
+                document.getElementById('nextMonth').onclick = () => { cur.setMonth(cur.getMonth() + 1); renderCal(); };
+                renderCal();
+
+                // ==================== CHECK UNAVAILABLE SLOTS ====================
+                function checkUnavailableSlots(dateStr) {
+                    // Reset trạng thái tất cả các slot trước khi kiểm tra
+                    document.querySelectorAll('.time-slot').forEach(btn => {
+                        btn.removeAttribute('disabled');
+                        btn.style.opacity = '1';
+                        btn.style.pointerEvents = 'auto';
+                        btn.style.backgroundColor = '';
+                        btn.style.color = '';
+                        btn.style.borderColor = '';
+                        btn.title = '';
+
+                        const originalTime = btn.dataset.time;
+                        btn.innerHTML = originalTime;
+
+                        btn.removeAttribute('data-max');
+                        btn.removeAttribute('data-booked');
+                    });
+
+                    document.getElementById('slotNotice').classList.add('d-none');
+
+                    var isToday = false;
+                    var currentTimeVal = 0;
+                    var closestNextSlot = -1;
+
+                    var todayDate = new Date();
+                    var todayStr = todayDate.getFullYear() + '-' + String(todayDate.getMonth() + 1).padStart(2, '0') + '-' + String(todayDate.getDate()).padStart(2, '0');
+                    if (dateStr === todayStr) {
+                        isToday = true;
+                        currentTimeVal = todayDate.getHours() * 60 + todayDate.getMinutes();
+
+                        var slotsVals = [];
+                        document.querySelectorAll('.time-slot').forEach(btn => {
+                            var parts = btn.dataset.time.split(':');
+                            slotsVals.push(parseInt(parts[0]) * 60 + parseInt(parts[1]));
+                        });
+                        slotsVals.sort((a,b) => a - b);
+
+                        for (let i = 0; i < slotsVals.length; i++) {
+                            if (slotsVals[i] > currentTimeVal) {
+                                closestNextSlot = slotsVals[i];
+                                break;
+                            }
                         }
+                    }
+
+                    var serviceId = document.getElementById('hMaDichVu').value;
+                    if (!serviceId) return;
+
+                    fetch(`/Booking/GetBookedSlots?date=${dateStr}&serviceId=${serviceId}`)
+                        .then(res => res.json())
+                        .then(data => {
+                            if (data.success) {
+                                const maxSlots = data.maxSlots || 1;
+                                const bookedMap = {};
+                                if (data.bookedSlots) {
+                                    data.bookedSlots.forEach(s => { bookedMap[s.KhungGio] = s.Count; });
+                                }
+
+                                document.querySelectorAll('.time-slot').forEach(btn => {
+                                    const slotTime = btn.dataset.time;
+                                    const booked = bookedMap[slotTime] || 0;
+                                    const remaining = maxSlots - booked;
+
+                                    btn.dataset.max = maxSlots;
+                                    btn.dataset.booked = booked;
+
+                                    var parts = slotTime.split(':');
+                                    var slotTimeVal = parseInt(parts[0]) * 60 + parseInt(parts[1]);
+
+                                    var isPassedOrTooClose = false;
+                                    if (isToday) {
+                                        if (slotTimeVal <= currentTimeVal || slotTimeVal === closestNextSlot) {
+                                            isPassedOrTooClose = true;
+                                        }
+                                    }
+
+                                    if (remaining <= 0 || isPassedOrTooClose) {
+                                        btn.setAttribute('disabled', 'disabled');
+                                        btn.style.opacity = '0.5';
+                                        btn.style.pointerEvents = 'none';
+                                        btn.style.backgroundColor = '#f8f9fa';
+                                        btn.style.color = '#adb5bd';
+                                        btn.style.borderColor = '#dee2e6';
+
+                                        if (isPassedOrTooClose && remaining > 0) {
+                                            btn.innerHTML = `${slotTime}<br><small style="font-size: 0.65rem; display:block; margin-top:-2px;">Không khả dụng</small>`;
+                                        } else {
+                                            btn.innerHTML = `${slotTime}<br><small style="font-size: 0.65rem; display:block; margin-top:-2px;">Hết chỗ</small>`;
+                                        }
+
+                                        if (btn.classList.contains('selected')) {
+                                            btn.classList.remove('selected');
+                                            document.getElementById('sumTime').textContent = '—';
+                                            document.getElementById('hKhungGio').value = '';
+                                        }
+                                    }
+                                });
+
+                                updateSlotNotice();
+                            }
+                        })
+                        .catch(err => console.error("Lỗi khi kiểm tra lịch bận:", err));
+                }
+
+                function updateSlotNotice() {
+                    var notice = document.getElementById('slotNotice');
+                    var selectedBtn = document.querySelector('.time-slot.selected');
+                    if (selectedBtn && selectedBtn.dataset.max) {
+                        var max = parseInt(selectedBtn.dataset.max);
+                        var booked = parseInt(selectedBtn.dataset.booked || 0);
+                        var remaining = max - booked;
+                        notice.innerHTML = `<i class="bi bi-info-circle-fill me-1"></i> Khung giờ này còn trống <strong>${remaining}</strong> suất.`;
+                        notice.classList.remove('d-none');
+                    } else {
+                        notice.classList.add('d-none');
                     }
                 }
 
-                var serviceId = document.getElementById('hMaDichVu').value;
-                if (!serviceId) return;
-
-                fetch(`/Booking/GetBookedSlots?date=${dateStr}&serviceId=${serviceId}`)
-                    .then(res => res.json())
-                    .then(data => {
-                        if (data.success) {
-                            const maxSlots = data.maxSlots || 1;
-                            const bookedMap = {};
-                            if (data.bookedSlots) {
-                                data.bookedSlots.forEach(s => { bookedMap[s.KhungGio] = s.Count; });
-                            }
-
-                            document.querySelectorAll('.time-slot').forEach(btn => {
-                                const slotTime = btn.dataset.time;
-                                const booked = bookedMap[slotTime] || 0;
-                                const remaining = maxSlots - booked;
-                                
-                                btn.dataset.max = maxSlots;
-                                btn.dataset.booked = booked;
-                                
-                                var parts = slotTime.split(':');
-                                var slotTimeVal = parseInt(parts[0]) * 60 + parseInt(parts[1]);
-                                
-                                var isPassedOrTooClose = false;
-                                if (isToday) {
-                                    if (slotTimeVal <= currentTimeVal || slotTimeVal === closestNextSlot) {
-                                        isPassedOrTooClose = true;
-                                    }
-                                }
-                                
-                                if (remaining <= 0 || isPassedOrTooClose) {
-                                    btn.setAttribute('disabled', 'disabled');
-                                    btn.style.opacity = '0.5';
-                                    btn.style.pointerEvents = 'none';
-                                    btn.style.backgroundColor = '#f8f9fa';
-                                    btn.style.color = '#adb5bd';
-                                    btn.style.borderColor = '#dee2e6';
-                                    
-                                    if (isPassedOrTooClose && remaining > 0) {
-                                        btn.innerHTML = `${slotTime}<br><small style="font-size: 0.65rem; display:block; margin-top:-2px;">Không khả dụng</small>`;
-                                    } else {
-                                        btn.innerHTML = `${slotTime}<br><small style="font-size: 0.65rem; display:block; margin-top:-2px;">Hết chỗ</small>`;
-                                    }
-                                    
-                                    if (btn.classList.contains('selected')) {
-                                        btn.classList.remove('selected');
-                                        document.getElementById('sumTime').textContent = '—';
-                                        document.getElementById('hKhungGio').value = '';
-                                    }
-                                }
-                            });
-                            
-                            updateSlotNotice();
-                        }
-                    })
-                    .catch(err => console.error("Lỗi khi kiểm tra lịch bận:", err));
-            }
-
-            function updateSlotNotice() {
-                var notice = document.getElementById('slotNotice');
-                var selectedBtn = document.querySelector('.time-slot.selected');
-                if (selectedBtn && selectedBtn.dataset.max) {
-                    var max = parseInt(selectedBtn.dataset.max);
-                    var booked = parseInt(selectedBtn.dataset.booked || 0);
-                    var remaining = max - booked;
-                    notice.innerHTML = `<i class="bi bi-info-circle-fill me-1"></i> Khung giờ này còn trống <strong>${remaining}</strong> suất.`;
-                    notice.classList.remove('d-none');
-                } else {
-                    notice.classList.add('d-none');
-                }
-            }
-
-            // ==================== TIME SLOTS ====================
-            document.querySelectorAll('.time-slot').forEach(btn => {
-                btn.onclick = function () {
-                    document.querySelectorAll('.time-slot').forEach(b => b.classList.remove('selected'));
-                    this.classList.add('selected');
-                    var t = this.dataset.time;
-                    document.getElementById('sumTime').textContent = t;
-                    document.getElementById('hKhungGio').value = t;
-                    updateSlotNotice();
-                }
-            });
-
-            // ==================== SERVICE SEARCH & FILTER ====================
-            window.filterPackages = function () {
-                var text = document.getElementById('pkgSearch').value.toLowerCase();
-                var cards = document.querySelectorAll('.booking-pkg-card');
-                var found = 0;
-                cards.forEach(c => {
-                    var name = c.querySelector('.pkg-name').textContent.toLowerCase();
-                    if (name.includes(text)) { c.style.display = 'flex'; found++; }
-                    else { c.style.display = 'none'; }
+                // ==================== TIME SLOTS ====================
+                document.querySelectorAll('.time-slot').forEach(btn => {
+                    btn.onclick = function () {
+                        document.querySelectorAll('.time-slot').forEach(b => b.classList.remove('selected'));
+                        this.classList.add('selected');
+                        var t = this.dataset.time;
+                        document.getElementById('sumTime').textContent = t;
+                        document.getElementById('hKhungGio').value = t;
+                        updateSlotNotice();
+                    }
                 });
-                document.getElementById('noResults').style.display = (found === 0) ? 'block' : 'none';
-            }
-        })();
 
-        // ==================== WIZARD & CALCULATION ====================
-        var basePrice = 0;
-        var totalPrice = 0;
-        var depositPrice = 0;
-        var currentStep = 1;
-        var bookingCodePlaceholder = "HAMA" + Math.floor(1000 + Math.random() * 9000);
-
-        // Biến lưu phí di chuyển
-        var travelFee = 0;
-        var travelDistance = 0;
-        var travelNote = "";
-
-        function selectPackage(card) {
-            var oldId = document.getElementById('hMaDichVu').value;
-            var newId = card.dataset.id;
-            
-            if (oldId && oldId !== newId) {
-                // 1. Reset Dịch vụ đi kèm (Addons)
-                document.querySelectorAll('.extra-cb').forEach(cb => {
-                    cb.checked = false;
-                });
-                
-                // 2. Reset Ghi chú đặc biệt
-                var gc = document.getElementById('ghiChu');
-                if (gc) gc.value = '';
-                
-                // 3. Reset Lịch chụp
-                document.getElementById('hNgayChup').value = '';
-                document.getElementById('sumDate').textContent = '—';
-                document.querySelectorAll('.cal-day').forEach(b => b.classList.remove('selected'));
-                
-                // 4. Reset Khung giờ
-                document.getElementById('hKhungGio').value = '';
-                document.getElementById('sumTime').textContent = '—';
-                document.querySelectorAll('.time-slot').forEach(b => {
-                    b.classList.remove('selected');
-                    const originalTime = b.dataset.time;
-                    b.innerHTML = originalTime;
-                    b.removeAttribute('disabled');
-                    b.style.opacity = '1';
-                    b.style.pointerEvents = 'auto';
-                    b.style.backgroundColor = '';
-                    b.style.color = '';
-                    b.style.borderColor = '';
-                });
-                document.getElementById('slotNotice').classList.add('d-none');
-            }
-
-            document.querySelectorAll('.booking-pkg-card').forEach(c => c.classList.remove('selected'));
-            card.classList.add('selected');
-            basePrice = parseInt(card.dataset.price);
-            document.getElementById('sumService').textContent = card.querySelector('.pkg-name').textContent;
-            document.getElementById('hMaDichVu').value = card.dataset.id;
-            
-            // Tải động dịch vụ đi kèm
-            var addons = [];
-            try {
-                addons = JSON.parse(card.dataset.addons || '[]');
-            } catch (e) {
-                console.error("Lỗi khi parse addons JSON:", e);
-            }
-            renderAddons(addons);
-
-            // Cập nhật lại slot trống nếu đã chọn ngày
-            var dateStr = document.getElementById('hNgayChup').value;
-            if (dateStr) {
-                checkUnavailableSlots(dateStr);
-            }
-            
-            calcTotal();
-        }
-
-        // Initialize if package is selected via URL query parameter
-        var sel = document.querySelector('.booking-pkg-card.selected');
-        if (sel) selectPackage(sel);
-
-        function renderAddons(addons) {
-            var container = document.getElementById('addonsContainer');
-            if (!container) return;
-            
-            if (!addons || addons.length === 0) {
-                container.innerHTML = '<p class="text-muted small">Gói chụp này không có dịch vụ đi kèm thêm.</p>';
-                return;
-            }
-            
-            var html = '';
-            addons.forEach(addon => {
-                var addonId = `ex_${addon.MaDVBS}`;
-                var formattedPrice = '';
-                if (addon.GiaTien >= 1000000) {
-                    formattedPrice = `+${(addon.GiaTien / 1000000).toFixed(1).replace('.0', '')}M`;
-                } else {
-                    formattedPrice = `+${(addon.GiaTien / 1000).toLocaleString()}K`;
+                // ==================== SERVICE SEARCH & FILTER ====================
+                window.filterPackages = function () {
+                    var text = document.getElementById('pkgSearch').value.toLowerCase();
+                    var cards = document.querySelectorAll('.booking-pkg-card');
+                    var found = 0;
+                    cards.forEach(c => {
+                        var name = c.querySelector('.pkg-name').textContent.toLowerCase();
+                        if (name.includes(text)) { c.style.display = 'flex'; found++; }
+                        else { c.style.display = 'none'; }
+                    });
+                    document.getElementById('noResults').style.display = (found === 0) ? 'block' : 'none';
                 }
-                
-                html += `
-                    <div class="col-md-6">
-                        <div class="extra-item d-flex justify-content-between align-items-center" onclick="toggleCheckbox('${addonId}', event)">
-                            <div class="form-check m-0">
-                                <input class="form-check-input extra-cb" type="checkbox" value="${addon.GiaTien}" id="${addonId}" data-name="${addon.TenDVBS}" onchange="calcTotal()" onclick="event.stopPropagation()">
-                                <label class="form-check-label small fw-bold" for="${addonId}" onclick="event.stopPropagation()">${addon.TenDVBS}</label>
-                            </div>
-                            <span class="small text-muted">${formattedPrice}</span>
-                        </div>
-                    </div>
-                `;
-            });
-            container.innerHTML = html;
-        }
+            })();
 
-        function toggleCheckbox(id, event) {
-            if (event && (event.target.tagName === 'INPUT' || event.target.tagName === 'LABEL')) {
-                return;
-            }
-            var cb = document.getElementById(id);
-            if (cb) {
-                cb.checked = !cb.checked;
+            // ==================== WIZARD & CALCULATION ====================
+            var basePrice = 0;
+            var totalPrice = 0;
+            var depositPrice = 0;
+            var currentStep = 1;
+            var bookingCodePlaceholder = "HAMA" + Math.floor(1000 + Math.random() * 9000);
+
+            // Biến lưu phí di chuyển
+            var travelFee = 0;
+            var travelDistance = 0;
+            var travelNote = "";
+
+            function selectPackage(card) {
+                var oldId = document.getElementById('hMaDichVu').value;
+                var newId = card.dataset.id;
+                var isAlreadySelected = (oldId === newId) && card.classList.contains('selected');
+
+                // === TOGGLE: Click same card → expand all back ===
+                if (isAlreadySelected) {
+                    expandAllPackages();
+                    return;
+                }
+
+                if (oldId && oldId !== newId) {
+                    // 1. Reset Dịch vụ đi kèm (Addons)
+                    document.querySelectorAll('.extra-cb').forEach(cb => {
+                        cb.checked = false;
+                    });
+
+                    // 2. Reset Ghi chú đặc biệt
+                    var gc = document.getElementById('ghiChu');
+                    if (gc) gc.value = '';
+
+                    // 3. Reset Lịch chụp
+                    document.getElementById('hNgayChup').value = '';
+                    document.getElementById('sumDate').textContent = '—';
+                    document.querySelectorAll('.cal-day').forEach(b => b.classList.remove('selected'));
+
+                    // 4. Reset Khung giờ
+                    document.getElementById('hKhungGio').value = '';
+                    document.getElementById('sumTime').textContent = '—';
+                    document.querySelectorAll('.time-slot').forEach(b => {
+                        b.classList.remove('selected');
+                        const originalTime = b.dataset.time;
+                        b.innerHTML = originalTime;
+                        b.removeAttribute('disabled');
+                        b.style.opacity = '1';
+                        b.style.pointerEvents = 'auto';
+                        b.style.backgroundColor = '';
+                        b.style.color = '';
+                        b.style.borderColor = '';
+                    });
+                    document.getElementById('slotNotice').classList.add('d-none');
+                }
+
+                // === COLLAPSE other cards ===
+                document.querySelectorAll('.booking-pkg-card').forEach(c => {
+                    c.classList.remove('selected');
+                    if (c !== card) {
+                        c.classList.add('pkg-hidden');
+                    } else {
+                        c.classList.remove('pkg-hidden');
+                    }
+                });
+                card.classList.add('selected');
+
+                // Show collapse hint
+                var hint = document.getElementById('pkgCollapseHint');
+                if (hint) hint.style.display = 'block';
+
+                // Hide search box when collapsed
+                var searchWrapper = document.querySelector('.search-wrapper');
+                if (searchWrapper) searchWrapper.style.display = 'none';
+
+                basePrice = parseInt(card.dataset.price);
+                document.getElementById('sumService').textContent = card.querySelector('.pkg-name').textContent;
+                document.getElementById('hMaDichVu').value = card.dataset.id;
+
+                // Tải động dịch vụ đi kèm
+                var addons = [];
+                try {
+                    addons = JSON.parse(card.dataset.addons || '[]');
+                } catch (e) {
+                    console.error("Lỗi khi parse addons JSON:", e);
+                }
+                renderAddons(addons);
+
+                // Cập nhật lại slot trống nếu đã chọn ngày
+                var dateStr = document.getElementById('hNgayChup').value;
+                if (dateStr) {
+                    checkUnavailableSlots(dateStr);
+                }
+
                 calcTotal();
             }
-        }
 
-        function calcTotal() {
-            var extra = 0;
-            document.querySelectorAll('.extra-cb:checked').forEach(cb => { extra += parseInt(cb.value); });
-            totalPrice = basePrice + extra + travelFee;
-            depositPrice = Math.round(totalPrice * 0.3);
-
-            // Ghi giá trị Tổng Tiền Thực Tế để lưu vào Database
-            document.getElementById('hTongTienThucTe').value = totalPrice;
-
-            document.getElementById('sumExtra').textContent = extra.toLocaleString() + ' ₫';
-            
-            var feeDisplay = travelFee > 0 ? travelFee.toLocaleString() + ' ₫' : 'Miễn phí';
-            document.getElementById('sumTravelFee').textContent = feeDisplay;
-            if (travelFee > 0) {
-                document.getElementById('sumTravelFee').className = "fw-bold text-danger";
-            } else {
-                document.getElementById('sumTravelFee').className = "fw-bold text-success";
-            }
-            
-            document.getElementById('sumTotal').textContent = totalPrice.toLocaleString() + ' ₫';
-            
-            // Cập nhật giá trị hiển thị ở Step 2
-            document.getElementById('valPayCoc').textContent = depositPrice.toLocaleString() + ' ₫';
-            document.getElementById('valPayHet').textContent = totalPrice.toLocaleString() + ' ₫';
-            
-            // Cập nhật giá trị ở phần QR/Giao dịch
-            updatePaymentDetails();
-        }
-
-        function upSummary() {
-            var tinh = document.getElementById('tinhThanh');
-            var quan = document.getElementById('quanHuyen');
-            var phuong = document.getElementById('phuongXa');
-            var soNha = document.getElementById('soNha').value.trim();
-            
-            var fullLoc = "Chưa nhập địa chỉ";
-            
-            if (tinh.value && quan.value && phuong.value && soNha) {
-                var tinhName = tinh.options[tinh.selectedIndex].dataset.name;
-                var quanName = quan.options[quan.selectedIndex].dataset.name;
-                var phuongName = phuong.options[phuong.selectedIndex].dataset.name;
-                fullLoc = `${soNha}, ${phuongName}, ${quanName}, ${tinhName}`;
-            }
-            
-            document.getElementById('sumLoc').textContent = fullLoc;
-            document.getElementById('hDiaDiemGop').value = fullLoc; // Lưu toàn bộ vào DB
-            
-            if (fullLoc !== "Chưa nhập địa chỉ") {
-                document.getElementById('diaDiem').value = fullLoc; // Lưu ẩn vào ô cũ tránh null required
-            } else {
-                document.getElementById('diaDiem').value = "";
-            }
-            
-            calcTotal();
-        }
-
-        // ==================== STEP TRANSITIONS ====================
-        function goToStep2() {
-            var fMaDichVu = document.getElementById('hMaDichVu').value;
-            var fNgayChup = document.getElementById('hNgayChup').value;
-            var fKhungGio = document.getElementById('hKhungGio').value;
-            var tinh = document.getElementById('tinhThanh').value;
-            var quan = document.getElementById('quanHuyen').value;
-            var phuong = document.getElementById('phuongXa').value;
-            var soNha = document.getElementById('soNha').value.trim();
-            var fSoDienThoai = document.getElementById('soDienThoai').value;
-
-            // Kiểm tra các trường dữ liệu ở Step 1
-            if (!fMaDichVu) { window.showErrorModal("Vui lòng chọn một Gói chụp dịch vụ ở khung bên trái!"); return; }
-            if (!fNgayChup) { window.showErrorModal("Vui lòng chọn Ngày chụp trên lịch (Ngày phải sau hôm nay ít nhất 1 ngày)!"); return; }
-            if (!fKhungGio) { window.showErrorModal("Vui lòng chọn Khung giờ cho buổi chụp!"); return; }
-            if (!tinh || !quan || !phuong || !soNha) { window.showErrorModal("Vui lòng nhập đầy đủ địa chỉ chi tiết cho buổi chụp!"); return; }
-            if (!isDistanceCalculated) { window.showErrorModal("Vui lòng nhấn nút Xác nhận (dấu tích) ở ô nhập địa chỉ để tính phí di chuyển trước khi tiếp tục!"); return; }
-            if (!fSoDienThoai.trim()) { window.showErrorModal("Vui lòng nhập Số điện thoại liên hệ!"); return; }
-
-            // Chuyển UI
-            document.getElementById('step1Container').style.display = 'none';
-            document.getElementById('step2Container').style.display = 'block';
-
-            // Cập nhật Progress Bar
-            document.getElementById('stepIndicator1').className = 'step-item completed';
-            document.getElementById('stepIndicator2').className = 'step-item active';
-            document.getElementById('progressLine').style.width = '50%';
-
-            currentStep = 2;
-            updatePaymentDetails();
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-
-        function goToStep1() {
-            document.getElementById('step1Container').style.display = 'block';
-            document.getElementById('step2Container').style.display = 'none';
-
-            // Cập nhật Progress Bar
-            document.getElementById('stepIndicator1').className = 'step-item active';
-            document.getElementById('stepIndicator2').className = 'step-item';
-            document.getElementById('progressLine').style.width = '0%';
-
-            currentStep = 1;
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-
-        // ==================== PAYMENT METHODS SELECTION ====================
-        function selectHinhThucThanhToan(type) {
-            document.getElementById('payOptionCoc').classList.remove('active');
-            document.getElementById('payOptionHet').classList.remove('active');
-            
-            document.getElementById('hHinhThucThanhToan').value = type;
-
-            if (type === 'DatCoc') {
-                document.getElementById('payOptionCoc').classList.add('active');
-            } else {
-                document.getElementById('payOptionHet').classList.add('active');
-            }
-            updatePaymentDetails();
-        }
-
-        function selectPhuongThuc(method) {
-            document.getElementById('payMethodQR').classList.remove('active');
-            document.getElementById('payMethodATM').classList.remove('active');
-            document.getElementById('payMethodVisa').classList.remove('active');
-
-            document.getElementById('hPhuongThucThanhToan').value = method;
-
-            if (method === 'Chuyển khoản QR') {
-                document.getElementById('payMethodQR').classList.add('active');
-                document.getElementById('panelQR').style.display = 'block';
-                document.getElementById('panelCreditCard').style.display = 'none';
-            } else if (method === 'Thẻ ATM nội địa') {
-                document.getElementById('payMethodATM').classList.add('active');
-                document.getElementById('panelQR').style.display = 'none';
-                document.getElementById('panelCreditCard').style.display = 'block';
-            } else {
-                document.getElementById('payMethodVisa').classList.add('active');
-                document.getElementById('panelQR').style.display = 'none';
-                document.getElementById('panelCreditCard').style.display = 'block';
-            }
-        }
-
-        function updatePaymentDetails() {
-            var hinhThuc = document.getElementById('hHinhThucThanhToan').value;
-            var amountToPay = (hinhThuc === 'DatCoc') ? depositPrice : totalPrice;
-            
-            // Ghi giá trị vào hidden input gửi đi
-            document.getElementById('hSoTienThanhToan').value = amountToPay;
-
-            // Cập nhật thông tin text hiển thị
-            document.getElementById('sumStep2Amount').textContent = amountToPay.toLocaleString() + ' ₫';
-            
-            var infoText = bookingCodePlaceholder + " " + (hinhThuc === 'DatCoc' ? "COC 30%" : "FULL 100%");
-            document.getElementById('sumStep2Content').textContent = infoText;
-            document.getElementById('sumStep2HinhThuc').textContent = (hinhThuc === 'DatCoc') ? "Đặt cọc trước (30%)" : "Thanh toán toàn bộ (100%)";
-
-            // Cập nhật URL QR động theo chuẩn VietQR API thực tế
-            var addInfoEncoded = encodeURIComponent(infoText);
-            var qrUrl = `https://img.vietqr.io/image/MB-0336486377-compact2.png?amount=${amountToPay}&addInfo=${addInfoEncoded}&accountName=HAMA%20STUDIO`;
-            document.getElementById('imgQR').src = qrUrl;
-        }
-
-        // ==================== SUBMISSION & SIMULATION ====================
-        function confirmPaymentAndSubmit() {
-            // Hiển thị Overlay mô phỏng thanh toán tự động
-            const overlay = document.getElementById('paymentLoadingOverlay');
-            const spinner = document.getElementById('paymentSpinner');
-            const successIcon = document.getElementById('paymentSuccessIcon');
-            const title = document.getElementById('paymentStatusTitle');
-            const desc = document.getElementById('paymentStatusDesc');
-            
-            overlay.classList.add('active');
-            spinner.classList.remove('d-none');
-            successIcon.classList.add('d-none');
-            title.textContent = "Đang đối soát giao dịch";
-            desc.textContent = "Hama Studio đang kết nối cổng ngân hàng để đối soát giao dịch VietQR tự động. Vui lòng không đóng trình duyệt...";
-
-            // Nối Ghi Chú tự động
-            var currentGhiChu = document.getElementById('ghiChu').value;
-            var extraNames = [];
-            document.querySelectorAll('.extra-cb:checked').forEach(cb => { extraNames.push(cb.dataset.name); });
-            var extraStr = extraNames.length > 0 ? "Dịch vụ đi kèm: " + extraNames.join(", ") : "";
-            var generatedNote = [extraStr, travelNote].filter(Boolean).join(" | ");
-            if (generatedNote) {
-                document.getElementById('ghiChu').value = (currentGhiChu ? currentGhiChu + "\n\n" : "") + "[" + generatedNote + "]";
-            }
-
-            // Giả lập tín hiệu chuyển khoản ngân hàng sau 1.5 giây
-            setTimeout(() => {
-                title.textContent = "Đã nhận tín hiệu chuyển khoản";
-                desc.textContent = "Cổng VietQR đã khớp lệnh mã đơn đặt lịch của bạn. Đang tiến hành xác minh số tiền giao dịch...";
-                
-                // Giả lập xác thực thành công sau 3 giây tổng cộng
-                setTimeout(() => {
-                    spinner.classList.add('d-none');
-                    successIcon.classList.remove('d-none');
-                    title.textContent = "Thanh toán thành công!";
-                    
-                    var moneyVal = parseInt(document.getElementById('hSoTienThanhToan').value) || 0;
-                    desc.innerHTML = `<span class="text-success fw-semibold">Hệ thống đã tự động ghi nhận số tiền ${moneyVal.toLocaleString()} ₫</span>.<br>Lịch chụp của bạn đã được xác nhận cọc 30% tự động. Đang chuẩn bị tạo đơn...`;
-                    
-                    // Cập nhật Progress Bar
-                    document.getElementById('stepIndicator2').className = 'step-item completed';
-                    document.getElementById('stepIndicator3').className = 'step-item active';
-                    document.getElementById('progressLine').style.width = '100%';
-
-                    // Submit form sau 1.8 giây hiển thị tích xanh thành công
-                    setTimeout(() => {
-                        document.getElementById('bookingWizardForm').submit();
-                    }, 1800);
-
-                }, 1500);
-
-            }, 1500);
-        }
-
-        // ==================== DISTANCE CALCULATION ====================
-        var STUDIO_ADDRESS = "Đà Nẵng, Việt Nam"; // Mốc xuất phát
-
-        // Fetch danh sách tỉnh thành
-        fetch('https://provinces.open-api.vn/api/?depth=1')
-            .then(res => res.json())
-            .then(data => {
-                let html = '<option value="">-- Tỉnh/Thành phố --</option>';
-                data.forEach(t => { html += `<option value="${t.code}" data-name="${t.name}">${t.name}</option>`; });
-                document.getElementById('tinhThanh').innerHTML = html;
-            });
-
-        function loadDistricts() {
-            var provinceCode = document.getElementById('tinhThanh').value;
-            var quanHuyen = document.getElementById('quanHuyen');
-            var phuongXa = document.getElementById('phuongXa');
-            
-            resetDistance();
-            phuongXa.innerHTML = '<option value="">-- Phường/Xã --</option>';
-            phuongXa.disabled = true;
-            
-            if (!provinceCode) {
-                quanHuyen.innerHTML = '<option value="">-- Quận/Huyện --</option>';
-                quanHuyen.disabled = true;
-                return;
-            }
-            
-            fetch(`https://provinces.open-api.vn/api/p/${provinceCode}?depth=2`)
-                .then(res => res.json())
-                .then(data => {
-                    let html = '<option value="">-- Quận/Huyện --</option>';
-                    data.districts.forEach(d => { html += `<option value="${d.code}" data-name="${d.name}">${d.name}</option>`; });
-                    quanHuyen.innerHTML = html;
-                    quanHuyen.disabled = false;
+            // Expand all packages back (called on second click or hint click)
+            function expandAllPackages() {
+                document.querySelectorAll('.booking-pkg-card').forEach(c => {
+                    c.classList.remove('pkg-hidden');
                 });
-        }
-
-        function loadWards() {
-            var districtCode = document.getElementById('quanHuyen').value;
-            var phuongXa = document.getElementById('phuongXa');
-            
-            resetDistance();
-            
-            if (!districtCode) {
-                phuongXa.innerHTML = '<option value="">-- Phường/Xã --</option>';
-                phuongXa.disabled = true;
-                return;
+                var hint = document.getElementById('pkgCollapseHint');
+                if (hint) hint.style.display = 'none';
+                var searchWrapper = document.querySelector('.search-wrapper');
+                if (searchWrapper) searchWrapper.style.display = 'block';
             }
-            
-            fetch(`https://provinces.open-api.vn/api/d/${districtCode}?depth=2`)
-                .then(res => res.json())
-                .then(data => {
-                    let html = '<option value="">-- Phường/Xã --</option>';
-                    data.wards.forEach(w => { html += `<option value="${w.code}" data-name="${w.name}">${w.name}</option>`; });
-                    phuongXa.innerHTML = html;
-                    phuongXa.disabled = false;
-                });
-        }
 
-        var isDistanceCalculated = false;
+            // Initialize if package is selected via URL query parameter
+            var sel = document.querySelector('.booking-pkg-card.selected');
+            if (sel) selectPackage(sel);
 
-        function resetDistance() {
-            travelFee = 0;
-            travelDistance = 0;
-            travelNote = "";
-            isDistanceCalculated = false;
-            document.getElementById('distanceResult').style.display = 'none';
-            document.getElementById('sumDistance').textContent = "0 km";
-            upSummary();
-        }
+            function renderAddons(addons) {
+                var container = document.getElementById('addonsContainer');
+                if (!container) return;
 
-        // Tọa độ mốc xuất phát: Hama Studio Đà Nẵng (123 Ngô Quyền, Đà Nẵng)
-        const STUDIO_COORDS = { lat: 16.09498, lon: 108.24488 };
-
-        // Hàm định vị địa chỉ chuẩn xác (Sử dụng ArcGIS cho độ chính xác số nhà tại VN)
-        async function geocodeExactAddress(soNha, phuongName, quanName, tinhName) {
-            const queries = [
-                `${soNha}, ${phuongName}, ${quanName}, ${tinhName}`,
-                `${phuongName}, ${quanName}, ${tinhName}`
-            ];
-            
-            for (let query of queries) {
-                try {
-                    const url = `https://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer/findAddressCandidates?f=json&singleLine=${encodeURIComponent(query)}&maxLocations=1`;
-                    const res = await fetch(url);
-                    const data = await res.json();
-                    
-                    if (data && data.candidates && data.candidates.length > 0) {
-                        const loc = data.candidates[0].location; // {x: lon, y: lat}
-                        return {
-                            lat: loc.y,
-                            lon: loc.x,
-                            matchedText: query
-                        };
-                    }
-                } catch (e) {
-                    console.error("Lỗi định vị ArcGIS với truy vấn: " + query, e);
+                if (!addons || addons.length === 0) {
+                    container.innerHTML = '<p class="text-muted small">Gói chụp này không có dịch vụ đi kèm thêm.</p>';
+                    return;
                 }
-            }
-            
-            throw new Error("Không thể định vị được địa chỉ này trên bản đồ. Vui lòng kiểm tra lại kết nối mạng!");
-        }
 
-        var map = null;
-        var marker = null;
-
-        function initOrUpdateMap(lat, lon) {
-            var mapContainer = document.getElementById('mapPicker');
-            mapContainer.style.display = 'block';
-            
-            if (!map) {
-                map = L.map('mapPicker').setView([lat, lon], 16);
-                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                    maxZoom: 19,
-                    attribution: '© OpenStreetMap'
-                }).addTo(map);
-                
-                marker = L.marker([lat, lon], { draggable: true }).addTo(map);
-                marker.bindPopup("<b>Vị trí chụp</b><br>Kéo thả ghim để định vị chính xác!").openPopup();
-                
-                marker.on('dragend', async function(e) {
-                    var newPos = marker.getLatLng();
-                    await calculateOsrmRoute(newPos.lat, newPos.lng);
-                });
-            } else {
-                map.setView([lat, lon], 16);
-                marker.setLatLng([lat, lon]);
-                marker.bindPopup("<b>Vị trí chụp</b><br>Kéo thả ghim để định vị chính xác!").openPopup();
-            }
-            
-            // Fix map display issue when container was hidden
-            setTimeout(() => { map.invalidateSize(); }, 300);
-        }
-
-        async function calculateOsrmRoute(destLat, destLon) {
-            var btn = document.getElementById('btnConfirmAddress');
-            var resDiv = document.getElementById('distanceResult');
-            
-            btn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>';
-            btn.disabled = true;
-            
-            try {
-                var osrmUrl = `https://router.project-osrm.org/route/v1/driving/${STUDIO_COORDS.lon},${STUDIO_COORDS.lat};${destLon},${destLat}?overview=false`;
-                
-                var routeRes = await fetch(osrmUrl);
-                var routeData = await routeRes.json();
-                
-                btn.innerHTML = '<i class="bi bi-check-lg fs-5"></i>';
-                btn.disabled = false;
-                resDiv.style.display = 'block';
-
-                if (routeData && routeData.routes && routeData.routes.length > 0) {
-                    var distanceMeters = routeData.routes[0].distance;
-                    var distanceKm = Math.round(distanceMeters / 1000);
-                    
-                    travelDistance = distanceKm;
-                    
-                    if (distanceKm <= 10) {
-                        travelFee = 0;
-                        travelNote = `Phí di chuyển: Miễn phí (${distanceKm} km)`;
-                        resDiv.innerHTML = `<span class="text-success fw-bold"><i class="bi bi-check-circle-fill"></i> Khoảng cách (Ô tô): ${distanceKm} km - Miễn phí di chuyển</span>`;
+                var html = '';
+                addons.forEach(addon => {
+                    var addonId = `ex_${addon.MaDVBS}`;
+                    var formattedPrice = '';
+                    if (addon.GiaTien >= 1000000) {
+                        formattedPrice = `+${(addon.GiaTien / 1000000).toFixed(1).replace('.0', '')}M`;
                     } else {
-                        var extraKm = distanceKm - 10;
-                        travelFee = extraKm * 10000;
-                        travelNote = `Phí di chuyển: ${travelFee.toLocaleString()}đ (${distanceKm} km)`;
-                        resDiv.innerHTML = `<span class="text-warning text-dark fw-bold"><i class="bi bi-info-circle-fill"></i> Khoảng cách (Ô tô): ${distanceKm} km - Phí di chuyển: ${travelFee.toLocaleString()} ₫</span>`;
+                        formattedPrice = `+${(addon.GiaTien / 1000).toLocaleString()}K`;
                     }
-                    
-                    isDistanceCalculated = true;
-                    document.getElementById('sumDistance').textContent = distanceKm + " km";
-                    upSummary();
-                } else {
-                    throw new Error("Không thể tìm kiếm tuyến đường dành cho Ô tô từ bản đồ OSRM.");
-                }
-            } catch (err) {
-                console.error("Lỗi khi tính khoảng cách: ", err);
-                btn.innerHTML = '<i class="bi bi-check-lg fs-5"></i>';
-                btn.disabled = false;
-                resDiv.style.display = 'block';
-                
-                travelFee = 0;
-                isDistanceCalculated = false;
-                resDiv.innerHTML = `<span class="text-danger"><i class="bi bi-exclamation-triangle-fill"></i> Không thể đo khoảng cách. Hãy thử kiểm tra lại kết nối mạng!</span>`;
-                upSummary();
-            }
-        }
 
-        async function calculateDistance() {
-            var btn = document.getElementById('btnConfirmAddress');
-            var resDiv = document.getElementById('distanceResult');
-            
-            try {
+                    html += `
+                        <div class="col-md-6">
+                            <div class="extra-item d-flex justify-content-between align-items-center" onclick="toggleCheckbox('${addonId}', event)">
+                                <div class="form-check m-0">
+                                    <input class="form-check-input extra-cb" type="checkbox" value="${addon.GiaTien}" id="${addonId}" data-name="${addon.TenDVBS}" onchange="calcTotal()" onclick="event.stopPropagation()">
+                                    <label class="form-check-label small fw-bold" for="${addonId}" onclick="event.stopPropagation()">${addon.TenDVBS}</label>
+                                </div>
+                                <span class="small text-muted">${formattedPrice}</span>
+                            </div>
+                        </div>
+                    `;
+                });
+                container.innerHTML = html;
+            }
+
+            function toggleCheckbox(id, event) {
+                if (event && (event.target.tagName === 'INPUT' || event.target.tagName === 'LABEL')) {
+                    return;
+                }
+                var cb = document.getElementById(id);
+                if (cb) {
+                    cb.checked = !cb.checked;
+                    calcTotal();
+                }
+            }
+
+            function calcTotal() {
+                var extra = 0;
+                document.querySelectorAll('.extra-cb:checked').forEach(cb => { extra += parseInt(cb.value); });
+                totalPrice = basePrice + extra + travelFee;
+                depositPrice = Math.round(totalPrice * 0.3);
+
+                // Ghi giá trị Tổng Tiền Thực Tế để lưu vào Database
+                document.getElementById('hTongTienThucTe').value = totalPrice;
+
+                document.getElementById('sumExtra').textContent = extra.toLocaleString() + ' ₫';
+
+                var feeDisplay = travelFee > 0 ? travelFee.toLocaleString() + ' ₫' : 'Miễn phí';
+                document.getElementById('sumTravelFee').textContent = feeDisplay;
+                if (travelFee > 0) {
+                    document.getElementById('sumTravelFee').className = "fw-bold text-danger";
+                } else {
+                    document.getElementById('sumTravelFee').className = "fw-bold text-success";
+                }
+
+                document.getElementById('sumTotal').textContent = totalPrice.toLocaleString() + ' ₫';
+
+                // Cập nhật giá trị hiển thị ở Step 2
+                document.getElementById('valPayCoc').textContent = depositPrice.toLocaleString() + ' ₫';
+                document.getElementById('valPayHet').textContent = totalPrice.toLocaleString() + ' ₫';
+
+                // Cập nhật giá trị ở phần QR/Giao dịch
+                updatePaymentDetails();
+            }
+
+            function upSummary() {
                 var tinh = document.getElementById('tinhThanh');
                 var quan = document.getElementById('quanHuyen');
                 var phuong = document.getElementById('phuongXa');
                 var soNha = document.getElementById('soNha').value.trim();
-                
-                if (!tinh.value || !quan.value || !phuong.value || !soNha) {
-                    window.showErrorModal("Vui lòng chọn đầy đủ Tỉnh/Thành, Quận/Huyện, Phường/Xã và nhập địa chỉ cụ thể trước khi xác nhận!");
+
+                var fullLoc = "Chưa nhập địa chỉ";
+
+                if (tinh.value && quan.value && phuong.value && soNha) {
+                    var tinhName = tinh.options[tinh.selectedIndex].dataset.name;
+                    var quanName = quan.options[quan.selectedIndex].dataset.name;
+                    var phuongName = phuong.options[phuong.selectedIndex].dataset.name;
+                    fullLoc = `${soNha}, ${phuongName}, ${quanName}, ${tinhName}`;
+                }
+
+                document.getElementById('sumLoc').textContent = fullLoc;
+                document.getElementById('hDiaDiemGop').value = fullLoc; // Lưu toàn bộ vào DB
+
+                if (fullLoc !== "Chưa nhập địa chỉ") {
+                    document.getElementById('diaDiem').value = fullLoc; // Lưu ẩn vào ô cũ tránh null required
+                } else {
+                    document.getElementById('diaDiem').value = "";
+                }
+
+                calcTotal();
+            }
+
+            // ==================== STEP TRANSITIONS ====================
+            function goToStep2() {
+                var fMaDichVu = document.getElementById('hMaDichVu').value;
+                var fNgayChup = document.getElementById('hNgayChup').value;
+                var fKhungGio = document.getElementById('hKhungGio').value;
+                var tinh = document.getElementById('tinhThanh').value;
+                var quan = document.getElementById('quanHuyen').value;
+                var phuong = document.getElementById('phuongXa').value;
+                var soNha = document.getElementById('soNha').value.trim();
+                var fSoDienThoai = document.getElementById('soDienThoai').value;
+
+                // Kiểm tra các trường dữ liệu ở Step 1
+                if (!fMaDichVu) { window.showErrorModal("Vui lòng chọn một Gói chụp dịch vụ ở khung bên trái!"); return; }
+                if (!fNgayChup) { window.showErrorModal("Vui lòng chọn Ngày chụp trên lịch (Ngày phải sau hôm nay ít nhất 1 ngày)!"); return; }
+                if (!fKhungGio) { window.showErrorModal("Vui lòng chọn Khung giờ cho buổi chụp!"); return; }
+                if (!tinh || !quan || !phuong || !soNha) { window.showErrorModal("Vui lòng nhập đầy đủ địa chỉ chi tiết cho buổi chụp!"); return; }
+                if (!isDistanceCalculated) { window.showErrorModal("Vui lòng nhấn nút Xác nhận (dấu tích) ở ô nhập địa chỉ để tính phí di chuyển trước khi tiếp tục!"); return; }
+                if (!fSoDienThoai.trim()) { window.showErrorModal("Vui lòng nhập Số điện thoại liên hệ!"); return; }
+
+                // Chuyển UI
+                document.getElementById('step1Container').style.display = 'none';
+                document.getElementById('step2Container').style.display = 'block';
+
+                // Cập nhật Progress Bar
+                document.getElementById('stepIndicator1').className = 'step-item completed';
+                document.getElementById('stepIndicator2').className = 'step-item active';
+                document.getElementById('progressLine').style.width = '50%';
+
+                currentStep = 2;
+                updatePaymentDetails();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+
+            function goToStep1() {
+                document.getElementById('step1Container').style.display = 'block';
+                document.getElementById('step2Container').style.display = 'none';
+
+                // Cập nhật Progress Bar
+                document.getElementById('stepIndicator1').className = 'step-item active';
+                document.getElementById('stepIndicator2').className = 'step-item';
+                document.getElementById('progressLine').style.width = '0%';
+
+                currentStep = 1;
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+
+            // ==================== PAYMENT METHODS SELECTION ====================
+            function selectHinhThucThanhToan(type) {
+                document.getElementById('payOptionCoc').classList.remove('active');
+                document.getElementById('payOptionHet').classList.remove('active');
+
+                document.getElementById('hHinhThucThanhToan').value = type;
+
+                if (type === 'DatCoc') {
+                    document.getElementById('payOptionCoc').classList.add('active');
+                } else {
+                    document.getElementById('payOptionHet').classList.add('active');
+                }
+                updatePaymentDetails();
+            }
+
+            function selectPhuongThuc(method) {
+                document.getElementById('payMethodQR').classList.remove('active');
+                document.getElementById('payMethodATM').classList.remove('active');
+                document.getElementById('payMethodVisa').classList.remove('active');
+
+                document.getElementById('hPhuongThucThanhToan').value = method;
+
+                if (method === 'Chuyển khoản QR') {
+                    document.getElementById('payMethodQR').classList.add('active');
+                    document.getElementById('panelQR').style.display = 'block';
+                    document.getElementById('panelCreditCard').style.display = 'none';
+                } else if (method === 'Thẻ ATM nội địa') {
+                    document.getElementById('payMethodATM').classList.add('active');
+                    document.getElementById('panelQR').style.display = 'none';
+                    document.getElementById('panelCreditCard').style.display = 'block';
+                } else {
+                    document.getElementById('payMethodVisa').classList.add('active');
+                    document.getElementById('panelQR').style.display = 'none';
+                    document.getElementById('panelCreditCard').style.display = 'block';
+                }
+            }
+
+            function updatePaymentDetails() {
+                var hinhThuc = document.getElementById('hHinhThucThanhToan').value;
+                var amountToPay = (hinhThuc === 'DatCoc') ? depositPrice : totalPrice;
+
+                // Ghi giá trị vào hidden input gửi đi
+                document.getElementById('hSoTienThanhToan').value = amountToPay;
+
+                // Cập nhật thông tin text hiển thị
+                document.getElementById('sumStep2Amount').textContent = amountToPay.toLocaleString() + ' ₫';
+
+                var infoText = bookingCodePlaceholder + " " + (hinhThuc === 'DatCoc' ? "COC 30%" : "FULL 100%");
+                document.getElementById('sumStep2Content').textContent = infoText;
+                document.getElementById('sumStep2HinhThuc').textContent = (hinhThuc === 'DatCoc') ? "Đặt cọc trước (30%)" : "Thanh toán toàn bộ (100%)";
+
+                // Cập nhật URL QR động theo chuẩn VietQR API thực tế
+                var addInfoEncoded = encodeURIComponent(infoText);
+                var qrUrl = `https://img.vietqr.io/image/MB-0336486377-compact2.png?amount=${amountToPay}&addInfo=${addInfoEncoded}&accountName=HAMA%20STUDIO`;
+                document.getElementById('imgQR').src = qrUrl;
+            }
+
+            // ==================== SUBMISSION & SIMULATION ====================
+            function confirmPaymentAndSubmit() {
+                // Hiển thị Overlay mô phỏng thanh toán tự động
+                const overlay = document.getElementById('paymentLoadingOverlay');
+                const spinner = document.getElementById('paymentSpinner');
+                const successIcon = document.getElementById('paymentSuccessIcon');
+                const title = document.getElementById('paymentStatusTitle');
+                const desc = document.getElementById('paymentStatusDesc');
+
+                overlay.classList.add('active');
+                spinner.classList.remove('d-none');
+                successIcon.classList.add('d-none');
+                title.textContent = "Đang đối soát giao dịch";
+                desc.textContent = "Hama Studio đang kết nối cổng ngân hàng để đối soát giao dịch VietQR tự động. Vui lòng không đóng trình duyệt...";
+
+                // Nối Ghi Chú tự động
+                var currentGhiChu = document.getElementById('ghiChu').value;
+                var extraNames = [];
+                document.querySelectorAll('.extra-cb:checked').forEach(cb => { extraNames.push(cb.dataset.name); });
+                var extraStr = extraNames.length > 0 ? "Dịch vụ đi kèm: " + extraNames.join(", ") : "";
+                var generatedNote = [extraStr, travelNote].filter(Boolean).join(" | ");
+                if (generatedNote) {
+                    document.getElementById('ghiChu').value = (currentGhiChu ? currentGhiChu + "\n\n" : "") + "[" + generatedNote + "]";
+                }
+
+                // Giả lập tín hiệu chuyển khoản ngân hàng sau 1.5 giây
+                setTimeout(() => {
+                    title.textContent = "Đã nhận tín hiệu chuyển khoản";
+                    desc.textContent = "Cổng VietQR đã khớp lệnh mã đơn đặt lịch của bạn. Đang tiến hành xác minh số tiền giao dịch...";
+
+                    // Giả lập xác thực thành công sau 3 giây tổng cộng
+                    setTimeout(() => {
+                        spinner.classList.add('d-none');
+                        successIcon.classList.remove('d-none');
+                        title.textContent = "Thanh toán thành công!";
+
+                        var moneyVal = parseInt(document.getElementById('hSoTienThanhToan').value) || 0;
+                        desc.innerHTML = `<span class="text-success fw-semibold">Hệ thống đã tự động ghi nhận số tiền ${moneyVal.toLocaleString()} ₫</span>.<br>Lịch chụp của bạn đã được xác nhận cọc 30% tự động. Đang chuẩn bị tạo đơn...`;
+
+                        // Cập nhật Progress Bar
+                        document.getElementById('stepIndicator2').className = 'step-item completed';
+                        document.getElementById('stepIndicator3').className = 'step-item active';
+                        document.getElementById('progressLine').style.width = '100%';
+
+                        // Submit form sau 1.8 giây hiển thị tích xanh thành công
+                        setTimeout(() => {
+                            document.getElementById('bookingWizardForm').submit();
+                        }, 1800);
+
+                    }, 1500);
+
+                }, 1500);
+            }
+
+            // ==================== DISTANCE CALCULATION ====================
+            var STUDIO_ADDRESS = "Đà Nẵng, Việt Nam"; // Mốc xuất phát
+
+            // Fetch danh sách tỉnh thành
+            fetch('https://provinces.open-api.vn/api/?depth=1')
+                .then(res => res.json())
+                .then(data => {
+                    let html = '<option value="">-- Tỉnh/Thành phố --</option>';
+                    data.forEach(t => { html += `<option value="${t.code}" data-name="${t.name}">${t.name}</option>`; });
+                    document.getElementById('tinhThanh').innerHTML = html;
+                });
+
+            function loadDistricts() {
+                var provinceCode = document.getElementById('tinhThanh').value;
+                var quanHuyen = document.getElementById('quanHuyen');
+                var phuongXa = document.getElementById('phuongXa');
+
+                resetDistance();
+                phuongXa.innerHTML = '<option value="">-- Phường/Xã --</option>';
+                phuongXa.disabled = true;
+
+                if (!provinceCode) {
+                    quanHuyen.innerHTML = '<option value="">-- Quận/Huyện --</option>';
+                    quanHuyen.disabled = true;
                     return;
                 }
 
-                var tinhName = tinh.options[tinh.selectedIndex].dataset.name;
-                var quanName = quan.options[quan.selectedIndex].dataset.name;
-                var phuongName = phuong.options[phuong.selectedIndex].dataset.name;
-                
+                fetch(`https://provinces.open-api.vn/api/p/${provinceCode}?depth=2`)
+                    .then(res => res.json())
+                    .then(data => {
+                        let html = '<option value="">-- Quận/Huyện --</option>';
+                        data.districts.forEach(d => { html += `<option value="${d.code}" data-name="${d.name}">${d.name}</option>`; });
+                        quanHuyen.innerHTML = html;
+                        quanHuyen.disabled = false;
+                    });
+            }
+
+            function loadWards() {
+                var districtCode = document.getElementById('quanHuyen').value;
+                var phuongXa = document.getElementById('phuongXa');
+
+                resetDistance();
+
+                if (!districtCode) {
+                    phuongXa.innerHTML = '<option value="">-- Phường/Xã --</option>';
+                    phuongXa.disabled = true;
+                    return;
+                }
+
+                fetch(`https://provinces.open-api.vn/api/d/${districtCode}?depth=2`)
+                    .then(res => res.json())
+                    .then(data => {
+                        let html = '<option value="">-- Phường/Xã --</option>';
+                        data.wards.forEach(w => { html += `<option value="${w.code}" data-name="${w.name}">${w.name}</option>`; });
+                        phuongXa.innerHTML = html;
+                        phuongXa.disabled = false;
+                    });
+            }
+
+            var isDistanceCalculated = false;
+
+            function resetDistance() {
+                travelFee = 0;
+                travelDistance = 0;
+                travelNote = "";
+                isDistanceCalculated = false;
+                document.getElementById('distanceResult').style.display = 'none';
+                document.getElementById('sumDistance').textContent = "0 km";
+                upSummary();
+            }
+
+            // Tọa độ mốc xuất phát: Hama Studio Đà Nẵng (123 Ngô Quyền, Đà Nẵng)
+            const STUDIO_COORDS = { lat: 16.09498, lon: 108.24488 };
+
+            // Hàm định vị địa chỉ chuẩn xác (Sử dụng ArcGIS cho độ chính xác số nhà tại VN)
+            async function geocodeExactAddress(soNha, phuongName, quanName, tinhName) {
+                const queries = [
+                    `${soNha}, ${phuongName}, ${quanName}, ${tinhName}`,
+                    `${phuongName}, ${quanName}, ${tinhName}`
+                ];
+
+                for (let query of queries) {
+                    try {
+                        const url = `https://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer/findAddressCandidates?f=json&singleLine=${encodeURIComponent(query)}&maxLocations=1`;
+                        const res = await fetch(url);
+                        const data = await res.json();
+
+                        if (data && data.candidates && data.candidates.length > 0) {
+                            const loc = data.candidates[0].location; // {x: lon, y: lat}
+                            return {
+                                lat: loc.y,
+                                lon: loc.x,
+                                matchedText: query
+                            };
+                        }
+                    } catch (e) {
+                        console.error("Lỗi định vị ArcGIS với truy vấn: " + query, e);
+                    }
+                }
+
+                throw new Error("Không thể định vị được địa chỉ này trên bản đồ. Vui lòng kiểm tra lại kết nối mạng!");
+            }
+
+            var map = null;
+            var marker = null;
+
+            function initOrUpdateMap(lat, lon) {
+                var mapContainer = document.getElementById('mapPicker');
+                mapContainer.style.display = 'block';
+
+                if (!map) {
+                    map = L.map('mapPicker').setView([lat, lon], 16);
+                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                        maxZoom: 19,
+                        attribution: '© OpenStreetMap'
+                    }).addTo(map);
+
+                    marker = L.marker([lat, lon], { draggable: true }).addTo(map);
+                    marker.bindPopup("<b>Vị trí chụp</b><br>Kéo thả ghim để định vị chính xác!").openPopup();
+
+                    marker.on('dragend', async function(e) {
+                        var newPos = marker.getLatLng();
+                        await calculateOsrmRoute(newPos.lat, newPos.lng);
+                    });
+                } else {
+                    map.setView([lat, lon], 16);
+                    marker.setLatLng([lat, lon]);
+                    marker.bindPopup("<b>Vị trí chụp</b><br>Kéo thả ghim để định vị chính xác!").openPopup();
+                }
+
+                // Fix map display issue when container was hidden
+                setTimeout(() => { map.invalidateSize(); }, 300);
+            }
+
+            async function calculateOsrmRoute(destLat, destLon) {
+                var btn = document.getElementById('btnConfirmAddress');
+                var resDiv = document.getElementById('distanceResult');
+
                 btn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>';
                 btn.disabled = true;
 
-                // 1. Định vị tọa độ đích (Geocoding) qua ArcGIS tới tận Số nhà
-                var dest = await geocodeExactAddress(soNha, phuongName, quanName, tinhName);
-                
-                // 2. Hiển thị bản đồ để kéo thả ghim
-                initOrUpdateMap(dest.lat, dest.lon);
-                
-                // 3. Tính khoảng cách thực tế (Driving Distance) dựa trên tọa độ của Ghim
-                await calculateOsrmRoute(dest.lat, dest.lon);
+                try {
+                    var osrmUrl = `https://router.project-osrm.org/route/v1/driving/${STUDIO_COORDS.lon},${STUDIO_COORDS.lat};${destLon},${destLat}?overview=false`;
 
-            } catch (err) {
-                console.error("Lỗi khi định vị: ", err);
-                btn.innerHTML = '<i class="bi bi-check-lg fs-5"></i>';
-                btn.disabled = false;
-                resDiv.style.display = 'block';
-                
-                travelFee = 0;
-                isDistanceCalculated = false;
-                resDiv.innerHTML = `<span class="text-danger"><i class="bi bi-exclamation-triangle-fill"></i> Không thể đo khoảng cách. Hãy thử kiểm tra lại kết nối mạng!</span>`;
-                window.showErrorModal(err.message || "Đã xảy ra sự cố khi tự động đo khoảng cách. Vui lòng thử lại sau!");
-                upSummary();
+                    var routeRes = await fetch(osrmUrl);
+                    var routeData = await routeRes.json();
+
+                    btn.innerHTML = '<i class="bi bi-check-lg fs-5"></i>';
+                    btn.disabled = false;
+                    resDiv.style.display = 'block';
+
+                    if (routeData && routeData.routes && routeData.routes.length > 0) {
+                        var distanceMeters = routeData.routes[0].distance;
+                        var distanceKm = Math.round(distanceMeters / 1000);
+
+                        travelDistance = distanceKm;
+
+                        if (distanceKm <= 10) {
+                            travelFee = 0;
+                            travelNote = `Phí di chuyển: Miễn phí (${distanceKm} km)`;
+                            resDiv.innerHTML = `<span class="text-success fw-bold"><i class="bi bi-check-circle-fill"></i> Khoảng cách (Ô tô): ${distanceKm} km - Miễn phí di chuyển</span>`;
+                        } else {
+                            var extraKm = distanceKm - 10;
+                            travelFee = extraKm * 10000;
+                            travelNote = `Phí di chuyển: ${travelFee.toLocaleString()}đ (${distanceKm} km)`;
+                            resDiv.innerHTML = `<span class="text-warning text-dark fw-bold"><i class="bi bi-info-circle-fill"></i> Khoảng cách (Ô tô): ${distanceKm} km - Phí di chuyển: ${travelFee.toLocaleString()} ₫</span>`;
+                        }
+
+                        isDistanceCalculated = true;
+                        document.getElementById('sumDistance').textContent = distanceKm + " km";
+                        upSummary();
+                    } else {
+                        throw new Error("Không thể tìm kiếm tuyến đường dành cho Ô tô từ bản đồ OSRM.");
+                    }
+                } catch (err) {
+                    console.error("Lỗi khi tính khoảng cách: ", err);
+                    btn.innerHTML = '<i class="bi bi-check-lg fs-5"></i>';
+                    btn.disabled = false;
+                    resDiv.style.display = 'block';
+
+                    travelFee = 0;
+                    isDistanceCalculated = false;
+                    resDiv.innerHTML = `<span class="text-danger"><i class="bi bi-exclamation-triangle-fill"></i> Không thể đo khoảng cách. Hãy thử kiểm tra lại kết nối mạng!</span>`;
+                    upSummary();
+                }
             }
-        }
 
-        window.addEventListener('load', function() {
-            resetDistance();
-        });
-    </script>
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+            async function calculateDistance() {
+                var btn = document.getElementById('btnConfirmAddress');
+                var resDiv = document.getElementById('distanceResult');
+
+                try {
+                    var tinh = document.getElementById('tinhThanh');
+                    var quan = document.getElementById('quanHuyen');
+                    var phuong = document.getElementById('phuongXa');
+                    var soNha = document.getElementById('soNha').value.trim();
+
+                    if (!tinh.value || !quan.value || !phuong.value || !soNha) {
+                        window.showErrorModal("Vui lòng chọn đầy đủ Tỉnh/Thành, Quận/Huyện, Phường/Xã và nhập địa chỉ cụ thể trước khi xác nhận!");
+                        return;
+                    }
+
+                    var tinhName = tinh.options[tinh.selectedIndex].dataset.name;
+                    var quanName = quan.options[quan.selectedIndex].dataset.name;
+                    var phuongName = phuong.options[phuong.selectedIndex].dataset.name;
+
+                    btn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>';
+                    btn.disabled = true;
+
+                    // 1. Định vị tọa độ đích (Geocoding) qua ArcGIS tới tận Số nhà
+                    var dest = await geocodeExactAddress(soNha, phuongName, quanName, tinhName);
+
+                    // 2. Hiển thị bản đồ để kéo thả ghim
+                    initOrUpdateMap(dest.lat, dest.lon);
+
+                    // 3. Tính khoảng cách thực tế (Driving Distance) dựa trên tọa độ của Ghim
+                    await calculateOsrmRoute(dest.lat, dest.lon);
+
+                } catch (err) {
+                    console.error("Lỗi khi định vị: ", err);
+                    btn.innerHTML = '<i class="bi bi-check-lg fs-5"></i>';
+                    btn.disabled = false;
+                    resDiv.style.display = 'block';
+
+                    travelFee = 0;
+                    isDistanceCalculated = false;
+                    resDiv.innerHTML = `<span class="text-danger"><i class="bi bi-exclamation-triangle-fill"></i> Không thể đo khoảng cách. Hãy thử kiểm tra lại kết nối mạng!</span>`;
+                    window.showErrorModal(err.message || "Đã xảy ra sự cố khi tự động đo khoảng cách. Vui lòng thử lại sau!");
+                    upSummary();
+                }
+            }
+
+            window.addEventListener('load', function() {
+                resetDistance();
+            });
+        </script>
+        <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 }
