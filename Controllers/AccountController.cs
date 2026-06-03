@@ -32,6 +32,13 @@ namespace HamaStudio.Controllers
                 var user = db.KhachHangs.FirstOrDefault(u => u.TenDangNhap == TenDangNhap && u.MatKhau == MatKhau);
                 if (user != null)
                 {
+                    // Kiểm tra tài khoản bị khóa
+                    if (user.TrangThai == "Khóa")
+                    {
+                        ViewBag.Error = "Tài khoản của bạn đã bị khóa. Vui lòng liên hệ Hama Studio để được hỗ trợ.";
+                        return View();
+                    }
+
                     Session["UserId"] = user.MaKhachHang;
                     Session["Username"] = user.TenDangNhap;
                     Session["FullName"] = user.HoTen;
