@@ -59,6 +59,14 @@ namespace HamaStudio.Controllers
                 {
                     try
                     {
+                        // ✨ Kiểm tra xem có LichChup nào phù hợp
+                        var lichChupPhuHop = db.LichChups
+                            .Where(lc => lc.MaDichVu == MaDichVu 
+                                && lc.NgayChup == NgayChup 
+                                && lc.TrangThai == "Hoạt động"
+                                && lc.SoLichConLai > 0)
+                            .FirstOrDefault();
+
                         DatLich datLich = new DatLich
                         {
                             MaKhachHang = userId,
@@ -67,14 +75,30 @@ namespace HamaStudio.Controllers
                             KhungGio = KhungGio,
                             DiaDiem = DiaDiem,
                             GhiChu = GhiChu,
-                            TrangThai = "Chờ xác nhận",
+                            TrangThai = lichChupPhuHop != null ? "Đã xác nhận" : "Chờ xác nhận", // Tự động xác nhận nếu có lịch
                             TongTien = TongTienThucTe,
                             SoTienDaCoc = Math.Round(TongTienThucTe * 0.3m),
-                            NgayHeThongGhiNhan = DateTime.Now
+                            NgayHeThongGhiNhan = DateTime.Now,
+                            MaLichChup = lichChupPhuHop?.MaLichChup // Liên kết với LichChup nếu có
                         };
 
                         db.DatLiches.Add(datLich);
                         db.SaveChanges(); // Tạo MaDatLich và kích hoạt trigger nếu có
+
+                        // ✨ Nếu có LichChup, giảm số lịch còn lại
+                        if (lichChupPhuHop != null)
+                        {
+                            lichChupPhuHop.SoLichConLai -= 1;
+                            lichChupPhuHop.NgayCapNhat = DateTime.Now;
+
+                            // Nếu hết chỗ, đổi trạng thái thành "Đã đầy"
+                            if (lichChupPhuHop.SoLichConLai <= 0)
+                            {
+                                lichChupPhuHop.TrangThai = "Đã đầy";
+                            }
+
+                            db.SaveChanges();
+                        }
 
                         // Lưu thông tin giao dịch thanh toán
                         ThanhToan thanhToan = new ThanhToan
@@ -120,6 +144,7 @@ namespace HamaStudio.Controllers
                              .Include("DichVu")
                              .Include("ThanhToans")
                              .Include("DanhGias")
+                             .Include("LichChup") // ✨ Include LichChup để hiển thị thông tin
                              .Where(b => b.MaKhachHang == userId)
                              .OrderByDescending(b => b.NgayHeThongGhiNhan)
                              .ToList();
@@ -265,29 +290,115 @@ namespace HamaStudio.Controllers
             try
             {
                 DateTime parsedDate = DateTime.ParseExact(date, "yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture);
-                
+
                 var dichVu = db.DichVus.Find(serviceId);
                 if (dichVu == null) 
                 {
                     return Json(new { success = false, message = "Service not found." }, JsonRequestBehavior.AllowGet);
                 }
-                
+
                 int maxSlots = dichVu.GioiHanTho;
 
-                // Đếm các lịch chụp đang hoạt động của RIÊNG dịch vụ này trong ngày được chọn
+                // ✨ ƯUTIÊN kiểm tra xem có LichChup nào cho ngày/dịch vụ này không
+                var lichChup = db.LichChups
+                    .Where(lc => lc.MaDichVu == serviceId 
+                        && lc.NgayChup == parsedDate 
+                        && (lc.TrangThai == "Hoạt động" || lc.TrangThai == "Đã đầy"))
+                    .FirstOrDefault();
+
+                if (lichChup != null)
+                {
+                    // Nếu có LichChup, sử dụng giới hạn từ LichChup thay vì từ DichVu
+                    maxSlots = lichChup.SoLichToiDa;
+
+                    // Đếm số booking đã liên kết với LichChup này
+                    int bookedFromLichChup = db.DatLiches
+                        .Where(b => b.MaLichChup == lichChup.MaLichChup && b.TrangThai != "Đã hủy")
+                        .Count();
+
+                    // Trả về thông tin LichChup
+                    return Json(new 
+                    { 
+                        success = true, 
+                        maxSlots = maxSlots, 
+                        bookedCount = bookedFromLichChup,
+                        lichChupId = lichChup.MaLichChup,
+                        lichChupStatus = lichChup.TrangThai,
+                        lichChupNote = lichChup.GhiChu,
+                        hasLichChup = true
+                    }, JsonRequestBehavior.AllowGet);
+                }
+
+                // Fallback: Nếu không có LichChup, tính theo cách cũ
                 var bookedSlots = db.DatLiches
                                     .Where(b => b.NgayChup == parsedDate && b.TrangThai != "Đã hủy" && b.MaDichVu == serviceId)
                                     .GroupBy(b => b.KhungGio)
                                     .Select(g => new { KhungGio = g.Key, Count = g.Count() })
                                     .ToList();
 
-                // Lọc các khung giờ đã hết chỗ (số lượng đặt >= giới hạn thợ của dịch vụ)
                 var fullyBookedSlots = bookedSlots
                                         .Where(s => s.Count >= maxSlots)
                                         .Select(s => s.KhungGio)
                                         .ToList();
 
-                return Json(new { success = true, maxSlots = maxSlots, bookedSlots = bookedSlots, fullyBookedSlots = fullyBookedSlots }, JsonRequestBehavior.AllowGet);
+                return Json(new 
+                { 
+                    success = true, 
+                    maxSlots = maxSlots, 
+                    bookedSlots = bookedSlots, 
+                    fullyBookedSlots = fullyBookedSlots,
+                    hasLichChup = false
+                }, JsonRequestBehavior.AllowGet);
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message }, JsonRequestBehavior.AllowGet);
+            }
+        }
+
+        /// <summary>
+        /// ✨ Lấy danh sách những ngày có lịch chụp được admin lên cho khách hàng xem
+        /// </summary>
+        [HttpGet]
+        public ActionResult GetAvailableLichChup(int? serviceId, int? month, int? year)
+        {
+            if (serviceId == null)
+            {
+                return Json(new { success = false, message = "Service ID is required." }, JsonRequestBehavior.AllowGet);
+            }
+
+            try
+            {
+                var today = DateTime.Now.Date;
+                var queryMonth = month ?? today.Month;
+                var queryYear = year ?? today.Year;
+
+                // Lấy tất cả LichChup của dịch vụ này trong tháng, chỉ những ngày có thể chụp
+                var availableLichChups = db.LichChups
+                    .Where(lc => lc.MaDichVu == serviceId 
+                        && lc.NgayChup.Year == queryYear 
+                        && lc.NgayChup.Month == queryMonth
+                        && lc.NgayChup >= today
+                        && (lc.TrangThai == "Hoạt động" || lc.TrangThai == "Đã đầy")
+                        && lc.SoLichConLai > 0)
+                    .OrderBy(lc => lc.NgayChup)
+                    .Select(lc => new 
+                    { 
+                        date = lc.NgayChup.ToString("yyyy-MM-dd"),
+                        day = lc.NgayChup.Day,
+                        soLichToiDa = lc.SoLichToiDa,
+                        soLichConLai = lc.SoLichConLai,
+                        ghiChu = lc.GhiChu,
+                        maLichChup = lc.MaLichChup
+                    })
+                    .ToList();
+
+                return Json(new 
+                { 
+                    success = true, 
+                    data = availableLichChups,
+                    message = availableLichChups.Count > 0 ? "Có " + availableLichChups.Count + " ngày được mở lịch" : "Chưa có lịch nào được mở cho tháng này"
+                }, JsonRequestBehavior.AllowGet);
             }
             catch (Exception ex)
             {

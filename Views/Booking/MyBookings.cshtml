@@ -348,6 +348,15 @@
                              <img src="@(string.IsNullOrEmpty(item.DichVu?.LinkAnhDaiDien) ? Url.Content("~/Content/Images/default.jpg") : (item.DichVu.LinkAnhDaiDien.StartsWith("http") ? item.DichVu.LinkAnhDaiDien : Url.Content("~/Content/Images/" + item.DichVu.LinkAnhDaiDien)))" onerror="this.src='https://images.unsplash.com/photo-1556228578-8c89e6adf883?w=600'" alt="@item.DichVu?.TenDichVu" />
                             <div class="position-absolute top-0 end-0 p-3">
                                 <span class="status-pill @statusClass shadow-sm">@trangThaiTrimmed</span>
+                                <!-- ✨ Badge auto-confirm nếu đơn được tự động xác nhận từ LichChup -->
+                                @if (item.MaLichChup.HasValue && trangThaiTrimmed == "Đã xác nhận")
+                                {
+                                    <div class="mt-2">
+                                        <span class="badge bg-success text-white d-flex align-items-center justify-content-center w-100" style="font-size:0.65rem; padding:4px 8px;">
+                                            <i class="bi bi-star-fill me-1" style="font-size:0.5rem;"></i> Xác nhận tự động
+                                        </span>
+                                    </div>
+                                }
                             </div>
                         </div>
                         <div class="card-body-luxury">

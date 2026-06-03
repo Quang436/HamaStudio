@@ -142,6 +142,7 @@
     <Compile Include="Models\DichVuBoSung.cs" />
     <Compile Include="Models\HamaStudioDbContext.cs" />
     <Compile Include="Models\KhachHang.cs" />
+    <Compile Include="Models\LichChup.cs" />
     <Compile Include="Models\Portfolio.cs" />
     <Compile Include="Models\QuanTriVien.cs" />
     <Compile Include="Models\ThanhToan.cs" />
@@ -167,12 +168,20 @@
     <Content Include="favicon.ico" />
     <Content Include="Global.asax" />
     <Content Include="Content\Site.css" />
+    <Content Include="HamaStudioDB_Complete.sql" />
     <Content Include="Scripts\bootstrap.bundle.js" />
     <Content Include="Scripts\bootstrap.bundle.min.js" />
     <Content Include="Scripts\bootstrap.esm.js" />
     <Content Include="Scripts\bootstrap.esm.min.js" />
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
+    <Content Include="DEVELOPMENT_GUIDE.md" />
+    <Content Include="PROJECT_ANALYSIS.md" />
+    <Content Include="SCHEDULE_MANAGEMENT_GUIDE.md" />
+    <Content Include="LICH_CHUP_QUICKSTART.md" />
+    <Content Include="IMPLEMENTATION_COMPLETE.md" />
+    <Content Include="PROJECT_ARCHITECTURE.md" />
+    <Content Include="PROJECT_API_REFERENCE.md" />
     <None Include="Scripts\jquery-3.7.0.intellisense.js" />
     <Content Include="Scripts\jquery-3.7.0.js" />
     <Content Include="Scripts\jquery-3.7.0.min.js" />
@@ -184,6 +193,7 @@
     <Content Include="Scripts\jquery.validate.unobtrusive.js" />
     <Content Include="Scripts\jquery.validate.unobtrusive.min.js" />
     <Content Include="Scripts\modernizr-2.8.3.js" />
+    <Content Include="Scripts\schedule-admin.js" />
     <Content Include="Web.config" />
     <Content Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
@@ -210,6 +220,7 @@
     <Content Include="Content\admin.css" />
     <Content Include="Scripts\admin.js" />
     <Content Include="Views\Booking\PayRemaining.cshtml" />
+    <Content Include="THAY_DOI_CHI_TIET.md" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

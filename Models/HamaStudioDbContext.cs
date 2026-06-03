@@ -22,6 +22,7 @@ namespace HamaStudio.Models
         public virtual DbSet<Portfolio> Portfolios { get; set; }
         public virtual DbSet<DacQuyen> DacQuyens { get; set; }
         public virtual DbSet<DichVuBoSung> DichVuBoSungs { get; set; }
+        public virtual DbSet<LichChup> LichChups { get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {

@@ -15,6 +15,8 @@ namespace HamaStudio.Models
 
         public int? MaDichVu { get; set; }
 
+        public int? MaLichChup { get; set; }
+
         public DateTime? NgayHeThongGhiNhan { get; set; } = DateTime.Now;
 
         [Column(TypeName = "date")]
@@ -37,7 +39,7 @@ namespace HamaStudio.Models
         public string TrangThai { get; set; } = "Chờ xác nhận";
 
         public string GhiChu { get; set; }
-        
+
         [StringLength(500)]
         public string LinkAnhBanGiao { get; set; }
 
@@ -46,6 +48,9 @@ namespace HamaStudio.Models
 
         [ForeignKey("MaDichVu")]
         public virtual DichVu DichVu { get; set; }
+
+        [ForeignKey("MaLichChup")]
+        public virtual LichChup LichChup { get; set; }
 
         public virtual ICollection<ThanhToan> ThanhToans { get; set; }
         public virtual ICollection<DanhGia> DanhGias { get; set; }

@@ -459,6 +459,204 @@ namespace HamaStudio.Controllers
         }
 
         // ─────────────────────────────────────────────
+        // QUẢN LÝ LỊCH CHỤP (Scheduling)
+        // ─────────────────────────────────────────────
+        [HttpGet]
+        public JsonResult GetLichChup(int? maDichVu)
+        {
+            if (!IsAdmin()) return Json(new { success = false }, JsonRequestBehavior.AllowGet);
+
+            IQueryable<LichChup> query = db.LichChups.Include("DichVu");
+
+            if (maDichVu.HasValue)
+                query = query.Where(l => l.MaDichVu == maDichVu);
+
+            var list = query
+                .OrderBy(l => l.NgayChup)
+                .ToList()
+                .Select(l => new
+                {
+                    l.MaLichChup,
+                    NgayChup = l.NgayChup.ToString("dd/MM/yyyy"),
+                    DichVu = l.DichVu != null ? l.DichVu.TenDichVu : "N/A",
+                    MaDichVu = l.MaDichVu ?? 0,
+                    l.SoLichToiDa,
+                    l.SoLichConLai,
+                    l.GhiChu,
+                    l.TrangThai,
+                    NgayTao = l.NgayTao.HasValue ? l.NgayTao.Value.ToString("dd/MM/yyyy HH:mm") : ""
+                });
+
+            return Json(list, JsonRequestBehavior.AllowGet);
+        }
+
+        [HttpPost]
+        public JsonResult ThemLichChup(int maDichVu, string ngayChup, int soLichToiDa, string ghiChu)
+        {
+            if (!IsAdmin()) return Json(new { success = false });
+
+            if (!DateTime.TryParse(ngayChup, out DateTime date))
+                return Json(new { success = false, message = "Invalid date format" });
+
+            // Check if date already exists for this service
+            var existing = db.LichChups.FirstOrDefault(l => 
+                l.MaDichVu == maDichVu && 
+                l.NgayChup == date.Date &&
+                l.TrangThai != "Đã hủy");
+
+            if (existing != null)
+                return Json(new { success = false, message = "Lịch chụp này đã tồn tại" });
+
+            var lichChup = new LichChup
+            {
+                MaDichVu = maDichVu,
+                NgayChup = date.Date,
+                SoLichToiDa = soLichToiDa,
+                SoLichConLai = soLichToiDa,
+                GhiChu = ghiChu,
+                TrangThai = "Hoạt động",
+                NgayTao = DateTime.Now
+            };
+
+            db.LichChups.Add(lichChup);
+            db.SaveChanges();
+
+            // Auto-confirm matching pending bookings
+            AutoConfirmMatchingBookings(lichChup);
+
+            return Json(new { success = true, id = lichChup.MaLichChup });
+        }
+
+        [HttpPost]
+        public JsonResult SuaLichChup(int maLichChup, int maDichVu, string ngayChup, int soLichToiDa, string ghiChu)
+        {
+            if (!IsAdmin()) return Json(new { success = false });
+
+            if (!DateTime.TryParse(ngayChup, out DateTime date))
+                return Json(new { success = false, message = "Invalid date format" });
+
+            var lichChup = db.LichChups.Find(maLichChup);
+            if (lichChup == null) 
+                return Json(new { success = false, message = "Not found" });
+
+            // Check for duplicate date for same service (excluding current record)
+            var existing = db.LichChups.FirstOrDefault(l =>
+                l.MaDichVu == maDichVu &&
+                l.NgayChup == date.Date &&
+                l.MaLichChup != maLichChup &&
+                l.TrangThai != "Đã hủy");
+
+            if (existing != null)
+                return Json(new { success = false, message = "Lịch chụp này đã tồn tại" });
+
+            int originalCapacity = lichChup.SoLichToiDa;
+            lichChup.MaDichVu = maDichVu;
+            lichChup.NgayChup = date.Date;
+            lichChup.SoLichToiDa = soLichToiDa;
+            lichChup.GhiChu = ghiChu;
+            lichChup.NgayCapNhat = DateTime.Now;
+
+            // Recalculate remaining slots
+            int bookedSlots = db.DatLiches.Count(d =>
+                d.MaLichChup == maLichChup &&
+                d.TrangThai == "Đã xác nhận");
+
+            lichChup.SoLichConLai = Math.Max(0, soLichToiDa - bookedSlots);
+
+            // Mark as full if slots are exceeded
+            if (lichChup.SoLichConLai <= 0)
+                lichChup.TrangThai = "Đã đầy";
+            else if (lichChup.TrangThai == "Đã đầy")
+                lichChup.TrangThai = "Hoạt động";
+
+            db.SaveChanges();
+            return Json(new { success = true });
+        }
+
+        [HttpPost]
+        public JsonResult XoaLichChup(int maLichChup)
+        {
+            if (!IsAdmin()) return Json(new { success = false });
+
+            var lichChup = db.LichChups.Find(maLichChup);
+            if (lichChup == null) 
+                return Json(new { success = false });
+
+            // Check if there are confirmed bookings
+            int bookedCount = db.DatLiches.Count(d =>
+                d.MaLichChup == maLichChup &&
+                d.TrangThai == "Đã xác nhận");
+
+            if (bookedCount > 0)
+                return Json(new { success = false, message = "Không thể xóa lịch đã có đặt chụp" });
+
+            lichChup.TrangThai = "Đã hủy";
+            db.SaveChanges();
+            return Json(new { success = true });
+        }
+
+        // Auto-confirm pending bookings that match the schedule
+        private void AutoConfirmMatchingBookings(LichChup lichChup)
+        {
+            var pendingBookings = db.DatLiches
+                .Where(d =>
+                    d.MaDichVu == lichChup.MaDichVu &&
+                    d.NgayChup == lichChup.NgayChup &&
+                    d.TrangThai == "Chờ xác nhận" &&
+                    d.MaLichChup == null)
+                .OrderBy(d => d.NgayHeThongGhiNhan)
+                .Take(lichChup.SoLichConLai)
+                .ToList();
+
+            foreach (var booking in pendingBookings)
+            {
+                booking.TrangThai = "Đã xác nhận";
+                booking.MaLichChup = lichChup.MaLichChup;
+                lichChup.SoLichConLai--;
+
+                if (lichChup.SoLichConLai <= 0)
+                {
+                    lichChup.TrangThai = "Đã đầy";
+                    break;
+                }
+            }
+
+            db.SaveChanges();
+        }
+
+        // Manual confirm pending booking to a schedule
+        [HttpPost]
+        public JsonResult XacNhanDatLichVaoLichChup(int maDatLich, int maLichChup)
+        {
+            if (!IsAdmin()) return Json(new { success = false });
+
+            var booking = db.DatLiches.Find(maDatLich);
+            var lichChup = db.LichChups.Find(maLichChup);
+
+            if (booking == null || lichChup == null)
+                return Json(new { success = false, message = "Not found" });
+
+            if (booking.TrangThai != "Chờ xác nhận")
+                return Json(new { success = false, message = "Booking must be pending" });
+
+            if (lichChup.SoLichConLai <= 0)
+                return Json(new { success = false, message = "No available slots" });
+
+            if (booking.NgayChup != lichChup.NgayChup || booking.MaDichVu != lichChup.MaDichVu)
+                return Json(new { success = false, message = "Date or service mismatch" });
+
+            booking.TrangThai = "Đã xác nhận";
+            booking.MaLichChup = maLichChup;
+            lichChup.SoLichConLai--;
+
+            if (lichChup.SoLichConLai <= 0)
+                lichChup.TrangThai = "Đã đầy";
+
+            db.SaveChanges();
+            return Json(new { success = true });
+        }
+
+        // ─────────────────────────────────────────────
         // DANH MỤC DỊCH VỤ (for dropdowns)
         // ─────────────────────────────────────────────
         [HttpGet]

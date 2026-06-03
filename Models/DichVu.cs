@@ -33,5 +33,6 @@ namespace HamaStudio.Models
         public virtual ICollection<Portfolio> Portfolios { get; set; }
         public virtual ICollection<DacQuyen> DacQuyens { get; set; }
         public virtual ICollection<DichVuBoSung> DichVuBoSungs { get; set; }
+        public virtual ICollection<LichChup> LichChups { get; set; }
     }
 }

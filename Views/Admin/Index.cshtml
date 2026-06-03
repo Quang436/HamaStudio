@@ -14,7 +14,7 @@
         <div class="sidebar-logo">HAMA STUDIO<span>Admin Panel</span></div>
         <nav class="sidebar-nav">
             <div class="nav-item active" data-sec="dashboard" onclick="switchSection('dashboard')"><i class="bi bi-grid"></i><span>Tổng quan</span></div>
-            <div class="nav-item" data-sec="booking-pending" onclick="switchSection('booking-pending')"><i class="bi bi-clock"></i><span>Lịch chờ xác nhận</span></div>
+            <div class="nav-item" data-sec="schedule" onclick="switchSection('schedule')"><i class="bi bi-calendar2-check"></i><span>Lên lịch chụp</span></div>
             <div class="nav-item" data-sec="booking-confirmed" onclick="switchSection('booking-confirmed')"><i class="bi bi-calendar-check"></i><span>Lịch đã xác nhận</span></div>
             <div class="nav-item" data-sec="history" onclick="switchSection('history')"><i class="bi bi-check2-circle"></i><span>Lịch sử hoàn thành</span></div>
             <div class="nav-item" data-sec="customers" onclick="switchSection('customers')"><i class="bi bi-people"></i><span>Khách hàng</span></div>
@@ -92,6 +92,37 @@
                     </div>
                 </div>
                 <div class="table-wrap"><table class="data-table"><thead><tr><th>ID</th><th>Khách hàng</th><th>SĐT</th><th>Dịch vụ</th><th>Ngày chụp</th><th>Khung giờ</th><th>Địa điểm</th><th>Tổng tiền</th><th>Đã cọc</th><th>Trạng thái</th><th>Thao tác</th></tr></thead><tbody id="tbl-pending"></tbody></table></div>
+            </div>
+
+            <!-- ═══ SCHEDULE ═══ -->
+            <div class="section" id="sec-schedule">
+                <div class="table-header">
+                    <h3>Lên lịch chụp</h3>
+                    <div class="filter-bar" style="margin-bottom:0">
+                        <select id="filter-schedule-service" class="search-input" style="width:200px" onchange="loadSchedule()">
+                            <option value="">Tất cả dịch vụ</option>
+                        </select>
+                        <input type="month" id="filter-schedule-month" class="search-input" style="width:150px" onchange="loadSchedule()" />
+                        <button class="btn btn-primary btn-sm" onclick="showAddSchedule()"><i class="bi bi-plus"></i> Lên lịch mới</button>
+                    </div>
+                </div>
+                <div class="table-wrap">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Dịch vụ</th>
+                                <th>Ngày chụp</th>
+                                <th>Tổng lịch</th>
+                                <th>Lịch còn lại</th>
+                                <th>Trạng thái</th>
+                                <th>Ghi chú</th>
+                                <th>Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbl-schedule"></tbody>
+                    </table>
+                </div>
             </div>
 
             <!-- ═══ CONFIRMED ═══ -->
@@ -244,6 +275,36 @@
         </div>
     </div>
 
+    <div class="modal-overlay" id="modal-schedule">
+        <div class="modal">
+            <div class="modal-head"><h3 id="modal-schedule-title">Lên lịch chụp</h3><button class="modal-close" onclick="hideModal('modal-schedule')">&times;</button></div>
+            <div class="modal-body">
+                <input type="hidden" id="schedule-mode" />
+                <input type="hidden" id="schedule-id" />
+                <div class="form-group">
+                    <label>Dịch vụ</label>
+                    <select id="schedule-dv" required></select>
+                </div>
+                <div class="form-group">
+                    <label>Ngày chụp</label>
+                    <input type="date" id="schedule-ngay" required />
+                </div>
+                <div class="form-group">
+                    <label>Số lịch tối đa</label>
+                    <input type="number" id="schedule-solich" min="1" value="5" required />
+                </div>
+                <div class="form-group">
+                    <label>Ghi chú</label>
+                    <textarea id="schedule-ghichu" placeholder="VD: Địa điểm mặc định, yêu cầu đặc biệt..."></textarea>
+                </div>
+            </div>
+            <div class="modal-foot">
+                <button class="btn" onclick="hideModal('modal-schedule')">Hủy</button>
+                <button class="btn btn-primary" onclick="submitSchedule()">Lưu lịch</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         // ===== ADMIN JS INLINE =====
         var currentSection = 'dashboard', danhMucList = [];
@@ -267,6 +328,7 @@
 
             if (id === 'dashboard') loadThongKe();
             else if (id === 'booking-pending') loadDatLich('chua_xac_nhan');
+            else if (id === 'schedule') { loadScheduleServices(); loadSchedule(); }
             else if (id === 'booking-confirmed') loadDatLich('da_xac_nhan');
             else if (id === 'history') loadDatLich('hoan_thanh');
             else if (id === 'customers') loadKhachHang();
@@ -725,5 +787,6 @@
             }
         });
     </script>
+    <script src="~/Scripts/schedule-admin.js"></script>
 </body>
 </html>

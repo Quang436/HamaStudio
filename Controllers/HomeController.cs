@@ -11,13 +11,23 @@ namespace HamaStudio.Controllers
 
         public ActionResult Index()
         {
-            // Lấy 3 dịch vụ nổi bật (giá cao nhất)
-            var featuredServices = db.DichVus.OrderByDescending(d => d.GiaTien).Take(3).ToList();
-            ViewBag.FeaturedServices = featuredServices;
+            try 
+            {
+                // Lấy 3 dịch vụ nổi bật (giá cao nhất)
+                var featuredServices = db.DichVus.OrderByDescending(d => d.GiaTien).Take(3).ToList();
+                ViewBag.FeaturedServices = featuredServices;
 
-            // Lấy portfolio mới nhất
-            var latestPortfolios = db.Portfolios.OrderByDescending(p => p.MaAnh).Take(6).ToList();
-            ViewBag.LatestPortfolios = latestPortfolios;
+                // Lấy portfolio mới nhất
+                var latestPortfolios = db.Portfolios.OrderByDescending(p => p.MaAnh).Take(6).ToList();
+                ViewBag.LatestPortfolios = latestPortfolios;
+            }
+            catch (System.Exception ex)
+            {
+                // Tạm thời trả về view mà không có dữ liệu để test
+                ViewBag.Error = "Database connection error: " + ex.Message;
+                ViewBag.FeaturedServices = new System.Collections.Generic.List<DichVu>();
+                ViewBag.LatestPortfolios = new System.Collections.Generic.List<Portfolio>();
+            }
 
             return View();
         }
