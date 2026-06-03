@@ -1,0 +1,908 @@
+@model IEnumerable<HamaStudio.Models.DatLich>
+
+@{
+    ViewBag.Title = "Lịch đã đặt | Hama Studio Experience";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,600;0,700;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
+<style>
+    :root {
+        --primary-dark: #1a1a1a;
+        --accent-gold: #c5a880;
+        --bg-soft: #fdfdfd;
+        --text-muted: #6c757d;
+        --card-radius: 16px;
+        --transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+    }
+
+    body {
+        font-family: 'Montserrat', sans-serif;
+        background-color: var(--bg-soft);
+        color: var(--primary-dark);
+    }
+
+    .serif {
+        font-family: 'Playfair Display', serif;
+    }
+
+    /* ===== HEADER ===== */
+    .header-boxed {
+        padding: 50px 0;
+        background: linear-gradient(to bottom, #fcfcfc, var(--bg-soft));
+        border-bottom: 1px solid #f0f0f0;
+        margin-bottom: 40px;
+        margin-top: 90px;
+    }
+
+    .section-label {
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 4px;
+        color: var(--accent-gold);
+        font-weight: 700;
+        display: block;
+        margin-bottom: 8px;
+    }
+
+    /* ===== STATUS FILTER TABS ===== */
+    .status-tab {
+        background: white;
+        border: 1px solid #e0e0e0;
+        color: var(--text-muted);
+        font-weight: 600;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        padding: 10px 24px;
+        border-radius: 50px;
+        transition: var(--transition);
+        cursor: pointer;
+    }
+
+    .status-tab:hover {
+        border-color: var(--accent-gold);
+        color: var(--accent-gold);
+        transform: translateY(-2px);
+    }
+
+    .status-tab.active {
+        background: var(--primary-dark) !important;
+        color: white !important;
+        border-color: var(--primary-dark);
+        box-shadow: 0 8px 15px rgba(0,0,0,0.08);
+    }
+
+    /* ===== STATUS BADGES ===== */
+    .status-pill {
+        font-size: 0.65rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        padding: 6px 14px;
+        border-radius: 50px;
+        display: inline-block;
+    }
+
+    .status-pending {
+        background: #f1f3f5;
+        color: #495057;
+    }
+
+    .status-confirmed {
+        background: #fdf6ec;
+        color: #e6a23c;
+    }
+
+    .status-completed {
+        background: #f0f9eb;
+        color: #67c23a;
+    }
+
+    .status-cancelled {
+        background: #fef0f0;
+        color: #f56c6c;
+    }
+
+    /* ===== PAYMENT STATUS BADGES ===== */
+    .pay-badge {
+        font-size: 0.7rem;
+        font-weight: 600;
+        padding: 4px 10px;
+        border-radius: 4px;
+        display: inline-flex;
+        align-items: center;
+    }
+
+    .bg-success-soft {
+        background-color: rgba(103, 194, 58, 0.1);
+        color: #67c23a;
+    }
+
+    .bg-warning-soft {
+        background-color: rgba(230, 162, 60, 0.1);
+        color: #e6a23c;
+    }
+
+    .bg-danger-soft {
+        background-color: rgba(245, 108, 108, 0.1);
+        color: #f56c6c;
+    }
+
+    /* ===== BOOKING CARDS ===== */
+    .booking-card {
+        background: white;
+        border: 1px solid #eee;
+        border-radius: var(--card-radius);
+        overflow: hidden;
+        transition: var(--transition);
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .booking-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 20px 40px rgba(0,0,0,0.06);
+        border-color: var(--accent-gold);
+    }
+
+    .card-img-wrapper {
+        position: relative;
+        height: 220px;
+        overflow: hidden;
+        background: #f0f0f0;
+    }
+
+    .card-img-wrapper img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: var(--transition);
+    }
+
+    .booking-card:hover .card-img-wrapper img {
+        transform: scale(1.08);
+    }
+
+    .card-body-luxury {
+        padding: 30px;
+        display: flex;
+        flex-direction: column;
+        flex-grow: 1;
+    }
+
+    .booking-title {
+        font-size: 1.15rem;
+        font-weight: 700;
+        margin-bottom: 15px;
+    }
+
+    .detail-row {
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.85rem;
+        margin-bottom: 10px;
+    }
+
+    .detail-label {
+        color: var(--text-muted);
+    }
+
+    .detail-value {
+        font-weight: 600;
+        color: var(--primary-dark);
+        text-align: right;
+    }
+
+    .divider-gold {
+        height: 1px;
+        background: linear-gradient(to right, var(--accent-gold), transparent);
+        margin: 20px 0;
+        opacity: 0.25;
+    }
+
+    .total-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: auto;
+    }
+
+    /* ===== STAR RATING ===== */
+    .stars-display {
+        color: var(--accent-gold);
+        font-size: 0.9rem;
+    }
+
+    /* ===== BUTTONS ===== */
+    .btn-action {
+        font-size: 0.6rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        padding: 6px 10px;
+        border-radius: 5px;
+        text-decoration: none;
+        transition: var(--transition);
+        display: inline-block;
+        border: 1px solid transparent;
+        cursor: pointer;
+        white-space: nowrap;
+    }
+
+    .btn-action-cancel {
+        border-color: #f56c6c;
+        color: #f56c6c;
+        background: transparent;
+    }
+
+    .btn-action-cancel:hover {
+        background: #f56c6c;
+        color: white;
+    }
+
+    .btn-action-pay {
+        border-color: var(--accent-gold);
+        color: var(--accent-gold);
+        background: transparent;
+    }
+
+    .btn-action-pay:hover {
+        background: var(--accent-gold);
+        color: white;
+    }
+
+    .btn-action-review {
+        border-color: var(--primary-dark);
+        color: var(--primary-dark);
+        background: transparent;
+    }
+
+    .btn-action-review:hover {
+        background: var(--primary-dark);
+        color: white;
+    }
+
+    .btn-action-disabled {
+        border-color: #ddd;
+        color: #999;
+        background: #fafafa;
+        cursor: not-allowed;
+    }
+
+    /* ===== CUSTOM CONFIRM MODAL ===== */
+    .custom-confirm-overlay {
+        position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+        background: rgba(0,0,0,0.4);
+        display: flex; align-items: center; justify-content: center;
+        z-index: 9999;
+        opacity: 0; visibility: hidden;
+        transition: all 0.3s ease;
+        backdrop-filter: blur(4px);
+    }
+    .custom-confirm-overlay.active {
+        opacity: 1; visibility: visible;
+    }
+    .custom-confirm-box {
+        background: #fff; padding: 40px 30px; border-radius: 16px;
+        text-align: center; max-width: 400px; width: 90%;
+        transform: translateY(-20px) scale(0.95);
+        transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+    }
+    .custom-confirm-overlay.active .custom-confirm-box {
+        transform: translateY(0) scale(1);
+    }
+</style>
+
+<div class="header-boxed">
+    <div class="container">
+        <div class="d-flex flex-column flex-md-row align-items-center justify-content-between gap-3">
+            <div class="text-center text-md-start">
+                <span class="section-label">Member Dashboard</span>
+                <h1 class="serif display-5 fw-bold mb-0">Quản lý lịch đặt của bạn</h1>
+            </div>
+            <div>
+                <a href="/Booking" class="btn btn-dark rounded-pill px-4 py-3 fw-bold small text-uppercase ls-1" style="font-size:0.75rem;">
+                    <i class="bi bi-plus-lg me-2"></i> ĐẶT BUỔI CHỤP MỚI
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container pb-5">
+    <!-- Status Filter Navigation Tabs -->
+    <div class="d-flex justify-content-center gap-2 mb-5 flex-wrap" id="statusTabsContainer">
+        <button class="status-tab active" data-status="all">Tất cả</button>
+        <button class="status-tab" data-status="Chờ xác nhận">Chờ xác nhận</button>
+        <button class="status-tab" data-status="Đã xác nhận">Đã xác nhận</button>
+        <button class="status-tab" data-status="Hoàn thành">Hoàn thành</button>
+        <button class="status-tab" data-status="Đã hủy">Đã hủy</button>
+    </div>
+
+    <!-- Booking Cards Container -->
+    <div class="row g-4" id="bookingsRow">
+        @if (Model != null && Model.Any())
+        {
+            foreach (var item in Model)
+            {
+                // Phân loại Class Trạng thái lịch chụp và cắt khoảng trắng thừa
+                string trangThaiTrimmed = item.TrangThai != null ? item.TrangThai.Trim() : "";
+                string statusClass = "status-pending";
+                if (trangThaiTrimmed == "Đã xác nhận" || trangThaiTrimmed == "Đã đặt cọc") { statusClass = "status-confirmed"; }
+                else if (trangThaiTrimmed == "Hoàn thành") { statusClass = "status-completed"; }
+                else if (trangThaiTrimmed == "Đã hủy") { statusClass = "status-cancelled"; }
+
+                // Tính toán tiền thanh toán
+                decimal totalPaid = item.ThanhToans != null ? item.ThanhToans.Sum(t => t.SoTienThanhToan) : 0;
+                decimal totalCost = item.TongTien ?? 0;
+                decimal remainingBalance = totalCost - totalPaid;
+
+                <div class="col-lg-4 col-md-6 booking-card-item" data-status="@trangThaiTrimmed">
+                    <div class="booking-card">
+                        <div class="card-img-wrapper">
+                             <img src="@(string.IsNullOrEmpty(item.DichVu?.LinkAnhDaiDien) ? Url.Content("~/Content/Images/default.jpg") : (item.DichVu.LinkAnhDaiDien.StartsWith("http") ? item.DichVu.LinkAnhDaiDien : Url.Content("~/Content/Images/" + item.DichVu.LinkAnhDaiDien)))" onerror="this.src='https://images.unsplash.com/photo-1556228578-8c89e6adf883?w=600'" alt="@item.DichVu?.TenDichVu" />
+                            <div class="position-absolute top-0 end-0 p-3">
+                                <span class="status-pill @statusClass shadow-sm">@trangThaiTrimmed</span>
+                            </div>
+                        </div>
+                        <div class="card-body-luxury">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <h5 class="serif booking-title mb-0">@(item.DichVu?.TenDichVu ?? "Dịch vụ")</h5>
+                            </div>
+                            
+                            <!-- Mã đặt lịch và ngày chụp -->
+                            <div class="detail-row">
+                                <span class="detail-label">Mã số đơn:</span>
+                                <span class="detail-value text-uppercase" style="color:var(--accent-gold);">LD@(item.MaDatLich.ToString("D4"))</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">Ngày chụp hình:</span>
+                                <span class="detail-value">@(item.NgayChup.ToString("dd/MM/yyyy"))</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">Khung giờ chụp:</span>
+                                <span class="detail-value">@item.KhungGio</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">Địa điểm chụp:</span>
+                                <span class="detail-value text-truncate ms-3" style="max-width:180px" title="@item.DiaDiem">@item.DiaDiem</span>
+                            </div>
+
+                            <div class="divider-gold"></div>
+
+                            <!-- Trạng thái thanh toán -->
+                            <div class="detail-row align-items-center mb-3">
+                                <span class="detail-label">Trạng thái thanh toán:</span>
+                                <span class="detail-value">
+                                    @if (totalPaid >= totalCost && totalCost > 0)
+                                    {
+                                        <span class="pay-badge bg-success-soft"><i class="bi bi-check-circle-fill me-1"></i> Đủ 100%</span>
+                                    }
+                                    else if (totalPaid > 0)
+                                    {
+                                        <span class="pay-badge bg-warning-soft"><i class="bi bi-wallet2 me-1"></i> Đã cọc 30%</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="pay-badge bg-danger-soft"><i class="bi bi-exclamation-circle me-1"></i> Chưa nộp tiền</span>
+                                    }
+                                </span>
+                            </div>
+
+                            <!-- Đánh giá hiển thị nếu có -->
+                            @if (item.DanhGias != null && item.DanhGias.Any())
+                            {
+                                var review = item.DanhGias.First();
+                                <div class="p-2 bg-light rounded mb-3 small text-muted border border-light">
+                                    <div class="d-flex justify-content-between mb-1">
+                                        <strong style="font-size:0.75rem;">Đánh giá của bạn:</strong>
+                                        <span class="stars-display">
+                                            @for (int i = 1; i <= 5; i++)
+                                            {
+                                                if (i <= review.SoSao)
+                                                {
+                                                    <i class="bi bi-star-fill text-warning"></i>
+                                                }
+                                                else
+                                                {
+                                                    <i class="bi bi-star text-muted"></i>
+                                                }
+                                            }
+                                        </span>
+                                    </div>
+                                    <p class="mb-0 text-truncate italic">"@review.NoiDungBinhLuan"</p>
+                                </div>
+                            }
+
+                            <!-- Tổng chi phí & Nút hành động -->
+                            <div class="total-row pt-2">
+                                <div>
+                                    <span class="text-muted small d-block">Tổng chi phí</span>
+                                    <span class="fw-bold fs-5 text-dark">@totalCost.ToString("N0") ₫</span>
+                                </div>
+                                
+                                <div class="action-buttons-wrapper d-flex gap-2">
+                                    @if (trangThaiTrimmed == "Chờ xác nhận")
+                                    {
+                                        <button type="button" class="btn-action btn-action-cancel" onclick="triggerCancelBooking(@item.MaDatLich, '@item.NgayChup.ToString("yyyy-MM-dd")')">Hủy lịch</button>
+                                    }
+                                    else if (trangThaiTrimmed == "Đã xác nhận" || trangThaiTrimmed == "Đã đặt cọc")
+                                    {
+                                        if (remainingBalance > 0)
+                                        {
+                                            <a href="/Booking/PayRemaining/@item.MaDatLich" class="btn-action btn-action-pay" title="Thanh toán 70% còn lại">Thanh toán 70%</a>
+                                        }
+                                        <button type="button" class="btn-action btn-action-cancel" onclick="triggerCancelBooking(@item.MaDatLich, '@item.NgayChup.ToString("yyyy-MM-dd")')">Hủy lịch</button>
+                                    }
+                                    else if (trangThaiTrimmed == "Hoàn thành")
+                                    {
+                                        if (item.DanhGias != null && item.DanhGias.Any())
+                                        {
+                                            <button type="button" class="btn-action btn-action-disabled" disabled>Đã đánh giá</button>
+                                        }
+                                        else
+                                        {
+                                            <button type="button" class="btn-action btn-action-review" onclick="openReviewModal(@item.MaDatLich, '@(item.DichVu?.TenDichVu ?? "Dịch vụ")')">Đánh giá</button>
+                                        }
+                                    }
+                                </div>
+                            </div>
+                            
+                            <!-- Đường dẫn Xem chi tiết gói chụp và các lựa chọn -->
+                            <div class="text-center mt-3 pt-3 border-top" style="border-top-style: dashed !important; border-top-color: #eee !important;">
+                                <a href="javascript:void(0)" class="text-decoration-none fw-bold small" style="color: var(--accent-gold); font-size: 0.72rem; letter-spacing: 0.5px;"
+                                   data-id="LD@(item.MaDatLich.ToString("D4"))"
+                                   data-booking-id="@item.MaDatLich"
+                                   data-service="@(item.DichVu?.TenDichVu ?? "Dịch vụ")"
+                                   data-service-desc="@(item.DichVu?.MoTa ?? "Chưa có mô tả chi tiết.")"
+                                   data-img="@(string.IsNullOrEmpty(item.DichVu?.LinkAnhDaiDien) ? Url.Content("~/Content/Images/default.jpg") : (item.DichVu.LinkAnhDaiDien.StartsWith("http") ? item.DichVu.LinkAnhDaiDien : Url.Content("~/Content/Images/" + item.DichVu.LinkAnhDaiDien)))"
+                                   data-date="@(item.NgayChup.ToString("dd/MM/yyyy"))"
+                                   data-time="@item.KhungGio"
+                                   data-location="@item.DiaDiem"
+                                   data-notes="@(string.IsNullOrEmpty(item.GhiChu) ? "Không có ghi chú hoặc yêu cầu đặc biệt nào được ghi nhận." : item.GhiChu)"
+                                   data-total="@(totalCost.ToString("N0")) ₫"
+                                   data-paid="@(totalPaid.ToString("N0")) ₫"
+                                   data-remaining="@(remainingBalance.ToString("N0")) ₫"
+                                   data-status="@trangThaiTrimmed"
+                                   data-link-anh="@item.LinkAnhBanGiao"
+                                   onclick="openDetailsModal(this)">
+                                    Xem chi tiết đơn hàng &amp; lựa chọn →
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+        else
+        {
+            <div class="col-12 text-center py-5">
+                <i class="bi bi-calendar-x display-1 text-muted mb-3 d-block" style="opacity:0.25"></i>
+                <h4 class="serif mb-2">Bạn chưa thực hiện cuộc đặt lịch nào</h4>
+                <p class="text-muted mb-4">Hãy để chúng tôi đồng hành cùng những khoảnh khắc đẹp nhất của bạn!</p>
+                <a href="/Booking" class="btn btn-dark rounded-pill px-5 py-3 fw-bold text-uppercase ls-1" style="font-size:0.8rem;">ĐẶT LỊCH NGAY</a>
+            </div>
+        }
+    </div>
+
+    <!-- No match filter result placeholder -->
+    <div id="noMatchPlaceholder" class="text-center py-5" style="display:none;">
+        <i class="bi bi-filter-circle display-2 text-muted mb-3 d-block" style="opacity:0.2"></i>
+        <h5 class="serif text-muted">Không tìm thấy lịch đặt nào ở trạng thái này.</h5>
+    </div>
+</div>
+
+<!-- ==================== HIDDEN CANCEL FORM ==================== -->
+<form id="cancelBookingForm" method="POST" action="/Booking/CancelBooking" style="display:none;">
+    @Html.AntiForgeryToken()
+    <input type="hidden" name="bookingId" id="cancelBookingId" />
+</form>
+
+<!-- ==================== BOOTSTRAP RATING MODAL ==================== -->
+<div class="modal fade" id="reviewModal" tabindex="-1" aria-labelledby="reviewModalLabel" aria-hidden="true" style="backdrop-filter: blur(5px);">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow" style="border-radius: var(--card-radius);">
+            <div class="modal-header border-0 bg-light p-4" style="border-top-left-radius: var(--card-radius); border-top-right-radius: var(--card-radius);">
+                <div>
+                    <h5 class="modal-title serif fw-bold text-dark" id="reviewModalLabel">Đánh giá dịch vụ Hama</h5>
+                    <span class="text-muted small d-block mt-1" id="reviewServiceName">Tên dịch vụ</span>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            
+            <form action="/Booking/AddReview" method="POST">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="bookingId" id="modalBookingId" />
+                <input type="hidden" name="rating" id="modalRating" value="5" />
+
+                <div class="modal-body p-4 text-center">
+                    <p class="text-muted small mb-4">Trải nghiệm của bạn là động lực phát triển lớn nhất của Hama Studio. Vui lòng chia sẻ cảm nhận chân thực nhé!</p>
+
+                    <!-- Interactive Star Rating -->
+                    <div class="star-rating d-flex justify-content-center gap-3 mb-4" style="font-size: 2.2rem; cursor: pointer;">
+                        <i class="bi bi-star-fill text-warning star-item" data-val="1"></i>
+                        <i class="bi bi-star-fill text-warning star-item" data-val="2"></i>
+                        <i class="bi bi-star-fill text-warning star-item" data-val="3"></i>
+                        <i class="bi bi-star-fill text-warning star-item" data-val="4"></i>
+                        <i class="bi bi-star-fill text-warning star-item" data-val="5"></i>
+                    </div>
+
+                    <div class="text-start mb-2">
+                        <label class="small text-uppercase fw-bold text-muted mb-1">Nội dung bình luận của bạn *</label>
+                        <textarea class="form-control" name="comment" rows="3" placeholder="Nhập cảm nhận về nước ảnh, thái độ phục vụ của nhiếp ảnh gia..." required style="border-radius:8px; font-size:0.9rem; padding:12px;"></textarea>
+                    </div>
+                </div>
+
+                <div class="modal-footer border-0 p-4">
+                    <button type="button" class="btn btn-light px-4 py-2" data-bs-dismiss="modal" style="border-radius:6px; font-size:0.8rem; font-weight:600;">HỦY BỎ</button>
+                    <button type="submit" class="btn btn-dark px-4 py-2" style="border-radius:6px; font-size:0.8rem; font-weight:600; background:var(--primary-dark);">GỬI ĐÁNH GIÁ</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== BOOTSTRAP DETAILS MODAL ==================== -->
+<div class="modal fade" id="detailsModal" tabindex="-1" aria-labelledby="detailsModalLabel" aria-hidden="true" style="backdrop-filter: blur(5px);">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content border-0 shadow" style="border-radius: var(--card-radius); overflow: hidden;">
+            <div class="modal-header border-0 bg-dark text-white p-4">
+                <div>
+                    <span class="text-uppercase small tracking-widest text-muted d-block mb-1" style="color: #c5a880 !important; font-size: 0.65rem; font-weight: 700; letter-spacing: 2px;">Booking Specification</span>
+                    <h5 class="modal-title serif fw-bold fs-4" id="detailsModalLabel">Chi tiết yêu cầu đặt lịch</h5>
+                </div>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            
+            <div class="modal-body p-4 bg-light">
+                <div class="row g-4">
+                    <!-- Left column: Package info -->
+                    <div class="col-md-5">
+                        <div class="bg-white p-4 rounded-3 border border-light shadow-sm h-100">
+                            <img id="detailImg" src="" alt="Dịch vụ" class="w-100 rounded-3 mb-3 object-fit-cover shadow-sm" style="height: 180px;" />
+                            <h5 id="detailServiceName" class="serif fw-bold text-dark mb-2">Tên gói</h5>
+                            <hr class="my-3" style="border-color: #eee;" />
+                            <p class="text-uppercase fw-bold small text-muted mb-1" style="font-size:0.65rem; letter-spacing: 1px;">Mô tả gói dịch vụ</p>
+                            <p id="detailServiceDesc" class="text-muted small lh-lg" style="font-size:0.8rem; max-height: 180px; overflow-y: auto;">Mô tả...</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Right column: Customer Selections -->
+                    <div class="col-md-7">
+                        <div class="bg-white p-4 rounded-3 border border-light shadow-sm h-100">
+                            <h6 class="serif fw-bold text-dark mb-3 border-bottom pb-2" style="border-color: #eee !important;"><i class="bi bi-person-badge me-2 text-muted"></i>Lựa chọn &amp; Thông tin của bạn</h6>
+                            
+                            <div class="d-flex flex-column gap-3">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="text-muted small">Mã đơn hàng:</span>
+                                    <strong id="detailOrderId" class="text-uppercase small text-dark" style="color: var(--accent-gold) !important; letter-spacing: 1px;">LD0001</strong>
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="text-muted small">Ngày chụp hình:</span>
+                                    <strong id="detailDate" class="small text-dark">06/06/2026</strong>
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="text-muted small">Khung giờ chụp:</span>
+                                    <strong id="detailTime" class="small text-dark">08:00 - 17:00</strong>
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="text-muted small">Địa điểm chụp:</span>
+                                    <strong id="detailLocation" class="small text-dark text-end" style="max-width: 220px;">Bà Nà Hills</strong>
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="text-muted small">Trạng thái đơn:</span>
+                                    <span id="detailStatus" class="status-pill small py-1 px-3">Chờ xác nhận</span>
+                                </div>
+                                
+                                <div class="border-top my-2" style="border-color:#eee !important;"></div>
+                                
+                                <div class="d-flex flex-column text-start">
+                                    <span class="text-muted small mb-1"><i class="bi bi-pencil-square me-1"></i>Ghi chú &amp; Lựa chọn dịch vụ bổ sung:</span>
+                                    <div class="p-3 bg-light rounded-3 text-muted small lh-lg font-monospace border border-light" id="detailNotes" style="font-size:0.8rem; white-space: pre-line; max-height:100px; overflow-y:auto;">
+                                        Không có ghi chú.
+                                    </div>
+                                </div>
+                                
+                                <div class="border-top my-2" style="border-color:#eee !important;"></div>
+                                
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="text-muted small">Đã thanh toán / đặt cọc:</span>
+                                    <strong id="detailPaid" class="text-dark small">0 ₫</strong>
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="text-muted small">Còn lại cần nộp:</span>
+                                    <strong id="detailRemaining" class="text-dark small">0 ₫</strong>
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center mt-1">
+                                    <span class="fw-bold text-dark small">Tổng chi phí thực tế:</span>
+                                    <strong id="detailTotal" class="fs-5 text-dark" style="color:var(--primary-dark) !important;">0 ₫</strong>
+                                </div>
+
+                                <!-- Dynamic Download / Photo Delivery Section -->
+                                <div id="panelDownloadLink" class="d-none mt-3 p-3 rounded-3" style="border: 1px dashed #28a745; background-color: rgba(40, 167, 69, 0.03);">
+                                    <div class="d-flex align-items-center justify-content-between">
+                                        <div>
+                                            <span class="text-success fw-bold d-block small"><i class="bi bi-cloud-arrow-down-fill me-1"></i>Đã có bộ ảnh hoàn tất!</span>
+                                            <span class="text-muted" style="font-size:0.7rem;">Ekip Hama đã hoàn thành xuất sắc album ảnh của bạn.</span>
+                                        </div>
+                                        <a id="btnDownloadPhotos" href="#" target="_blank" class="btn btn-success btn-sm rounded-pill px-3 fw-bold" style="font-size:0.75rem;"><i class="bi bi-download me-1"></i>Tải Album</a>
+                                    </div>
+                                </div>
+                                <div id="panelDownloadProcessing" class="d-none mt-3 p-3 rounded-3" style="border: 1px dashed #e6a23c; background-color: rgba(230, 162, 60, 0.03);">
+                                    <div class="d-flex align-items-center gap-2 text-warning small">
+                                        <div class="spinner-border spinner-border-sm text-warning" role="status" style="width: 1rem; height: 1rem; border-width: 2px;"></div>
+                                        <div>
+                                            <strong class="d-block text-warning" style="font-size:0.75rem;">Đang xử lý hậu kỳ ảnh...</strong>
+                                            <span class="text-muted" style="font-size:0.7rem;">Ekip đang chỉnh sửa bộ ảnh chụp của bạn. Vui lòng đợi nhé!</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Simulated Admin Control Box (For Testing & Demo) -->
+                                <div class="mt-4 pt-3 border-top" style="border-top: 1px solid #eee !important;">
+                                    <button class="btn btn-sm btn-outline-secondary w-100 text-uppercase fw-bold ls-1 p-2" type="button" data-bs-toggle="collapse" data-bs-target="#adminSimulateBox" aria-expanded="false" aria-controls="adminSimulateBox" style="font-size:0.65rem; border-radius:6px;">
+                                        <i class="bi bi-gear-fill me-1"></i> Quản trị Hama Studio (Giả lập)
+                                    </button>
+                                    <div class="collapse mt-3" id="adminSimulateBox">
+                                        <div class="p-3 bg-light rounded-3 text-start border border-light shadow-sm">
+                                            <span class="badge bg-dark mb-2 text-uppercase fw-bold ls-1" style="font-size:0.6rem;">Studio Control Panel</span>
+                                            <form action="/Booking/UpdateBookingAdmin" method="POST" id="adminUpdateForm">
+                                                @Html.AntiForgeryToken()
+                                                <!-- Hidden Input for Database MaDatLich -->
+                                                <input type="hidden" name="bookingId" id="adminBookingId" />
+                                                
+                                                <div class="mb-2">
+                                                    <label class="small fw-bold text-muted mb-1 d-block" style="font-size:0.7rem;">Cập nhật Trạng thái đơn:</label>
+                                                    <select name="trangThai" id="adminSelectStatus" class="form-select form-select-sm" style="font-size:0.8rem; border-radius:6px; background-color: #fff;">
+                                                        <option value="Chờ xác nhận">Chờ xác nhận</option>
+                                                        <option value="Đã xác nhận">Đã xác nhận</option>
+                                                        <option value="Đã đặt cọc">Đã đặt cọc</option>
+                                                        <option value="Hoàn thành">Hoàn thành (Đã bàn giao sản phẩm)</option>
+                                                        <option value="Đã hủy">Đã hủy lịch</option>
+                                                    </select>
+                                                </div>
+                                                
+                                                <div class="mb-3">
+                                                    <label class="small fw-bold text-muted mb-1 d-block" style="font-size:0.7rem;">Link bàn giao ảnh (Chỉ dùng cho 'Hoàn thành'):</label>
+                                                    <input type="text" name="linkAnh" id="adminLinkAnh" class="form-control form-control-sm" placeholder="Ví dụ: https://drive.google.com/..." style="font-size:0.8rem; border-radius:6px;" />
+                                                </div>
+                                                
+                                                <button type="submit" class="btn btn-dark btn-sm w-100 fw-bold" style="font-size:0.75rem; border-radius:6px; background:var(--primary-dark); border-color: var(--primary-dark);">LƯU THAY ĐỔI</button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="modal-footer border-0 bg-white p-4">
+                <button type="button" class="btn btn-dark px-5 py-2 fw-semibold" data-bs-dismiss="modal" style="border-radius:6px; font-size:0.8rem; background: var(--primary-dark);">ĐÓNG LẠI</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Custom Confirm Modal -->
+<div id="customConfirmModal" class="custom-confirm-overlay">
+    <div class="custom-confirm-box" style="max-width: 440px;">
+        <i class="bi bi-exclamation-triangle-fill text-danger mb-3 d-block" style="font-size: 3.5rem;"></i>
+        <h5 class="serif fw-bold text-dark">Xác nhận hủy lịch</h5>
+        <p id="cancelWarningMsg" class="text-muted small mt-2 mb-4" style="line-height:1.6;"></p>
+        <div class="d-flex justify-content-center gap-3">
+            <button type="button" class="btn btn-light px-4 rounded-pill fw-semibold small" style="font-size: 0.75rem;" onclick="closeConfirmModal()">Giữ lại</button>
+            <button type="button" class="btn btn-danger px-4 rounded-pill fw-semibold small" style="font-size: 0.75rem;" onclick="proceedCancelBooking()">Xác nhận hủy</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        // ==================== 1. JS INTERACTIVE TABS FILTER ====================
+        const tabs = document.querySelectorAll(".status-tab");
+        const cards = document.querySelectorAll(".booking-card-item");
+        const noMatchPlaceholder = document.getElementById("noMatchPlaceholder");
+
+        tabs.forEach(tab => {
+            tab.addEventListener("click", function () {
+                // Đổi tab active
+                tabs.forEach(t => t.classList.remove("active"));
+                this.classList.add("active");
+
+                const statusToFilter = this.dataset.status;
+                let visibleCount = 0;
+
+                cards.forEach(card => {
+                    const cardStatus = card.dataset.status;
+                    const isMatch = (statusToFilter === "all") || 
+                                    (cardStatus === statusToFilter) || 
+                                    (statusToFilter === "Đã xác nhận" && cardStatus === "Đã đặt cọc");
+                    if (isMatch) {
+                        card.style.display = "block";
+                        visibleCount++;
+                    } else {
+                        card.style.display = "none";
+                    }
+                });
+
+                // Hiển thị thông báo nếu không có lịch đặt nào
+                if (visibleCount === 0 && cards.length > 0) {
+                    noMatchPlaceholder.style.display = "block";
+                } else {
+                    noMatchPlaceholder.style.display = "none";
+                }
+            });
+        });
+
+        // ==================== 2. INTERACTIVE STAR SELECTION ====================
+        const stars = document.querySelectorAll(".star-item");
+        const modalRatingInput = document.getElementById("modalRating");
+
+        stars.forEach(star => {
+            star.addEventListener("click", function () {
+                const val = parseInt(this.dataset.val);
+                modalRatingInput.value = val;
+                
+                stars.forEach((s, idx) => {
+                    if (idx < val) {
+                        s.className = 'bi bi-star-fill text-warning star-item';
+                    } else {
+                        s.className = 'bi bi-star star-item';
+                    }
+                });
+            });
+        });
+    });
+
+    // ==================== 3. TRIGGER CANCEL BOOKING ====================
+    let cancelBookingTargetId = null;
+
+    function triggerCancelBooking(bookingId, photoshootDateStr) {
+        cancelBookingTargetId = bookingId;
+        
+        // Tính khoảng cách ngày chụp và ngày hôm nay
+        const today = new Date();
+        today.setHours(0, 0, 0, 0); // Đặt về 0h để tính khoảng cách ngày chuẩn xác
+        
+        const photoDate = new Date(photoshootDateStr);
+        photoDate.setHours(0, 0, 0, 0);
+        
+        const oneDayMs = 24 * 60 * 60 * 1000;
+        const diffTime = photoDate - today;
+        const diffDays = Math.ceil(diffTime / oneDayMs);
+        
+        const warningSpan = document.getElementById("cancelWarningMsg");
+        
+        if (diffDays <= 3) {
+            warningSpan.innerHTML = `
+                Bạn có chắc chắn muốn hủy yêu cầu đặt lịch này không?<br>
+                <div class="alert alert-danger mt-3 small p-3 text-start mb-0" style="font-size: 0.75rem; border-radius: 8px; line-height: 1.5; border-color: rgba(245, 108, 108, 0.2); background-color: rgba(245, 108, 108, 0.05); color: #f56c6c;">
+                    <i class="bi bi-exclamation-octagon-fill me-1"></i>
+                    <strong>Chú ý:</strong> Chỉ còn <strong>${diffDays <= 0 ? 0 : diffDays} ngày</strong> là đến lịch chụp của bạn. Theo chính sách của Hama Studio, việc hủy lịch sát ngày chụp (3 ngày trở xuống) sẽ <strong>bị khấu trừ 30% tiền cọc</strong>!
+                </div>
+            `;
+        } else {
+            warningSpan.innerHTML = `
+                Bạn có chắc chắn muốn hủy yêu cầu đặt lịch này không?<br>
+                <span class="text-danger fw-semibold">Hành động này không thể hoàn tác.</span>
+            `;
+        }
+        
+        document.getElementById("customConfirmModal").classList.add("active");
+    }
+
+    function closeConfirmModal() {
+        document.getElementById("customConfirmModal").classList.remove("active");
+        cancelBookingTargetId = null;
+    }
+
+    function proceedCancelBooking() {
+        if (cancelBookingTargetId) {
+            document.getElementById("cancelBookingId").value = cancelBookingTargetId;
+            document.getElementById("cancelBookingForm").submit();
+        }
+    }
+
+    // ==================== 4. OPEN REVIEW MODAL ====================
+    function openReviewModal(bookingId, serviceName) {
+        document.getElementById("modalBookingId").value = bookingId;
+        document.getElementById("reviewServiceName").textContent = serviceName;
+        
+        // Reset stars to 5 stars
+        document.getElementById("modalRating").value = 5;
+        const stars = document.querySelectorAll(".star-item");
+        stars.forEach(s => s.className = 'bi bi-star-fill text-warning star-item');
+
+        // Hiển thị modal qua Bootstrap API
+        var myModal = new bootstrap.Modal(document.getElementById('reviewModal'));
+        myModal.show();
+    }
+
+    // ==================== 5. OPEN DETAILS MODAL ====================
+    function openDetailsModal(btn) {
+        // Lấy dữ liệu từ data- attributes
+        const orderId = btn.dataset.id;
+        const bookingIdVal = btn.dataset.bookingId;
+        const serviceName = btn.dataset.service;
+        const serviceDesc = btn.dataset.serviceDesc;
+        const imgUrl = btn.dataset.img;
+        const date = btn.dataset.date;
+        const time = btn.dataset.time;
+        const location = btn.dataset.location;
+        const notes = btn.dataset.notes;
+        const total = btn.dataset.total;
+        const paid = btn.dataset.paid;
+        const remaining = btn.dataset.remaining;
+        const status = btn.dataset.status;
+        const linkAnh = btn.dataset.linkAnh || "";
+
+        // Đổ dữ liệu vào Modal
+        document.getElementById("detailOrderId").textContent = orderId;
+        document.getElementById("detailServiceName").textContent = serviceName;
+        document.getElementById("detailServiceDesc").textContent = serviceDesc;
+        document.getElementById("detailImg").src = imgUrl;
+        document.getElementById("detailDate").textContent = date;
+        document.getElementById("detailTime").textContent = time;
+        document.getElementById("detailLocation").textContent = location;
+        document.getElementById("detailNotes").textContent = notes;
+        document.getElementById("detailTotal").textContent = total;
+        document.getElementById("detailPaid").textContent = paid;
+        document.getElementById("detailRemaining").textContent = remaining;
+
+        // Xử lý status pill class
+        const statusPill = document.getElementById("detailStatus");
+        statusPill.textContent = status;
+        
+        // Xóa class cũ
+        statusPill.className = "status-pill small py-1 px-3";
+        if (status === "Đã xác nhận" || status === "Đã đặt cọc" || status === "Đã đặt cọc 30%") {
+            statusPill.classList.add("status-confirmed");
+        } else if (status === "Hoàn thành") {
+            statusPill.classList.add("status-completed");
+        } else if (status === "Đã hủy") {
+            statusPill.classList.add("status-cancelled");
+        } else {
+            statusPill.classList.add("status-pending");
+        }
+
+        // --- Xử lý Cổng Bàn Giao Ảnh (Feature 3) ---
+        const panelDownloadLink = document.getElementById("panelDownloadLink");
+        const panelDownloadProcessing = document.getElementById("panelDownloadProcessing");
+        const btnDownloadPhotos = document.getElementById("btnDownloadPhotos");
+
+        panelDownloadLink.classList.add("d-none");
+        panelDownloadProcessing.classList.add("d-none");
+
+        if (status === "Hoàn thành") {
+            if (linkAnh && linkAnh.trim() !== "") {
+                btnDownloadPhotos.href = linkAnh;
+                panelDownloadLink.classList.remove("d-none");
+            } else {
+                panelDownloadProcessing.classList.remove("d-none");
+            }
+        }
+
+        // --- Đổ dữ liệu vào Bảng điều khiển Quản trị Studio giả lập ---
+        document.getElementById("adminBookingId").value = bookingIdVal;
+        document.getElementById("adminSelectStatus").value = status;
+        document.getElementById("adminLinkAnh").value = linkAnh;
+
+        // Reset collapse panel admin box
+        var adminCollapseEl = document.getElementById('adminSimulateBox');
+        if (adminCollapseEl.classList.contains('show')) {
+            var bsCollapse = bootstrap.Collapse.getInstance(adminCollapseEl);
+            if (bsCollapse) bsCollapse.hide();
+        }
+
+        // Mở modal qua Bootstrap API
+        var myModal = new bootstrap.Modal(document.getElementById('detailsModal'));
+        myModal.show();
+    }
+</script>

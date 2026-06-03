@@ -1,0 +1,439 @@
+@model HamaStudio.Models.DichVu
+
+@{
+    ViewBag.Title = Model.TenDichVu + " | Hama Studio Experience";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&family=Playfair+Display:ital,wght@0,600;0,700;1,500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
+<style>
+    :root {
+        --primary-dark: #1a1a1a;
+        --accent-gold: #c5a880;
+        --bg-soft: #fdfdfd;
+        --text-muted: #6c757d;
+        --card-radius: 12px;
+        --transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+    }
+
+    body {
+        font-family: 'Montserrat', sans-serif;
+        background-color: var(--bg-soft);
+        color: var(--primary-dark);
+    }
+
+    .serif {
+        font-family: 'Playfair Display', serif;
+    }
+
+    /* ===== BREADCRUMB LUXURY ===== */
+    .breadcrumb-custom {
+        padding: 30px 0 10px;
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        margin-top: 90px;
+    }
+
+        .breadcrumb-custom a {
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: 0.3s;
+        }
+
+            .breadcrumb-custom a:hover {
+                color: var(--accent-gold);
+            }
+
+    /* ===== IMAGE GALLERY ===== */
+    .main-img-container {
+        position: relative;
+        height: 600px;
+        overflow: hidden;
+        border-radius: var(--card-radius);
+        background: #eee;
+    }
+
+        .main-img-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: opacity 0.5s ease;
+        }
+
+    .thumb-img {
+        height: 100px;
+        object-fit: cover;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: var(--transition);
+        opacity: 0.5;
+        border: 1px solid transparent;
+    }
+
+        .thumb-img:hover, .thumb-img.active {
+            opacity: 1;
+            border-color: var(--accent-gold);
+            transform: translateY(-5px);
+        }
+
+    /* ===== SERVICE INFO ===== */
+    .service-badge {
+        font-size: 0.65rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 3px;
+        color: var(--accent-gold);
+        border: 1px solid var(--accent-gold);
+        padding: 4px 15px;
+        border-radius: 50px;
+        display: inline-block;
+        margin-bottom: 20px;
+    }
+
+    .price-large {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: var(--primary-dark);
+        margin: 20px 0;
+    }
+
+    .promo-tag {
+        background: #fff5e6;
+        color: #d4a017;
+        font-size: 0.75rem;
+        font-weight: 700;
+        padding: 5px 12px;
+        border-radius: 4px;
+        display: inline-block;
+        margin-bottom: 15px;
+    }
+
+    /* ===== EXTRA SERVICES (ERD: MaDVBS) ===== */
+    .extra-item {
+        background: white;
+        border: 1px solid #eee;
+        border-radius: 8px;
+        padding: 15px;
+        transition: var(--transition);
+        margin-bottom: 12px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+        .extra-item:hover {
+            border-color: var(--accent-gold);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.02);
+        }
+
+    /* ===== STICKY SIDEBAR ===== */
+    .booking-sidebar {
+        position: sticky;
+        top: 100px;
+        background: white;
+        padding: 40px;
+        border-radius: var(--card-radius);
+        border: 1px solid #f0f0f0;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.03);
+    }
+
+    .btn-premium {
+        background: var(--primary-dark);
+        color: white;
+        padding: 18px;
+        border-radius: 8px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        width: 100%;
+        border: none;
+        transition: var(--transition);
+        font-size: 0.85rem;
+    }
+
+        .btn-premium:hover {
+            background: var(--accent-gold);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(197, 168, 128, 0.2);
+        }
+
+    /* ===== RELATED CARDS ===== */
+    .related-card {
+        border: 1px solid #eee;
+        border-radius: var(--card-radius);
+        overflow: hidden;
+        transition: var(--transition);
+        height: 100%;
+        background: white;
+    }
+
+        .related-card:hover {
+            transform: translateY(-10px);
+            border-color: var(--accent-gold);
+        }
+
+    .related-img {
+        height: 220px;
+        object-fit: cover;
+        width: 100%;
+    }
+</style>
+
+<div class="container">
+    <nav class="breadcrumb-custom">
+        <a href="/">Home</a> <span class="mx-2" style="opacity:0.3">/</span>
+        <a href="/Home/Services">Dịch vụ</a> <span class="mx-2" style="opacity:0.3">/</span>
+        <span class="fw-bold">@Model.TenDichVu</span>
+    </nav>
+
+    <div class="row g-5 py-4">
+        <div class="col-lg-7">
+            <div class="main-img-container shadow-sm mb-4">
+                <img id="mainImg" src="@(string.IsNullOrEmpty(Model.LinkAnhDaiDien) ? Url.Content("~/Content/Images/default.jpg") : (Model.LinkAnhDaiDien.StartsWith("http") ? Model.LinkAnhDaiDien : Url.Content("~/Content/Images/" + Model.LinkAnhDaiDien)))" onerror="this.src='https://images.unsplash.com/photo-1519225421980-715cb0215aed?w=1200'" alt="@Model.TenDichVu" />
+            </div>
+
+            <div class="d-flex gap-1 mb-5">
+                @if (Model.Portfolios != null && Model.Portfolios.Any())
+                {
+                    bool first = true;
+                    foreach (var p in Model.Portfolios.Take(4))
+                    {
+                        <img src="@(p.LinkFileAnh.StartsWith("http") ? p.LinkFileAnh : Url.Content("~/Content/Images/" + p.LinkFileAnh))" onerror="this.src='https://images.unsplash.com/photo-1519225421980-715cb0215aed?w=400'" class="thumb-img @(first ? "active" : "")" onclick="switchImg(this)" style="height: 100px; width: auto;" />
+                        first = false;
+                    }
+                }
+            </div>
+
+            <div class="pe-lg-5">
+                <h3 class="serif fw-bold mb-4">Chi tiết gói dịch vụ</h3>
+                <p class="text-muted lh-lg mb-5">
+                    @Html.Raw(Model.MoTa?.Replace("\n", "<br/>"))
+                </p>
+
+                <h5 class="serif fw-bold mb-4 border-bottom pb-2">Đặc quyền trong gói chụp</h5>
+                <div class="row g-4">
+                    @if (Model.DacQuyens != null && Model.DacQuyens.Any())
+                    {
+                        foreach (var d in Model.DacQuyens)
+                        {
+                            <div class="col-md-6 d-flex gap-3">
+                                <i class="bi @d.Icon text-gold fs-4"></i>
+                                <div>
+                                    <p class="fw-bold mb-1 small text-uppercase">@d.TieuDe</p>
+                                    <span class="text-muted small">@d.NoiDung</span>
+                                </div>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <div class="col-12 text-muted small">Chưa có thông tin đặc quyền cho gói này.</div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-5">
+            <div class="booking-sidebar">
+                <span class="service-badge">@(Model.DanhMucDichVu?.TenDanhMuc ?? "Dịch vụ")</span>
+                <h1 class="serif display-6 fw-bold mt-2">@Model.TenDichVu</h1>
+
+                @{
+                    var danhGias = Model.DatLiches?.SelectMany(dl => dl.DanhGias).ToList();
+                    double avgRating = danhGias != null && danhGias.Any() ? (double)danhGias.Average(dg => dg.SoSao ?? 5) : 5.0;
+                    int reviewCount = danhGias?.Count ?? 0;
+                }
+                <div class="d-flex align-items-center gap-2 mb-3 mt-1">
+                    <div class="text-warning small">
+                        @for (int i = 1; i <= 5; i++)
+                        {
+                            if (i <= Math.Round(avgRating))
+                            {
+                                <i class="bi bi-star-fill"></i>
+                            }
+                            else
+                            {
+                                <i class="bi bi-star"></i>
+                            }
+                        }
+                    </div>
+                    <span class="text-muted" style="font-size: 0.75rem;">(@reviewCount đánh giá)</span>
+                </div>
+
+                <div class="price-block mt-4">
+                    <div class="price-large">
+                        @Model.GiaTien.ToString("N0", new System.Globalization.CultureInfo("vi-VN")) đ
+                    </div>
+                </div>
+
+                <hr class="my-4" style="opacity: 0.05;">
+
+                <p class="small fw-bold text-uppercase ls-2 mb-3">Dịch vụ bổ sung ưu đãi</p>
+                <div class="extra-services mb-5">
+                    @if (Model.DichVuBoSungs != null && Model.DichVuBoSungs.Any())
+                    {
+                        foreach (var dv in Model.DichVuBoSungs)
+                        {
+                            <div class="extra-item">
+                                <div>
+                                    <p class="fw-bold mb-0 small">@dv.TenDVBS</p>
+                                    <span class="text-muted" style="font-size: 10px;">@dv.MoTa</span>
+                                </div>
+                                <span class="fw-bold text-dark small">+@dv.GiaTien.ToString("N0", new System.Globalization.CultureInfo("vi-VN")) đ</span>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <div class="text-muted small fst-italic">Không có dịch vụ bổ sung nào.</div>
+                    }
+                </div>
+
+                <a href="/Booking?serviceId=@Model.MaDichVu" class="btn btn-premium shadow-sm mb-3">TIẾN HÀNH ĐẶT LỊCH NGAY</a>
+                <p class="text-center text-muted small">Hoặc tư vấn trực tiếp qua Zalo: 0336 486 377</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- REVIEWS SECTION -->
+    <div class="mt-5 pt-5 border-top">
+        <div class="row g-5">
+            <!-- Overall Rating Panel -->
+            <div class="col-lg-4">
+                <div class="p-4 bg-light rounded-3 text-center border border-light sticky-top" style="top:100px;">
+                    <span class="section-label" style="letter-spacing: 3px;">Reviews</span>
+                    <h4 class="serif fw-bold text-dark mb-3">Đánh giá dịch vụ</h4>
+                    
+                    <div class="display-3 fw-bold serif text-dark mb-2">@avgRating.ToString("F1")</div>
+                    
+                    <div class="mb-2" style="font-size: 1.4rem;">
+                        @for (int i = 1; i <= 5; i++)
+                        {
+                            if (i <= Math.Round(avgRating))
+                            {
+                                <i class="bi bi-star-fill text-warning"></i>
+                            }
+                            else
+                            {
+                                <i class="bi bi-star text-muted"></i>
+                            }
+                        }
+                    </div>
+                    
+                    <p class="text-muted small mb-0">(@reviewCount lượt đánh giá từ khách hàng đã trải nghiệm)</p>
+                </div>
+            </div>
+
+            <!-- Detailed Reviews List -->
+            <div class="col-lg-8">
+                <h5 class="serif fw-bold mb-4">Nhận xét của khách hàng</h5>
+                
+                @if (danhGias != null && danhGias.Any())
+                {
+                    <div class="d-flex flex-column gap-4">
+                        @foreach (var rev in danhGias.OrderByDescending(r => r.NgayGui))
+                        {
+                            <div class="p-4 bg-white rounded-3 shadow-sm border border-light position-relative" style="transition:0.3s;">
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <div class="d-flex align-items-center gap-3">
+                                        <div class="bg-dark text-white rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width:40px; height:40px; font-size:0.9rem;">
+                                            @(rev.KhachHang != null && !string.IsNullOrEmpty(rev.KhachHang.HoTen) ? rev.KhachHang.HoTen.Substring(0, 1).ToUpper() : "K")
+                                        </div>
+                                        <div>
+                                            <strong class="d-block text-dark small">@(rev.KhachHang != null ? rev.KhachHang.HoTen : "Khách hàng giấu tên")</strong>
+                                            <span class="text-muted" style="font-size: 0.75rem;">@rev.NgayGui.Value.ToString("dd/MM/yyyy")</span>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="stars-display text-warning" style="font-size:0.85rem;">
+                                        @for (int i = 1; i <= 5; i++)
+                                        {
+                                            if (i <= rev.SoSao)
+                                            {
+                                                <i class="bi bi-star-fill"></i>
+                                            }
+                                            else
+                                            {
+                                                <i class="bi bi-star text-muted"></i>
+                                            }
+                                        }
+                                    </div>
+                                </div>
+                                <p class="mb-0 text-muted small" style="line-height:1.6; font-style:italic;">"@rev.NoiDungBinhLuan"</p>
+                            </div>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <div class="p-5 text-center bg-white rounded-3 border border-light">
+                        <i class="bi bi-chat-heart display-4 text-muted mb-3 d-block" style="opacity:0.25"></i>
+                        <h6 class="serif text-muted">Chưa có đánh giá nào cho gói dịch vụ này.</h6>
+                        <p class="text-muted small mb-0">Các đánh giá thực tế sẽ hiển thị tại đây sau khi khách hàng hoàn tất lịch chụp và phản hồi.</p>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-5 pt-5 border-top">
+        <div class="d-flex justify-content-between align-items-end mb-5">
+            <div>
+                <span class="section-label" style="letter-spacing: 5px;">Discover</span>
+                <h2 class="serif display-6">Các gói chụp liên quan</h2>
+            </div>
+            <a href="/Home/Services" class="text-dark fw-bold small text-uppercase ls-1 text-decoration-none">Xem tất cả →</a>
+        </div>
+
+        <div class="row g-4">
+            @{
+                var relatedServices = ViewBag.RelatedServices as IEnumerable<HamaStudio.Models.DichVu>;
+                if (relatedServices != null && relatedServices.Any())
+                {
+                    foreach (var svc in relatedServices)
+                    {
+                        <div class="col-md-4">
+                            <a href="/Home/ServiceDetail/@svc.MaDichVu" class="text-decoration-none text-dark d-block h-100">
+                                <div class="related-card">
+                                    <img src="@(string.IsNullOrEmpty(svc.LinkAnhDaiDien) ? Url.Content("~/Content/Images/default.jpg") : (svc.LinkAnhDaiDien.StartsWith("http") ? svc.LinkAnhDaiDien : Url.Content("~/Content/Images/" + svc.LinkAnhDaiDien)))" class="related-img" onerror="this.src='https://images.unsplash.com/photo-1511285560929-80b456fea0bc?w=600'" />
+                                    <div class="p-4">
+                                        <p class="fw-bold mb-1 text-truncate">@svc.TenDichVu</p>
+                                        <p class="text-muted small mb-3" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">@svc.MoTa</p>
+                                        <div class="fw-bold">@svc.GiaTien.ToString("N0", new System.Globalization.CultureInfo("vi-VN")) đ</div>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <div class="col-12 text-muted text-center py-4">Chưa có gói dịch vụ liên quan nào.</div>
+                }
+            }
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function switchImg(thumb) {
+            const main = document.getElementById('mainImg');
+            const src = thumb.src.replace('w=400', 'w=1200'); // Lấy ảnh chất lượng cao
+
+            main.style.opacity = '0';
+
+            setTimeout(() => {
+                main.src = src;
+                main.style.opacity = '1';
+
+                // Cập nhật trạng thái active của thumbnail
+                document.querySelectorAll('.thumb-img').forEach(t => t.classList.remove('active'));
+                thumb.classList.add('active');
+            }, 250);
+        }
+    </script>
+}

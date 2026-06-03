@@ -1,0 +1,8 @@
+cat <<EOT > .gitignore
+.vs/
+.vscode/
+bin/
+obj/
+packages/
+*.user
+EOT

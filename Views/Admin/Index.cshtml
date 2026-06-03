@@ -1,0 +1,729 @@
+@{Layout = null;}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Admin — Hama Studio</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+    <link rel="stylesheet" href="~/Content/admin.css" />
+</head>
+<body class="admin-body">
+    <!-- SIDEBAR -->
+    <aside class="admin-sidebar">
+        <div class="sidebar-logo">HAMA STUDIO<span>Admin Panel</span></div>
+        <nav class="sidebar-nav">
+            <div class="nav-item active" data-sec="dashboard" onclick="switchSection('dashboard')"><i class="bi bi-grid"></i><span>Tổng quan</span></div>
+            <div class="nav-item" data-sec="booking-pending" onclick="switchSection('booking-pending')"><i class="bi bi-clock"></i><span>Lịch chờ xác nhận</span></div>
+            <div class="nav-item" data-sec="booking-confirmed" onclick="switchSection('booking-confirmed')"><i class="bi bi-calendar-check"></i><span>Lịch đã xác nhận</span></div>
+            <div class="nav-item" data-sec="history" onclick="switchSection('history')"><i class="bi bi-check2-circle"></i><span>Lịch sử hoàn thành</span></div>
+            <div class="nav-item" data-sec="customers" onclick="switchSection('customers')"><i class="bi bi-people"></i><span>Khách hàng</span></div>
+            <div class="nav-item" data-sec="services" onclick="switchSection('services')"><i class="bi bi-camera"></i><span>Dịch vụ</span></div>
+            <div class="nav-item" data-sec="portfolio" onclick="switchSection('portfolio')"><i class="bi bi-images"></i><span>Portfolio</span></div>
+            <div class="nav-item" data-sec="addons" onclick="switchSection('addons')"><i class="bi bi-plus-circle"></i><span>Dịch vụ bổ sung</span></div>
+        </nav>
+        <div class="sidebar-footer">&copy; 2026 Hama Studio</div>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="admin-main">
+        <header class="admin-header">
+            <h2 id="page-title">Tổng quan</h2>
+            <div class="header-actions">
+                <span style="font-size:12px;color:var(--text2);margin-right:8px">Xin chào, <b style="color:var(--text)">@(Session["FullName"] ?? "Admin")</b></span>
+                <a href="/Account/Logout" class="btn btn-sm"><i class="bi bi-box-arrow-right"></i> Đăng xuất</a>
+            </div>
+        </header>
+        <div class="admin-content">
+
+            <!-- ═══ DASHBOARD ═══ -->
+            <div class="section active" id="sec-dashboard">
+                <div class="stats-grid" id="dashboard-stats">
+                    <div class="stat-card"><div class="label">Tổng khách hàng</div><div class="value">@ViewBag.TongKhachHang</div></div>
+                    <div class="stat-card"><div class="label">Tổng lịch đặt</div><div class="value">@ViewBag.TongDatLich</div></div>
+                    <div class="stat-card"><div class="label">Tổng doanh thu</div><div class="value">@(String.Format("{0:N0}đ", ViewBag.TongDoanhThu))</div></div>
+                    <div class="stat-card"><div class="label">Chờ xác nhận</div><div class="value" style="color:var(--yellow)">@ViewBag.LichChoXacNhan</div></div>
+                </div>
+
+                <!-- Bo loc thong ke -->
+                <div class="filter-bar" style="flex-wrap:wrap;gap:10px;align-items:flex-end">
+                    <div>
+                        <label style="font-size:10px;color:var(--text2);display:block;margin-bottom:4px;text-transform:uppercase;letter-spacing:1px">Năm</label>
+                        <select id="revenue-year" class="search-input" style="width:100px">
+                            @for (int y = 2023; y <= 2027; y++)
+                            {
+                                <option value="@y" @(y == DateTime.Now.Year ? "selected" : "")>@y</option>
+}
+                        </select>
+                    </div>
+                    <div>
+                        <label style="font-size:10px;color:var(--text2);display:block;margin-bottom:4px;text-transform:uppercase;letter-spacing:1px">Xem theo ngày</label>
+                        <input type="date" id="revenue-day-from" class="search-input" style="width:155px" />
+                    </div>
+                    <div>
+                        <label style="font-size:10px;color:var(--text2);display:block;margin-bottom:4px;text-transform:uppercase;letter-spacing:1px">Đến ngày</label>
+                        <input type="date" id="revenue-day-to" class="search-input" style="width:155px" />
+                    </div>
+                    <button class="btn btn-primary btn-sm" style="height:34px" onclick="loadThongKe()"><i class="bi bi-search"></i> Xem thống kê</button>
+                    <button class="btn btn-sm" style="height:34px" onclick="exportReport()"><i class="bi bi-download"></i> Xuất báo cáo</button>
+                </div>
+
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px">
+                    <div class="chart-container"><h4>Biểu đồ doanh thu</h4><div class="chart-bar-wrap" id="revenue-chart"></div></div>
+                    <div>
+                        <div class="stats-grid" style="grid-template-columns:1fr 1fr;margin-bottom:16px">
+                            <div class="stat-card"><div class="label">Doanh thu</div><div class="value" id="rv-total">--</div></div>
+                            <div class="stat-card"><div class="label">Lịch đặt</div><div class="value" id="rv-booking">--</div></div>
+                            <div class="stat-card"><div class="label">Đã hủy</div><div class="value" id="rv-cancel" style="color:var(--red)">--</div></div>
+                            <div class="stat-card"><div class="label">Đánh giá TB</div><div class="value" id="rv-star" style="color:var(--yellow)">--</div></div>
+                        </div>
+                        <div class="table-wrap"><table class="data-table" style="min-width:auto"><thead><tr><th>#</th><th>Dịch vụ</th><th>Doanh thu</th></tr></thead><tbody id="tbl-revenue-dv"></tbody></table></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ═══ PENDING ═══ -->
+            <div class="section" id="sec-booking-pending">
+                <div class="table-header">
+                    <h3>Lịch chờ xác nhận</h3>
+                    <div class="filter-bar" style="margin-bottom:0">
+                        <input class="search-input" id="search-pending" placeholder="Tìm khách hàng, dịch vụ..." />
+                        <button class="btn btn-sm" onclick="doSearch('tbl-pending','search-pending')"><i class="bi bi-search"></i> Tìm</button>
+                    </div>
+                </div>
+                <div class="table-wrap"><table class="data-table"><thead><tr><th>ID</th><th>Khách hàng</th><th>SĐT</th><th>Dịch vụ</th><th>Ngày chụp</th><th>Khung giờ</th><th>Địa điểm</th><th>Tổng tiền</th><th>Đã cọc</th><th>Trạng thái</th><th>Thao tác</th></tr></thead><tbody id="tbl-pending"></tbody></table></div>
+            </div>
+
+            <!-- ═══ CONFIRMED ═══ -->
+            <div class="section" id="sec-booking-confirmed">
+                <div class="table-header">
+                    <h3>Lịch đã xác nhận / đặt cọc</h3>
+                    <div class="filter-bar" style="margin-bottom:0">
+                        <input class="search-input" id="search-confirmed" placeholder="Tìm khách hàng, dịch vụ..." />
+                        <button class="btn btn-sm" onclick="doSearch('tbl-confirmed','search-confirmed')"><i class="bi bi-search"></i> Tìm</button>
+                    </div>
+                </div>
+                <div class="table-wrap"><table class="data-table"><thead><tr><th>ID</th><th>Khách hàng</th><th>SĐT</th><th>Dịch vụ</th><th>Ngày chụp</th><th>Khung giờ</th><th>Địa điểm</th><th>Tổng tiền</th><th>Đã cọc</th><th>Trạng thái</th><th>Thao tác</th></tr></thead><tbody id="tbl-confirmed"></tbody></table></div>
+            </div>
+
+            <!-- ═══ HISTORY ═══ -->
+            <div class="section" id="sec-history">
+                <div class="table-header">
+                    <h3>Lịch sử hoàn thành</h3>
+                    <div class="filter-bar" style="margin-bottom:0">
+                        <input class="search-input" id="search-history" placeholder="Tìm khách hàng, dịch vụ..." />
+                        <button class="btn btn-sm" onclick="doSearch('tbl-history','search-history')"><i class="bi bi-search"></i> Tìm</button>
+                    </div>
+                </div>
+                <div class="table-wrap"><table class="data-table"><thead><tr><th>ID</th><th>Khách hàng</th><th>SĐT</th><th>Dịch vụ</th><th>Ngày chụp</th><th>Khung giờ</th><th>Địa điểm</th><th>Tổng tiền</th><th>Đã cọc</th><th>Trạng thái</th><th>Thao tác</th></tr></thead><tbody id="tbl-history"></tbody></table></div>
+            </div>
+
+            <!-- ═══ CUSTOMERS ═══ -->
+            <div class="section" id="sec-customers">
+                <div class="table-header">
+                    <h3>Khách hàng</h3>
+                    <div class="filter-bar" style="margin-bottom:0">
+                        <select id="filter-kh-status" class="search-input" style="width:140px">
+                            <option value="">Tất cả</option>
+                            <option value="Hoạt động">Hoạt động</option>
+                            <option value="Khóa">Đã khóa</option>
+                        </select>
+                        <input class="search-input" id="search-customers" placeholder="Tìm tên, email, SĐT..." />
+                        <button class="btn btn-sm" onclick="filterKhachHang()"><i class="bi bi-search"></i> Tìm</button>
+                    </div>
+                </div>
+                <div class="table-wrap"><table class="data-table"><thead><tr><th>ID</th><th>Họ tên</th><th>Email</th><th>SĐT</th><th>Địa chỉ</th><th>Số lịch</th><th>Trạng thái</th><th>Thao tác</th></tr></thead><tbody id="tbl-customers"></tbody></table></div>
+            </div>
+
+            <!-- ═══ SERVICES ═══ -->
+            <div class="section" id="sec-services">
+                <div class="table-header">
+                    <h3>Dịch vụ</h3>
+                    <div class="filter-bar" style="margin-bottom:0">
+                        <input class="search-input" id="search-services" placeholder="Tìm tên dịch vụ..." />
+                        <button class="btn btn-sm" onclick="doSearch('tbl-services','search-services')"><i class="bi bi-search"></i> Tìm</button>
+                        <button class="btn btn-primary btn-sm" onclick="showAddDV()"><i class="bi bi-plus"></i> Thêm dịch vụ</button>
+                    </div>
+                </div>
+                <div class="table-wrap"><table class="data-table"><thead><tr><th>ID</th><th>Tên dịch vụ</th><th>Danh mục</th><th>Giá</th><th>Slot</th><th>Thao tác</th></tr></thead><tbody id="tbl-services"></tbody></table></div>
+            </div>
+
+            <!-- ═══ PORTFOLIO ═══ -->
+            <div class="section" id="sec-portfolio">
+                <div class="table-header">
+                    <h3>Portfolio</h3>
+                    <div class="filter-bar" style="margin-bottom:0">
+                        <input class="search-input" id="search-portfolio" placeholder="Tìm tiêu đề..." />
+                        <button class="btn btn-sm" onclick="doSearchPortfolio()"><i class="bi bi-search"></i> Tìm</button>
+                        <button class="btn btn-primary btn-sm" onclick="showAddPF()"><i class="bi bi-plus"></i> Thêm ảnh</button>
+                    </div>
+                </div>
+                <div class="portfolio-grid" id="portfolio-grid"></div>
+            </div>
+
+            <!-- ═══ ADDONS ═══ -->
+            <div class="section" id="sec-addons">
+                <div class="table-header">
+                    <h3>Dịch vụ bổ sung</h3>
+                    <div class="filter-bar" style="margin-bottom:0">
+                        <input class="search-input" id="search-addons" placeholder="Tìm tên dịch vụ bổ sung..." />
+                        <button class="btn btn-sm" onclick="doSearch('tbl-addons','search-addons')"><i class="bi bi-search"></i> Tìm</button>
+                        <button class="btn btn-primary btn-sm" onclick="showAddBS()"><i class="bi bi-plus"></i> Thêm</button>
+                    </div>
+                </div>
+                <div class="table-wrap"><table class="data-table"><thead><tr><th>ID</th><th>Tên</th><th>Mô tả</th><th>Giá</th><th>Dịch vụ gốc</th><th>Thao tác</th></tr></thead><tbody id="tbl-addons"></tbody></table></div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- ═══ MODALS ═══ -->
+    <div class="modal-overlay" id="modal-complete">
+        <div class="modal">
+            <div class="modal-head"><h3>Hoàn thành đơn</h3><button class="modal-close" onclick="hideModal('modal-complete')">&times;</button></div>
+            <div class="modal-body"><input type="hidden" id="complete-id" /><div class="form-group"><label>Link ảnh bàn giao</label><input type="text" id="complete-link" placeholder="https://..." /></div></div>
+            <div class="modal-foot"><button class="btn" onclick="hideModal('modal-complete')">Hủy</button><button class="btn btn-primary" onclick="submitComplete()">Xác nhận</button></div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="modal-dv">
+        <div class="modal">
+            <div class="modal-head"><h3 id="modal-dv-title">Thêm dịch vụ</h3><button class="modal-close" onclick="hideModal('modal-dv')">&times;</button></div>
+            <div class="modal-body">
+                <input type="hidden" id="dv-mode" /><input type="hidden" id="dv-id" />
+                <div class="form-group"><label>Tên dịch vụ</label><input type="text" id="dv-ten" /></div>
+                <div class="form-group"><label>Danh mục</label><select id="dv-danhmuc"></select></div>
+                <div class="form-group"><label>Giá tiền</label><input type="number" id="dv-gia" /></div>
+                <div class="form-group"><label>Giới hạn thợ (slot)</label><input type="number" id="dv-slot" value="1" /></div>
+                <div class="form-group"><label>Mô tả</label><textarea id="dv-mota"></textarea></div>
+                <div class="form-group"><label>Link ảnh đại diện</label><input type="text" id="dv-anh" /></div>
+            </div>
+            <div class="modal-foot"><button class="btn" onclick="hideModal('modal-dv')">Hủy</button><button class="btn btn-primary" onclick="submitDV()">Lưu</button></div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="modal-pf">
+        <div class="modal">
+            <div class="modal-head"><h3 id="modal-pf-title">Portfolio</h3><button class="modal-close" onclick="hideModal('modal-pf')">&times;</button></div>
+            <div class="modal-body">
+                <input type="hidden" id="pf-mode" /><input type="hidden" id="pf-id" />
+                <div class="form-group"><label><i class="bi bi-fonts"></i> Tiêu đề</label><input type="text" id="pf-tieude" placeholder="Nhập tiêu đề cho ảnh..." /></div>
+                <div class="form-group"><label><i class="bi bi-tag"></i> Dịch vụ</label><select id="pf-dv"></select></div>
+
+                <div class="form-group">
+                    <label><i class="bi bi-image"></i> Chọn ảnh Portfolio</label>
+                    <div class="upload-zone" id="pf-upload-zone" onclick="document.getElementById('pf-file').click()">
+                        <input type="file" id="pf-file" accept="image/*" style="display:none" onchange="previewPFImage(this)" />
+                        <div class="upload-placeholder" id="pf-placeholder">
+                            <i class="bi bi-cloud-arrow-up"></i>
+                            <p>Kéo thả ảnh hoặc nhấn để chọn</p>
+                            <span>Hỗ trợ: JPG, PNG, WEBP (Max 5MB)</span>
+                        </div>
+                        <div class="upload-preview" id="pf-preview" style="display:none">
+                            <img src="" id="pf-preview-img" />
+                            <div class="preview-overlay"><i class="bi bi-arrow-repeat"></i> Thay đổi ảnh</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-foot"><button class="btn" onclick="hideModal('modal-pf')">Hủy</button><button class="btn btn-primary" onclick="submitPF()">Lưu dữ liệu</button></div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="modal-bs">
+        <div class="modal">
+            <div class="modal-head"><h3 id="modal-bs-title">Dịch vụ bổ sung</h3><button class="modal-close" onclick="hideModal('modal-bs')">&times;</button></div>
+            <div class="modal-body">
+                <input type="hidden" id="bs-mode" /><input type="hidden" id="bs-id" />
+                <div class="form-group"><label>Tên</label><input type="text" id="bs-ten" /></div>
+                <div class="form-group"><label>Mô tả</label><textarea id="bs-mota"></textarea></div>
+                <div class="form-group"><label>Giá tiền</label><input type="number" id="bs-gia" /></div>
+                <div class="form-group"><label>Dịch vụ gốc</label><select id="bs-dv"></select></div>
+            </div>
+            <div class="modal-foot"><button class="btn" onclick="hideModal('modal-bs')">Hủy</button><button class="btn btn-primary" onclick="submitBS()">Lưu</button></div>
+        </div>
+    </div>
+
+    <script>
+        // ===== ADMIN JS INLINE =====
+        var currentSection = 'dashboard', danhMucList = [];
+
+        document.addEventListener('DOMContentLoaded', function () {
+            loadDanhMuc();
+            switchSection('dashboard');
+        });
+
+        // === NAV ===
+        function switchSection(id) {
+            currentSection = id;
+            document.querySelectorAll('.section').forEach(function (s) { s.classList.remove('active') });
+            document.querySelectorAll('.nav-item').forEach(function (n) { n.classList.remove('active') });
+            var sec = document.getElementById('sec-' + id);
+            if (sec) sec.classList.add('active');
+            var nav = document.querySelector('[data-sec="' + id + '"]');
+            if (nav) nav.classList.add('active');
+            var t = document.getElementById('page-title');
+            if (t && nav) t.textContent = nav.querySelector('span').textContent;
+
+            if (id === 'dashboard') loadThongKe();
+            else if (id === 'booking-pending') loadDatLich('chua_xac_nhan');
+            else if (id === 'booking-confirmed') loadDatLich('da_xac_nhan');
+            else if (id === 'history') loadDatLich('hoan_thanh');
+            else if (id === 'customers') loadKhachHang();
+            else if (id === 'services') loadDichVu();
+            else if (id === 'portfolio') loadPortfolio();
+            else if (id === 'addons') loadDichVuBoSung();
+        }
+
+        // === DANH MUC ===
+        function loadDanhMuc() {
+            fetch('/Admin/GetDanhMuc').then(function (r) { return r.json() }).then(function (d) { danhMucList = d || [] }).catch(function () { });
+        }
+        function danhMucOptions(sel) {
+            var h = '<option value="">-- Ch\u1ECDn --</option>';
+            (danhMucList || []).forEach(function (dm) { h += '<option value="' + dm.MaDanhMuc + '"' + (dm.MaDanhMuc == sel ? ' selected' : '') + '>' + dm.TenDanhMuc + '</option>' });
+            return h;
+        }
+
+        // === FORMAT ===
+        function fmt(n) { return new Intl.NumberFormat('vi-VN').format(n || 0) }
+        function badge(tt) {
+            if (!tt) return '';
+            var t = tt.trim(); var cls = '';
+            if (t.indexOf('Ch\u1EDD') > -1) cls = 'badge-wait';
+            else if (t === 'Ho\u00E0n th\u00E0nh') cls = 'badge-done';
+            else if (t.indexOf('x\u00E1c nh\u1EADn') > -1) cls = 'badge-confirmed';
+            else if (t.indexOf('c\u1ECDc') > -1) cls = 'badge-deposit';
+            else if (t.indexOf('h\u1EE7y') > -1) cls = 'badge-cancel';
+            else if (t === 'Ho\u1EA1t \u0111\u1ED9ng') cls = 'badge-active';
+            else if (t === 'Kh\u00F3a') cls = 'badge-locked';
+            return '<span class="badge ' + cls + '">' + t + '</span>';
+        }
+        function esc(s) { return (s || '').replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/"/g, '&quot;') }
+
+        // === TIM KIEM ===
+        function filterTable(tbodyId, keyword) {
+            var el = document.getElementById(tbodyId); if (!el) return;
+            var kw = (keyword || '').toLowerCase();
+            el.querySelectorAll('tr').forEach(function (r) {
+                r.style.display = (kw === '' || r.textContent.toLowerCase().indexOf(kw) > -1) ? '' : 'none';
+            });
+        }
+        function doSearch(tbodyId, inputId) {
+            var el = document.getElementById(inputId);
+            filterTable(tbodyId, el ? el.value : '');
+        }
+        function doSearchPortfolio() {
+            var el = document.getElementById('search-portfolio');
+            var kw = el ? el.value.toLowerCase() : '';
+            document.querySelectorAll('#portfolio-grid .portfolio-card').forEach(function (c) {
+                c.style.display = (kw === '' || c.textContent.toLowerCase().indexOf(kw) > -1) ? '' : 'none';
+            });
+        }
+        function filterKhachHang() {
+            var statusEl = document.getElementById('filter-kh-status');
+            var searchEl = document.getElementById('search-customers');
+            var status = statusEl ? statusEl.value : '';
+            var kw = searchEl ? searchEl.value.toLowerCase() : '';
+            var el = document.getElementById('tbl-customers'); if (!el) return;
+            el.querySelectorAll('tr').forEach(function (r) {
+                var textOk = (kw === '' || r.textContent.toLowerCase().indexOf(kw) > -1);
+                var statusOk = true;
+                if (status) { statusOk = false; r.querySelectorAll('.badge').forEach(function (b) { if (b.textContent.trim() === status) statusOk = true }) }
+                r.style.display = (textOk && statusOk) ? '' : 'none';
+            });
+        }
+
+        // === THONG KE ===
+        function loadThongKe() {
+            var yearEl = document.getElementById('revenue-year');
+            var nam = yearEl ? yearEl.value : new Date().getFullYear();
+            var url = '/Admin/GetThongKe?nam=' + nam;
+            var dfEl = document.getElementById('revenue-day-from');
+            var dtEl = document.getElementById('revenue-day-to');
+            var dayFrom = dfEl ? dfEl.value : '';
+            var dayTo = dtEl ? dtEl.value : '';
+            var isDay = false;
+            if (dayFrom) { url += '&ngayTu=' + dayFrom; isDay = true }
+            if (dayTo) { url += '&ngayDen=' + dayTo; isDay = true }
+            fetch(url).then(function (r) { return r.json() }).then(function (d) {
+                if (!d.success) return;
+                var rvt = document.getElementById('rv-total'); if (rvt) rvt.textContent = fmt(d.tongDoanhThu) + '\u0111';
+                var rvb = document.getElementById('rv-booking'); if (rvb) rvb.textContent = d.tongDatLich;
+                var rvc = document.getElementById('rv-cancel'); if (rvc) rvc.textContent = d.tongHuy;
+                var rvs = document.getElementById('rv-star'); if (rvs) rvs.textContent = (parseFloat(d.tbSao) || 0).toFixed(1) + ' \u2605';
+                var arr = d.doanhThuTheoThang || [];
+                var max = 0; arr.forEach(function (m) { if ((m.doanhThu || 0) > max) max = m.doanhThu });
+                if (max === 0) max = 1;
+                var ch = '';
+                arr.forEach(function (m) {
+                    var h = Math.max(4, ((m.doanhThu || 0) / max) * 160);
+                    var lbl = isDay ? 'N' + m.thang : 'T' + m.thang;
+                    var val = (m.doanhThu > 0) ? fmt(Math.round(m.doanhThu / 1000)) + 'K' : '';
+                    ch += '<div class="chart-bar" title="' + fmt(m.doanhThu) + '" style="height:' + h + 'px"><span class="bar-value">' + val + '</span><span class="bar-label">' + lbl + '</span></div>';
+                });
+                var ce = document.getElementById('revenue-chart'); if (ce) ce.innerHTML = ch || '<div style="padding:20px;color:#999;font-size:12px">Ch\u01B0a c\u00F3 d\u1EEF li\u1EC7u</div>';
+                var dvArr = d.doanhThuTheoDV || []; var th = '';
+                dvArr.forEach(function (s, i) { th += '<tr><td>' + (i + 1) + '</td><td>' + (s.tenDichVu || 'N/A') + '</td><td>' + fmt(s.tongTien) + '\u0111</td></tr>' });
+                if (!dvArr.length) th = '<tr><td colspan="3" class="empty-state">Ch\u01B0a c\u00F3 d\u1EEF li\u1EC7u</td></tr>';
+                var de = document.getElementById('tbl-revenue-dv'); if (de) de.innerHTML = th;
+            }).catch(function (e) { console.error('GetThongKe:', e) });
+        }
+        function exportReport() {
+            var yearEl = document.getElementById('revenue-year');
+            var nam = yearEl ? yearEl.value : '';
+            var c = 'BAO CAO DOANH THU HAMA STUDIO - NAM ' + nam + '\r\nNgay xuat: ' + new Date().toLocaleString('vi-VN') + '\r\n';
+            var el;
+            el = document.getElementById('rv-total'); if (el) c += 'Tong doanh thu: ' + el.textContent + '\r\n';
+            el = document.getElementById('rv-booking'); if (el) c += 'Tong lich dat: ' + el.textContent + '\r\n';
+            el = document.getElementById('rv-cancel'); if (el) c += 'Da huy: ' + el.textContent + '\r\n';
+            c += '\r\nCHI TIET DOANH THU THEO DICH VU\r\n';
+            document.querySelectorAll('#tbl-revenue-dv tr').forEach(function (r) { var cells = r.querySelectorAll('td'); if (cells.length >= 3) c += cells[0].textContent + '. ' + cells[1].textContent + ': ' + cells[2].textContent + '\r\n' });
+            var blob = new Blob(['\uFEFF' + c], { type: 'text/plain;charset=utf-8' });
+            var a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'BaoCao_' + nam + '.txt'; a.click();
+        }
+
+        // === DAT LICH ===
+        function loadDatLich(loai) {
+            var tid = loai === 'chua_xac_nhan' ? 'tbl-pending' : (loai === 'da_xac_nhan' ? 'tbl-confirmed' : 'tbl-history');
+            fetch('/Admin/GetDatLich?loai=' + loai).then(function (r) { return r.json() }).then(function (data) {
+                var h = '';
+                (data || []).forEach(function (d) {
+                    h += '<tr><td>' + d.MaDatLich + '</td><td>' + (d.KhachHang || '--') + '</td><td>' + (d.SoDienThoai || '--') + '</td>';
+                    h += '<td>' + (d.DichVu || '--') + '</td><td>' + (d.NgayChup || '--') + '</td><td>' + (d.KhungGio || '--') + '</td>';
+                    h += '<td>' + (d.DiaDiem || '--') + '</td><td>' + fmt(d.TongTien) + '\u0111</td><td>' + fmt(d.SoTienDaCoc) + '\u0111</td>';
+                    h += '<td>' + badge(d.TrangThai) + '</td><td class="btn-group">';
+                    if (loai === 'chua_xac_nhan') {
+                        h += '<button class="btn btn-primary btn-sm" onclick="updateDL(' + d.MaDatLich + ',\'\u0110\u00E3 x\u00E1c nh\u1EADn\')">X\u00E1c nh\u1EADn</button>';
+                        h += '<button class="btn btn-danger btn-sm" onclick="updateDL(' + d.MaDatLich + ',\'\u0110\u00E3 h\u1EE7y\')">H\u1EE7y</button>';
+                    } else if (loai === 'da_xac_nhan') {
+                        h += '<button class="btn btn-primary btn-sm" onclick="showComplete(' + d.MaDatLich + ')">Ho\u00E0n th\u00E0nh</button>';
+                        h += '<button class="btn btn-danger btn-sm" onclick="updateDL(' + d.MaDatLich + ',\'\u0110\u00E3 h\u1EE7y\')">H\u1EE7y</button>';
+                    }
+                    h += '</td></tr>';
+                });
+                if (!data || !data.length) h = '<tr><td colspan="11" class="empty-state">Kh\u00F4ng c\u00F3 d\u1EEF li\u1EC7u</td></tr>';
+                var el = document.getElementById(tid); if (el) el.innerHTML = h;
+            }).catch(function (e) { console.error('loadDatLich:', e) });
+        }
+        function updateDL(id, tt, link) {
+            var fd = new FormData(); fd.append('maDatLich', id); fd.append('trangThai', tt);
+            if (link) fd.append('linkAnh', link);
+            fetch('/Admin/CapNhatTrangThaiDatLich', { method: 'POST', body: fd }).then(function (r) { return r.json() }).then(function (d) {
+                if (d.success) {
+                    if (currentSection === 'booking-pending') loadDatLich('chua_xac_nhan');
+                    else if (currentSection === 'booking-confirmed') loadDatLich('da_xac_nhan');
+                    else loadDatLich('hoan_thanh');
+                }
+            });
+        }
+        function showComplete(id) {
+            var el = document.getElementById('complete-id'); if (el) el.value = id;
+            var el2 = document.getElementById('complete-link'); if (el2) el2.value = '';
+            showModal('modal-complete');
+        }
+        function submitComplete() {
+            var idEl = document.getElementById('complete-id');
+            var linkEl = document.getElementById('complete-link');
+            updateDL(idEl ? idEl.value : '', 'Ho\u00E0n th\u00E0nh', linkEl ? linkEl.value : '');
+            hideModal('modal-complete');
+        }
+
+        // === KHACH HANG ===
+        function loadKhachHang() {
+            fetch('/Admin/GetKhachHang').then(function (r) { return r.json() }).then(function (data) {
+                var h = '';
+                (data || []).forEach(function (k) {
+                    h += '<tr><td>' + k.MaKhachHang + '</td><td>' + (k.HoTen || '--') + '</td><td>' + (k.Email || '--') + '</td>';
+                    h += '<td>' + (k.SoDienThoai || '--') + '</td><td>' + (k.DiaChi || '--') + '</td>';
+                    h += '<td>' + (k.SoLichDat || 0) + '</td><td>' + badge(k.TrangThai) + '</td>';
+                    h += '<td class="btn-group">';
+                    if (k.TrangThai === 'Ho\u1EA1t \u0111\u1ED9ng') h += '<button class="btn btn-danger btn-sm" onclick="updateKH(' + k.MaKhachHang + ',\'Kh\u00F3a\')">Kh\u00F3a</button>';
+                    else h += '<button class="btn btn-primary btn-sm" onclick="updateKH(' + k.MaKhachHang + ',\'Ho\u1EA1t \u0111\u1ED9ng\')">M\u1EDF kh\u00F3a</button>';
+                    h += '</td></tr>';
+                });
+                if (!data || !data.length) h = '<tr><td colspan="8" class="empty-state">Kh\u00F4ng c\u00F3 d\u1EEF li\u1EC7u</td></tr>';
+                var el = document.getElementById('tbl-customers'); if (el) el.innerHTML = h;
+            }).catch(function (e) { console.error('loadKhachHang:', e) });
+        }
+        function updateKH(id, tt) {
+            var fd = new FormData(); fd.append('maKhachHang', id); fd.append('trangThai', tt);
+            fetch('/Admin/CapNhatTrangThaiKhachHang', { method: 'POST', body: fd }).then(function () { loadKhachHang() });
+        }
+
+        // === DICH VU ===
+        function loadDichVu() {
+            fetch('/Admin/GetDichVu').then(function (r) { return r.json() }).then(function (data) {
+                var h = '';
+                (data || []).forEach(function (d) {
+                    h += '<tr><td>' + d.MaDichVu + '</td><td>' + (d.TenDichVu || '') + '</td><td>' + (d.TenDanhMuc || 'N/A') + '</td>';
+                    h += '<td>' + fmt(d.GiaTien) + '\u0111</td><td>' + (d.GioiHanTho || 0) + '</td>';
+                    h += '<td class="btn-group">';
+                    h += '<button class="btn btn-sm" onclick="editDV(' + d.MaDichVu + ',\'' + esc(d.TenDichVu) + '\',' + (d.GiaTien || 0) + ',' + (d.GioiHanTho || 0) + ',\'' + esc(d.MoTa) + '\',\'' + esc(d.LinkAnhDaiDien) + '\',' + (d.MaDanhMuc || 0) + ')">S\u1EEDa</button>';
+                    h += '<button class="btn btn-danger btn-sm" onclick="deleteDV(' + d.MaDichVu + ')">X\u00F3a</button>';
+                    h += '</td></tr>';
+                });
+                if (!data || !data.length) h = '<tr><td colspan="6" class="empty-state">Kh\u00F4ng c\u00F3 d\u1EEF li\u1EC7u</td></tr>';
+                var el = document.getElementById('tbl-services'); if (el) el.innerHTML = h;
+            }).catch(function (e) { console.error('loadDichVu:', e) });
+        }
+        function showAddDV() {
+            var e;
+            e = document.getElementById('dv-mode'); if (e) e.value = 'add';
+            e = document.getElementById('dv-id'); if (e) e.value = '';
+            e = document.getElementById('dv-ten'); if (e) e.value = '';
+            e = document.getElementById('dv-gia'); if (e) e.value = '';
+            e = document.getElementById('dv-slot'); if (e) e.value = '1';
+            e = document.getElementById('dv-mota'); if (e) e.value = '';
+            e = document.getElementById('dv-anh'); if (e) e.value = '';
+            e = document.getElementById('dv-danhmuc'); if (e) e.innerHTML = danhMucOptions('');
+            e = document.getElementById('modal-dv-title'); if (e) e.textContent = 'Th\u00EAm d\u1ECBch v\u1EE5';
+            showModal('modal-dv');
+        }
+        function editDV(id, ten, gia, slot, mota, anh, dm) {
+            var e;
+            e = document.getElementById('dv-mode'); if (e) e.value = 'edit';
+            e = document.getElementById('dv-id'); if (e) e.value = id;
+            e = document.getElementById('dv-ten'); if (e) e.value = ten;
+            e = document.getElementById('dv-gia'); if (e) e.value = gia;
+            e = document.getElementById('dv-slot'); if (e) e.value = slot;
+            e = document.getElementById('dv-mota'); if (e) e.value = mota;
+            e = document.getElementById('dv-anh'); if (e) e.value = anh;
+            e = document.getElementById('dv-danhmuc'); if (e) e.innerHTML = danhMucOptions(dm);
+            e = document.getElementById('modal-dv-title'); if (e) e.textContent = 'S\u1EEDa d\u1ECBch v\u1EE5';
+            showModal('modal-dv');
+        }
+        function submitDV() {
+            var tenEl = document.getElementById('dv-ten');
+            var ten = tenEl ? tenEl.value.trim() : '';
+            if (!ten) { alert('Vui l\u00F2ng nh\u1EADp t\u00EAn!'); return }
+            var modeEl = document.getElementById('dv-mode');
+            var mode = modeEl ? modeEl.value : 'add';
+            var fd = new FormData();
+            fd.append('tenDichVu', ten);
+            var g = document.getElementById('dv-gia'); fd.append('giaTien', g ? g.value : '0');
+            var s = document.getElementById('dv-slot'); fd.append('gioiHanTho', s ? s.value : '1');
+            var m = document.getElementById('dv-mota'); fd.append('moTa', m ? m.value : '');
+            var a = document.getElementById('dv-anh'); fd.append('linkAnh', a ? a.value : '');
+            var dm = document.getElementById('dv-danhmuc'); fd.append('maDanhMuc', dm ? dm.value : '0');
+            if (mode === 'edit') { var i = document.getElementById('dv-id'); fd.append('maDichVu', i ? i.value : '') }
+            var url = mode === 'add' ? '/Admin/ThemDichVu' : '/Admin/SuaDichVu';
+            fetch(url, { method: 'POST', body: fd }).then(function (r) { return r.json() }).then(function (res) {
+                if (res.success) { hideModal('modal-dv'); loadDichVu() } else { alert('L\u1ED7i!') }
+            }).catch(function () { alert('L\u1ED7i k\u1EBFt n\u1ED1i!') });
+        }
+        function deleteDV(id) {
+            if (!confirm('X\u00F3a d\u1ECBch v\u1EE5 n\u00E0y?')) return;
+            var fd = new FormData(); fd.append('maDichVu', id);
+            fetch('/Admin/XoaDichVu', { method: 'POST', body: fd }).then(function () { loadDichVu() });
+        }
+
+        // === PORTFOLIO ===
+        function loadPortfolio() {
+            fetch('/Admin/GetPortfolio').then(function (r) { return r.json() }).then(function (data) {
+                var h = '';
+                (data || []).forEach(function (p) {
+                    h += '<div class="portfolio-card"><img src="' + (p.LinkFileAnh || '') + '" alt="" onerror="this.src=\'https://placehold.co/400x300/f3f1ee/8c8578?text=No+Image\'">';
+                    h += '<div class="card-info"><h5>' + (p.TieuDe || 'Kh\u00F4ng ti\u00EAu \u0111\u1EC1') + '</h5><p>' + (p.TenDichVu || '') + '</p></div>';
+                    h += '<div class="card-actions">';
+                    h += '<button class="btn btn-sm" onclick="editPF(' + p.MaAnh + ',\'' + esc(p.TieuDe) + '\',' + (p.MaDichVu || 0) + ',\'' + (p.LinkFileAnh || '') + '\')">Sửa</button>';
+                    h += '<button class="btn btn-danger btn-sm" onclick="deletePF(' + p.MaAnh + ')">X\u00F3a</button>';
+                    h += '</div></div>';
+                });
+                if (!data || !data.length) h = '<div class="empty-state">Ch\u01B0a c\u00F3 portfolio</div>';
+                var el = document.getElementById('portfolio-grid'); if (el) el.innerHTML = h;
+            }).catch(function (e) { console.error('loadPortfolio:', e) });
+        }
+        function showAddPF() {
+            var e;
+            e = document.getElementById('pf-mode'); if (e) e.value = 'add';
+            e = document.getElementById('pf-id'); if (e) e.value = '';
+            e = document.getElementById('pf-tieude'); if (e) e.value = '';
+            e = document.getElementById('pf-file'); if (e) try { e.value = '' } catch (ex) { }
+
+            // Reset preview
+            var preview = document.getElementById('pf-preview');
+            var placeholder = document.getElementById('pf-placeholder');
+            if (preview) preview.style.display = 'none';
+            if (placeholder) placeholder.style.display = 'block';
+
+            loadDichVuDropdown('pf-dv', '');
+            e = document.getElementById('modal-pf-title'); if (e) e.textContent = 'Thêm ảnh Portfolio';
+            showModal('modal-pf');
+        }
+        function editPF(id, td, dv, imgUrl) {
+            var e;
+            e = document.getElementById('pf-mode'); if (e) e.value = 'edit';
+            e = document.getElementById('pf-id'); if (e) e.value = id;
+            e = document.getElementById('pf-tieude'); if (e) e.value = td;
+            e = document.getElementById('pf-file'); if (e) try { e.value = '' } catch (ex) { }
+
+            // Set preview if image exists
+            var preview = document.getElementById('pf-preview');
+            var placeholder = document.getElementById('pf-placeholder');
+            var previewImg = document.getElementById('pf-preview-img');
+            if (imgUrl && preview && placeholder && previewImg) {
+                preview.style.display = 'block';
+                placeholder.style.display = 'none';
+                previewImg.src = imgUrl;
+            }
+
+            loadDichVuDropdown('pf-dv', dv);
+            e = document.getElementById('modal-pf-title'); if (e) e.textContent = 'Sửa ảnh Portfolio';
+            showModal('modal-pf');
+        }
+        function loadDichVuDropdown(elId, selected) {
+            fetch('/Admin/GetDichVu').then(function (r) { return r.json() }).then(function (data) {
+                var h = '<option value="">-- Ch\u1ECDn d\u1ECBch v\u1EE5 --</option>';
+                (data || []).forEach(function (d) { h += '<option value="' + d.MaDichVu + '"' + (d.MaDichVu == selected ? ' selected' : '') + '>' + d.TenDichVu + '</option>' });
+                var el = document.getElementById(elId); if (el) el.innerHTML = h;
+            });
+        }
+        function submitPF() {
+            var tdEl = document.getElementById('pf-tieude');
+            var tieuDe = tdEl ? tdEl.value.trim() : '';
+            if (!tieuDe) { alert('Vui l\u00F2ng nh\u1EADp ti\u00EAu \u0111\u1EC1!'); return }
+            var modeEl = document.getElementById('pf-mode');
+            var mode = modeEl ? modeEl.value : 'add';
+            var fd = new FormData();
+            fd.append('tieuDe', tieuDe);
+            var dvEl = document.getElementById('pf-dv'); fd.append('maDichVu', dvEl ? dvEl.value : '0');
+            var fi = document.getElementById('pf-file');
+            if (fi && fi.files && fi.files.length > 0) fd.append('fileAnh', fi.files[0]);
+            if (mode === 'edit') { var idEl = document.getElementById('pf-id'); fd.append('maAnh', idEl ? idEl.value : '') }
+            var url = mode === 'add' ? '/Admin/ThemPortfolio' : '/Admin/SuaPortfolio';
+            fetch(url, { method: 'POST', body: fd }).then(function (r) { return r.json() }).then(function (res) {
+                if (res.success) { hideModal('modal-pf'); loadPortfolio() } else { alert('L\u1ED7i: ' + (res.message || '')) }
+            }).catch(function (e) { alert('L\u1ED7i k\u1EBFt n\u1ED1i: ' + e) });
+        }
+        function deletePF(id) {
+            if (!confirm('X\u00F3a \u1EA3nh portfolio n\u00E0y?')) return;
+            var fd = new FormData(); fd.append('maAnh', id);
+            fetch('/Admin/XoaPortfolio', { method: 'POST', body: fd }).then(function () { loadPortfolio() });
+        }
+
+        // === DICH VU BO SUNG ===
+        function loadDichVuBoSung() {
+            fetch('/Admin/GetDichVuBoSung').then(function (r) { return r.json() }).then(function (data) {
+                var h = '';
+                (data || []).forEach(function (d) {
+                    h += '<tr><td>' + d.MaDVBS + '</td><td>' + (d.TenDVBS || '') + '</td><td>' + (d.MoTa || '--') + '</td>';
+                    h += '<td>' + fmt(d.GiaTien) + '\u0111</td><td>' + (d.TenDichVu || 'N/A') + '</td>';
+                    h += '<td class="btn-group">';
+                    h += '<button class="btn btn-sm" onclick="editBS(' + d.MaDVBS + ',\'' + esc(d.TenDVBS) + '\',\'' + esc(d.MoTa) + '\',' + (d.GiaTien || 0) + ',' + (d.MaDichVu || 0) + ')">S\u1EEDa</button>';
+                    h += '<button class="btn btn-danger btn-sm" onclick="deleteBS(' + d.MaDVBS + ')">X\u00F3a</button>';
+                    h += '</td></tr>';
+                });
+                if (!data || !data.length) h = '<tr><td colspan="6" class="empty-state">Kh\u00F4ng c\u00F3 d\u1EEF li\u1EC7u</td></tr>';
+                var el = document.getElementById('tbl-addons'); if (el) el.innerHTML = h;
+            }).catch(function (e) { console.error('loadDichVuBoSung:', e) });
+        }
+        function showAddBS() {
+            var e;
+            e = document.getElementById('bs-mode'); if (e) e.value = 'add';
+            e = document.getElementById('bs-id'); if (e) e.value = '';
+            e = document.getElementById('bs-ten'); if (e) e.value = '';
+            e = document.getElementById('bs-mota'); if (e) e.value = '';
+            e = document.getElementById('bs-gia'); if (e) e.value = '';
+            loadDichVuDropdown('bs-dv', '');
+            e = document.getElementById('modal-bs-title'); if (e) e.textContent = 'Th\u00EAm d\u1ECBch v\u1EE5 b\u1ED5 sung';
+            showModal('modal-bs');
+        }
+        function editBS(id, ten, mota, gia, dv) {
+            var e;
+            e = document.getElementById('bs-mode'); if (e) e.value = 'edit';
+            e = document.getElementById('bs-id'); if (e) e.value = id;
+            e = document.getElementById('bs-ten'); if (e) e.value = ten;
+            e = document.getElementById('bs-mota'); if (e) e.value = mota;
+            e = document.getElementById('bs-gia'); if (e) e.value = gia;
+            loadDichVuDropdown('bs-dv', dv);
+            e = document.getElementById('modal-bs-title'); if (e) e.textContent = 'S\u1EEDa d\u1ECBch v\u1EE5 b\u1ED5 sung';
+            showModal('modal-bs');
+        }
+        function submitBS() {
+            var tenEl = document.getElementById('bs-ten');
+            var ten = tenEl ? tenEl.value.trim() : '';
+            if (!ten) { alert('Vui l\u00F2ng nh\u1EADp t\u00EAn!'); return }
+            var modeEl = document.getElementById('bs-mode');
+            var mode = modeEl ? modeEl.value : 'add';
+            var fd = new FormData();
+            fd.append('tenDVBS', ten);
+            var m = document.getElementById('bs-mota'); fd.append('moTa', m ? m.value : '');
+            var g = document.getElementById('bs-gia'); fd.append('giaTien', g ? g.value : '0');
+            var dv = document.getElementById('bs-dv'); fd.append('maDichVu', dv ? dv.value : '0');
+            if (mode === 'edit') { var i = document.getElementById('bs-id'); fd.append('maDVBS', i ? i.value : '') }
+            var url = mode === 'add' ? '/Admin/ThemDichVuBoSung' : '/Admin/SuaDichVuBoSung';
+            fetch(url, { method: 'POST', body: fd }).then(function (r) { return r.json() }).then(function (res) {
+                if (res.success) { hideModal('modal-bs'); loadDichVuBoSung() } else { alert('L\u1ED7i!') }
+            }).catch(function () { alert('L\u1ED7i k\u1EBFt n\u1ED1i!') });
+        }
+        function deleteBS(id) {
+            if (!confirm('X\u00F3a d\u1ECBch v\u1EE5 b\u1ED5 sung n\u00E0y?')) return;
+            var fd = new FormData(); fd.append('maDVBS', id);
+            fetch('/Admin/XoaDichVuBoSung', { method: 'POST', body: fd }).then(function () { loadDichVuBoSung() });
+        }
+
+        // === MODAL ===
+        function showModal(id) {
+            var el = document.getElementById(id);
+            if (el) { el.style.display = 'flex'; el.classList.add('show') }
+        }
+        function hideModal(id) {
+            var el = document.getElementById(id);
+            if (el) { el.style.display = 'none'; el.classList.remove('show') }
+        }
+        document.addEventListener('click', function (e) {
+            if (e.target && e.target.classList && e.target.classList.contains('modal-overlay')) {
+                e.target.style.display = 'none'; e.target.classList.remove('show');
+            }
+        });
+        // === PORTFOLIO PREVIEW & DRAG DROP ===
+        function previewPFImage(input) {
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+                reader.onload = function (e) {
+                    var preview = document.getElementById('pf-preview');
+                    var placeholder = document.getElementById('pf-placeholder');
+                    var previewImg = document.getElementById('pf-preview-img');
+                    if (preview && placeholder && previewImg) {
+                        preview.style.display = 'block';
+                        placeholder.style.display = 'none';
+                        previewImg.src = e.target.result;
+                    }
+                }
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        // Initialize Drag & Drop
+        document.addEventListener('DOMContentLoaded', function () {
+            var zone = document.getElementById('pf-upload-zone');
+            if (zone) {
+                ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                    zone.addEventListener(eventName, preventDefaults, false);
+                });
+                function preventDefaults(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                }
+                ['dragenter', 'dragover'].forEach(eventName => {
+                    zone.addEventListener(eventName, () => zone.classList.add('dragover'), false);
+                });
+                ['dragleave', 'drop'].forEach(eventName => {
+                    zone.addEventListener(eventName, () => zone.classList.remove('dragover'), false);
+                });
+                zone.addEventListener('drop', handleDrop, false);
+                function handleDrop(e) {
+                    var dt = e.dataTransfer;
+                    var files = dt.files;
+                    var input = document.getElementById('pf-file');
+                    if (input) {
+                        input.files = files;
+                        previewPFImage(input);
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>

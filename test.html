@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Fallback Geocoding</title>
+</head>
+<body>
+    <button id="btn" onclick="calc()">Calculate Free Route with Fallback</button>
+    <div id="result"></div>
+    <script>
+        const STUDIO_COORDS = { lat: 16.0544, lon: 108.2022 }; // Đà Nẵng
+        
+        async function geocodeWithFallback(soNha, phuong, quan, tinh) {
+            const queries = [
+                `${soNha}, ${phuong}, ${quan}, ${tinh}`,
+                `${phuong}, ${quan}, ${tinh}`,
+                `${quan}, ${tinh}`
+            ];
+            
+            for (let q of queries) {
+                console.log("Trying geocode: " + q);
+                const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(q)}&limit=1`;
+                try {
+                    const res = await fetch(url, { headers: { 'User-Agent': 'HamaStudioTestApp' } });
+                    const data = await res.json();
+                    if (data && data.length > 0) {
+                        console.log("Success with: " + q);
+                        return { lat: parseFloat(data[0].lat), lon: parseFloat(data[0].lon), matchType: q };
+                    }
+                } catch(e) {
+                    console.error("OSM failed for " + q, e);
+                }
+            }
+            throw new Error("Không thể định vị địa chỉ này ở bất kỳ cấp nào!");
+        }
+
+        async function calc() {
+            var btn = document.getElementById('btn');
+            btn.innerHTML = 'Calculating...';
+            document.getElementById('result').innerText = "";
+            
+            try {
+                const dest = await geocodeWithFallback("123 Nguyễn Văn Linh", "Phường Thạch Thang", "Quận Hải Châu", "Đà Nẵng");
+                
+                // Calculate route using free OSRM
+                const osrmUrl = `https://router.project-osrm.org/route/v1/driving/${STUDIO_COORDS.lon},${STUDIO_COORDS.lat};${dest.lon},${dest.lat}?overview=false`;
+                
+                const res = await fetch(osrmUrl);
+                const data = await res.json();
+                
+                if (data && data.routes && data.routes.length > 0) {
+                    const distanceMeters = data.routes[0].distance;
+                    const distanceKm = Math.round(distanceMeters / 1000);
+                    btn.innerHTML = 'Done';
+                    document.getElementById('result').innerText = `Tìm thấy tọa độ bằng mốc: "${dest.matchType}"\nKhoảng cách thực tế: ${distanceKm} km (OSRM routing)`;
+                } else {
+                    throw new Error("Không thể tìm đường đi bằng OSRM");
+                }
+            } catch (err) {
+                btn.innerHTML = 'Error';
+                document.getElementById('result').innerText = "Lỗi: " + err.message;
+            }
+        }
+    </script>
+</body>
+</html>
